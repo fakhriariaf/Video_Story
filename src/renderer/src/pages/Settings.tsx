@@ -16,7 +16,7 @@ import {
   SlidersHorizontal,
   Trash2
 } from 'lucide-react'
-import { HF_IMAGE_MODELS, HF_VIDEO_MODELS } from '@shared/media'
+import { HF_IMAGE_MODELS, HF_VIDEO_MODELS, IMAGE_MODELS, VIDEO_MODELS } from '@shared/media'
 import { LANGUAGES, LLM_PROVIDERS } from '@shared/models'
 import type { AccountStatus, ApiProvider, AppSettings, KeyStatus, KeyTestResult, LlmProvider, TtsProvider } from '@shared/types'
 import { ChatGptAccount } from '../components/ChatGptAccount'
@@ -30,6 +30,9 @@ import { Badge, Button, Field, IconButton, confirmDialog, cx, inputCls } from '.
 import { errorText, relativeTime } from '../lib/format'
 import { useModels } from '../lib/useModels'
 import { useApp } from '../store/app'
+
+const FAL_IMAGE_COUNT = IMAGE_MODELS.filter((m) => m.provider === 'fal').length
+const FAL_VIDEO_COUNT = VIDEO_MODELS.filter((m) => m.provider === 'fal').length
 
 type Tab = 'services' | 'general' | 'about'
 
@@ -576,23 +579,29 @@ function TtsSection({ settings, statusOf, onChanged, onSettings }: { settings: A
   )
 }
 
-function HiggsfieldSection({ status, onChanged }: { status?: KeyStatus; onChanged: () => void }) {
+function MediaSection({ statusOf, onChanged }: { statusOf: (p: ApiProvider) => KeyStatus | undefined; onChanged: () => void }) {
   return (
     <>
-      <SectionTitle icon={<ImageIcon className="size-5" />} title="Gambar dan video" sub="Higgsfield membuat gambar klip, lembar karakter, dan video AI." />
+      <SectionTitle
+        icon={<ImageIcon className="size-5" />}
+        title="Gambar dan video"
+        sub="Pilih penyedianya per proyek di langkah Ide cerita. Isi kunci untuk penyedia yang mau kamu pakai."
+      />
       <Card>
         <div className="flex items-center gap-3">
           <ProviderLogo id="higgsfield" />
           <div className="flex flex-1 flex-col">
             <span className="text-base font-bold">Higgsfield</span>
-            <span className="text-[13px] text-ink-2">GPT Image 2.5, Kling, Seedance, dan model lain dari akun Higgsfield kamu</span>
+            <span className="text-[13px] text-ink-2">
+              {HF_IMAGE_MODELS.length} model gambar dan {HF_VIDEO_MODELS.length} model video, dibayar dengan kredit Higgsfield
+            </span>
           </div>
-          <StatusBadge status={status} />
+          <StatusBadge status={statusOf('higgsfield')} />
         </div>
         <KeyForm
           provider="higgsfield"
           name="Higgsfield"
-          status={status}
+          status={statusOf('higgsfield')}
           placeholder="Tempel hasil tombol Copy API key"
           hint={
             <>
@@ -606,14 +615,56 @@ function HiggsfieldSection({ status, onChanged }: { status?: KeyStatus; onChange
           linkLabel="Buka console Higgsfield"
           onChanged={onChanged}
         />
-        <p className="flex items-start gap-2.5 border-t border-dashed border-line pt-4 text-[13px] leading-relaxed text-ink-2">
-          <Film className="mt-0.5 size-4 shrink-0" />
+      </Card>
+      <Card>
+        <div className="flex items-center gap-3">
+          <ProviderLogo id="fal" />
+          <div className="flex flex-1 flex-col">
+            <span className="text-base font-bold">fal.ai</span>
+            <span className="text-[13px] text-ink-2">
+              {FAL_IMAGE_COUNT} model gambar dan {FAL_VIDEO_COUNT} model video (Nano Banana, Flux, Seedream, Kling, Seedance, Wan, dan lainnya), dibayar dengan
+              saldo fal.ai
+            </span>
+          </div>
+          <StatusBadge status={statusOf('fal')} />
+        </div>
+        <KeyForm
+          provider="fal"
+          name="fal.ai"
+          status={statusOf('fal')}
+          placeholder="Tempel kunci fal.ai"
+          help="Kunci dicek lewat daftar harga, tanpa memakai saldo."
+          link="https://fal.ai/dashboard/keys"
+          linkLabel="Buka fal.ai"
+          onChanged={onChanged}
+        />
+      </Card>
+      <Card>
+        <div className="flex items-center gap-3">
+          <ProviderLogo id="gemini" />
+          <div className="flex flex-1 flex-col">
+            <span className="text-base font-bold">Google Gemini</span>
+            <span className="text-[13px] text-ink-2">Nano Banana untuk gambar dan Gemini Omni Flash untuk video</span>
+          </div>
+          <StatusBadge status={statusOf('gemini')} />
+        </div>
+        <p className="flex items-start gap-2.5 text-[13px] leading-relaxed text-ink-2">
+          <Info className="mt-0.5 size-4 shrink-0" />
           <span>
-            Semua {HF_IMAGE_MODELS.length} model gambar dan {HF_VIDEO_MODELS.length} model video Higgsfield bisa dipakai. Modelnya dipilih per proyek
-            di langkah <strong className="text-ink">Ide cerita</strong>, bagian Model AI.
+            Memakai kunci Gemini yang sama dengan Suara narator di atas. Gambar dan video Gemini tidak termasuk kuota gratis, jadi aktifkan billing di{' '}
+            <a className="font-medium text-ink underline" href="https://aistudio.google.com/" target="_blank" rel="noreferrer">
+              Google AI Studio
+            </a>{' '}
+            dulu.
           </span>
         </p>
       </Card>
+      <p className="flex items-start gap-2.5 text-[13px] leading-relaxed text-ink-2">
+        <Film className="mt-0.5 size-4 shrink-0" />
+        <span>
+          Model gambar dan video dipilih per proyek di langkah <strong className="text-ink">Ide cerita</strong>, bagian Model AI.
+        </span>
+      </p>
     </>
   )
 }
@@ -697,7 +748,7 @@ export function Settings() {
                   onSettings={setSettings}
                 />
                 <TtsSection settings={settings} statusOf={statusOf} onChanged={reload} onSettings={setSettings} />
-                <HiggsfieldSection status={statusOf('higgsfield')} onChanged={reload} />
+                <MediaSection statusOf={statusOf} onChanged={reload} />
                 <WhisperSection settings={settings} onSettings={setSettings} />
               </>
             )}

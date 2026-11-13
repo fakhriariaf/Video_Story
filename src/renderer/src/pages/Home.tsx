@@ -99,7 +99,8 @@ export function Home() {
       return !!k?.configured && k.lastOk !== false
     }
     const issues: { what: string; blocks: string }[] = []
-    if (!ok('higgsfield')) issues.push({ what: 'kunci Higgsfield', blocks: 'gambar' })
+    // Images need any one image provider; new projects start on a provider that has a key.
+    if (!ok('higgsfield') && !ok('fal') && !ok('gemini')) issues.push({ what: 'kunci Higgsfield, fal.ai, atau Gemini', blocks: 'gambar' })
     const llm = appSettings.llmProvider
     if (llm === 'chatgpt') {
       // ChatGPT is connected by signing in, and only counts once plan usage was allowed.
