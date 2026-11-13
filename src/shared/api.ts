@@ -1,5 +1,7 @@
 import type {
+  AccountStatus,
   ApiProvider,
+  AuthProvider,
   AspectRatio,
   AppSettings,
   Asset,
@@ -83,7 +85,17 @@ export interface StudioApi {
     /** The full stored key, only for the "show key" button. */
     revealKey(provider: ApiProvider): Promise<string | null>
     testKey(provider: ApiProvider): Promise<KeyTestResult>
+    /** Signs in on openrouter.ai in the browser; the key it hands back is saved and tested like a pasted one. */
+    loginOpenRouter(): Promise<KeyTestResult>
     voices(provider: TtsProvider): Promise<VoiceOption[]>
+  }
+  auth: {
+    status(): Promise<AccountStatus[]>
+    /** Opens the provider's sign-in page in the browser and waits for the user to finish. */
+    login(provider: AuthProvider): Promise<AccountStatus>
+    logout(provider: AuthProvider): Promise<{ revoked: boolean }>
+    /** Stops waiting for a sign-in that was started. */
+    cancel(): Promise<void>
   }
   models: {
     /** Live model list from the provider. Served from cache unless `refresh` is set or the cache is stale. */
@@ -113,6 +125,7 @@ export interface StudioApi {
     clip(cb: (e: ClipPatchEvent) => void): () => void
     character(cb: (e: CharacterPatchEvent) => void): () => void
     asset(cb: (asset: Asset) => void): () => void
+    auth(cb: (status: AccountStatus) => void): () => void
   }
 }
 
@@ -121,5 +134,6 @@ export const EVENTS = {
   clip: 'event:clip',
   character: 'event:character',
   asset: 'event:asset',
-  whisper: 'event:whisper'
+  whisper: 'event:whisper',
+  auth: 'event:auth'
 } as const

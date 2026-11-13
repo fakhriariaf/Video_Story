@@ -23,6 +23,13 @@ export const LLM_PROVIDERS: { id: LlmProvider; name: string; note: string; link:
     linkLabel: 'Buat kunci di console Groq'
   },
   {
+    id: 'chatgpt',
+    name: 'ChatGPT (langganan)',
+    note: 'Login dengan akun ChatGPT, memakai kuota paketmu',
+    link: 'https://chatgpt.com/settings/usage',
+    linkLabel: 'Kelola pemakaian'
+  },
+  {
     id: 'custom',
     name: 'Endpoint custom',
     note: 'Server apa pun yang kompatibel dengan OpenAI API, misalnya Ollama, LM Studio, vLLM, DeepSeek, atau xAI Grok.',

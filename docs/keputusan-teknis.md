@@ -82,6 +82,17 @@ dan audio dimatikan lewat parameter kalau modelnya punya. Audio dari file video 
 Kunci kriptografi `safeStorage` baru tertulis ke `Local State` sekitar 10 detik setelah dibuat. Membuatnya saat
 startup (`warmUpEncryption`) mencegah kunci API tidak terbaca setelah aplikasi ditutup paksa.
 
+### Login akun hanya lewat jalur resmi
+Login memakai program yang memang dibuka untuk aplikasi pihak ketiga: "Sign in with ChatGPT" untuk aplikasi
+open-source lokal (registrasi dinamis atas nama Video Story) dan OAuth PKCE OpenRouter. Client ID milik aplikasi lain
+(Codex CLI, Gemini CLI, Claude Code) **tidak boleh** dipakai: itu menyamar sebagai aplikasi lain, melanggar ketentuan
+penyedia, dan bisa membuat akun pengguna diblokir. Karena itu Gemini tetap API key.
+
+### Refresh token dibuat serial
+Refresh token ChatGPT berotasi. Dua refresh bersamaan dengan token yang sama membuat salah satunya ditolak
+(`refresh_token_reused`) dan sesi berakhir. `singleFlight` memastikan hanya satu refresh berjalan per penyedia, dan
+refresh membaca ulang token dari database sebelum mengirim permintaan.
+
 ### YouTube embed butuh Referer berisi ID aplikasi (kalau dipakai lagi)
 Halaman About tidak lagi memutar video YouTube. Kalau embed ditambahkan lagi: halaman dari `file://` tidak
 mengirim Referer, dan YouTube menolak embed tanpa identitas (Error 153). Tambahkan header Referer berisi ID

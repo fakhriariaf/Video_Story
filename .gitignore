@@ -10,3 +10,4 @@ dist
 .DS_Store
 .env
 .claude/settings.local.json
+.test-build/

@@ -138,11 +138,12 @@ Setiap bagian (penyusun cerita, suara narator) punya satu dropdown penyedia. Han
 | Layanan | Dipakai untuk | Wajib |
 |---|---|---|
 | [Higgsfield](https://higgsfield.ai) (satu kunci dari tombol **Copy API key**, format `KEY_ID:KEY_SECRET`) | Gambar, lembar karakter, video AI | Ya |
-| Penyusun cerita, pilih satu: Google Gemini, OpenRouter, Groq, atau endpoint custom yang kompatibel dengan OpenAI | Naskah, rencana visual, pemeran | Ya, salah satu |
+| Penyusun cerita, pilih satu: **ChatGPT (langganan, login akun)**, Google Gemini, OpenRouter (API key atau **Login dengan OpenRouter**), Groq, atau endpoint custom yang kompatibel dengan OpenAI | Naskah, rencana visual, pemeran | Ya, salah satu |
 | Google Gemini | Suara narator Gemini TTS | Kalau memakai Gemini TTS |
 | ElevenLabs | Suara narator dengan waktu per kata yang presisi | Opsional |
 
-- **Daftar model penyusun cerita** diambil langsung dari penyedia setelah kuncinya disimpan, lalu dipilih lewat dropdown yang bisa dicari.
+- **ChatGPT (langganan)**: klik **Continue with ChatGPT** lalu login di browser. Penyusunan cerita memakai kuota paket ChatGPT-mu, tanpa API key. Pemakaian bisa dipantau di [pengaturan ChatGPT](https://chatgpt.com/settings/usage).
+- **Daftar model penyusun cerita** diambil langsung dari penyedia setelah kuncinya disimpan atau setelah login, lalu dipilih lewat dropdown yang bisa dicari.
 - **Endpoint custom** menerima server apa pun yang kompatibel dengan OpenAI API, misalnya:
   - Ollama (`http://localhost:11434/v1`);
   - LM Studio, vLLM, atau DeepSeek;

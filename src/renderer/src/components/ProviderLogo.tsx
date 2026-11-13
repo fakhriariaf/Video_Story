@@ -2,13 +2,13 @@ import { Server } from 'lucide-react'
 import { cx } from './ui'
 
 /**
- * Brand marks of the services the app connects to. Gemini, OpenRouter, Groq and ElevenLabs come from
+ * Brand marks of the services the app connects to. Gemini, OpenRouter, Groq, ElevenLabs and OpenAI come from
  * LobeHub Icons (MIT); the Higgsfield mark is its official app icon. Logos belong to their owners.
  */
 const FILES = import.meta.glob('../assets/providers/*.{svg,png}', { eager: true, import: 'default' }) as Record<string, string>
 const file = (name: string): string => FILES[`../assets/providers/${name}`]
 
-export type ProviderLogoId = 'gemini' | 'openrouter' | 'groq' | 'elevenlabs' | 'higgsfield' | 'custom'
+export type ProviderLogoId = 'gemini' | 'openrouter' | 'groq' | 'elevenlabs' | 'higgsfield' | 'custom' | 'chatgpt'
 
 const LOOK: Record<ProviderLogoId, { bg: string; src?: string; inset: number }> = {
   gemini: { bg: '#FFFFFF', src: 'gemini.svg', inset: 0.2 },
@@ -16,7 +16,8 @@ const LOOK: Record<ProviderLogoId, { bg: string; src?: string; inset: number }> 
   groq: { bg: '#F55036', src: 'groq.svg', inset: 0.2 },
   elevenlabs: { bg: '#000000', src: 'elevenlabs.svg', inset: 0.28 },
   higgsfield: { bg: '#D1FE17', src: 'higgsfield.png', inset: 0 },
-  custom: { bg: '#F3EFE8', inset: 0.24 }
+  custom: { bg: '#F3EFE8', inset: 0.24 },
+  chatgpt: { bg: '#FFFFFF', src: 'openai.svg', inset: 0.2 }
 }
 
 export function ProviderLogo({ id, size = 40, className }: { id: ProviderLogoId; size?: number; className?: string }) {

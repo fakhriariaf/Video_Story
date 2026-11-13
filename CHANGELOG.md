@@ -8,6 +8,13 @@ Cara menaikkan versi ada di [docs/pengembangan.md](docs/pengembangan.md#versi-da
 
 ## [Belum dirilis]
 
+### Ditambahkan
+- Penyusun cerita **ChatGPT (langganan)**: login dengan akun ChatGPT lewat "Sign in with ChatGPT", tanpa API key.
+  Penyusunan cerita memakai kuota paket ChatGPT.
+- Tombol **Login dengan OpenRouter**: kunci OpenRouter dibuat otomatis lewat login di browser.
+- Modul login akun bersama (`src/main/oauth/`) dengan penyimpanan token terenkripsi dan refresh otomatis.
+- Unit test untuk modul tanpa Electron: `npm test`.
+
 ## [1.0.0] - 2026-10-02
 
 Rilis pertama Video Story.

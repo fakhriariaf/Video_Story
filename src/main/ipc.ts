@@ -3,6 +3,8 @@ import { copyFileSync, mkdirSync } from 'node:fs'
 import { basename, dirname, extname, join } from 'node:path'
 import { app, BrowserWindow, clipboard, dialog, ipcMain, shell } from 'electron'
 import type {
+  AccountStatus,
+  AuthProvider,
   ApiProvider,
   AppSettings,
   AspectRatio,
@@ -46,6 +48,9 @@ import {
   saveSnapshot,
   updateAssetMeta
 } from './repo'
+import { cancelChatGptLogin, loginChatGpt, logoutChatGpt } from './oauth/chatgpt'
+import { cancelOpenRouterLogin, loginOpenRouter } from './oauth/openrouter'
+import { accountStatus } from './oauth/store'
 import { clearSecret, keyStatuses, recordCheck, revealSecret, setSecret } from './secrets'
 import { dropCache, getSettings, setSettings } from './settings'
 import { probeDurationMs, probeSize } from './services/audio'
@@ -212,6 +217,28 @@ export function registerIpc(): void {
     if (provider === 'custom') setSettings({ customBaseUrl: '' })
   })
   handle('models:list', (source: ModelSource, refresh?: boolean) => llm.listModels(source, !!refresh))
+
+  handle('auth:status', (): AccountStatus[] => [accountStatus('chatgpt')])
+  handle('auth:login', (provider: AuthProvider) => {
+    if (provider !== 'chatgpt') throw new Error(`Login ${String(provider)} belum tersedia.`)
+    return loginChatGpt()
+  })
+  handle('auth:logout', (provider: AuthProvider) => {
+    if (provider !== 'chatgpt') throw new Error(`Login ${String(provider)} belum tersedia.`)
+    return logoutChatGpt()
+  })
+  handle('auth:cancel', () => {
+    cancelChatGptLogin()
+    cancelOpenRouterLogin()
+  })
+  handle('settings:loginOpenRouter', async () => {
+    const key = await loginOpenRouter()
+    setSecret('openrouter', key)
+    dropCache('models:openrouter')
+    const result = await testProvider('openrouter', key)
+    recordCheck('openrouter', result.ok, result.message)
+    return result
+  })
   handle('settings:testKey', async (provider: ApiProvider) => {
     const result = await testProvider(provider).catch((e): KeyTestResult => ({ ok: false, message: (e as Error).message }))
     recordCheck(provider, result.ok, result.message)

@@ -1,6 +1,8 @@
+import { llmName } from '@shared/models'
 import type { KeyTestResult, LlmProvider, ModelList, ModelOption, ModelSource } from '@shared/types'
 import { getSecret, PROVIDER_NAMES } from '../secrets'
 import { getSettings, readCache, writeCache } from '../settings'
+import * as chatgpt from './chatgpt'
 import * as eleven from './elevenlabs'
 import * as gemini from './gemini'
 import { readError } from './http'
@@ -9,7 +11,7 @@ import { extractJson } from './json'
 const STALE_MS = 24 * 60 * 60 * 1000
 const GENERATE_TIMEOUT_MS = 4 * 60 * 1000
 
-type CompatProvider = Exclude<LlmProvider, 'gemini'>
+type CompatProvider = Exclude<LlmProvider, 'gemini' | 'chatgpt'>
 
 interface Compat {
   provider: CompatProvider
@@ -167,6 +169,8 @@ async function fetchModels(source: ModelSource): Promise<ModelOption[]> {
       return groqModels()
     case 'custom':
       return customModels()
+    case 'chatgpt':
+      return chatgpt.listModels()
   }
 }
 
@@ -185,7 +189,7 @@ export async function listModels(source: ModelSource, refresh = false): Promise<
 
 // ---------- key checks ----------
 
-export async function testLlm(provider: LlmProvider, key?: string | null, baseUrl?: string): Promise<KeyTestResult> {
+export async function testLlm(provider: Exclude<LlmProvider, 'chatgpt'>, key?: string | null, baseUrl?: string): Promise<KeyTestResult> {
   if (provider === 'gemini') return gemini.testKey(key ?? undefined)
   try {
     const c = compat(provider, key, baseUrl)
@@ -303,7 +307,8 @@ export function activeLlm(): ActiveLlm {
 /** Generates a JSON object that follows `schema` with whichever LLM the user made active. */
 export async function generateJson<T>(req: { system: string; prompt: string; schema: object; name: string; signal?: AbortSignal }): Promise<T> {
   const { provider, model } = activeLlm()
-  if (!model) throw new LlmError(`Pilih model ${PROVIDER_NAMES[provider]} dulu di Pengaturan › Kunci API dan model.`)
+  if (!model) throw new LlmError(`Pilih model ${llmName(provider)} dulu di Pengaturan › Layanan AI dan kunci.`)
   if (provider === 'gemini') return (await gemini.generateJson(model, req.system, req.prompt, req.schema)) as T
+  if (provider === 'chatgpt') return (await chatgpt.generateJson(model, req.system, req.prompt, req.schema, req.name, req.signal)) as T
   return (await chatJson(compat(provider), model, req.system, req.prompt, req.schema, req.name, req.signal)) as T
 }

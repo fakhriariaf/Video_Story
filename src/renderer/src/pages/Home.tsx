@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { AlertTriangle, ArrowRight, Copy, FolderOpen, MoreHorizontal, Plus, Search, SlidersHorizontal, Trash2 } from 'lucide-react'
 import { DURATIONS, LANGUAGES, llmName } from '@shared/models'
 import { getStyle } from '@shared/styles'
-import type { ApiProvider, AppSettings, AspectRatio, KeyStatus, ProjectStatus, ProjectSummary, TtsProvider } from '@shared/types'
+import type { AccountStatus, ApiProvider, AppSettings, AspectRatio, KeyStatus, ProjectStatus, ProjectSummary, TtsProvider } from '@shared/types'
 import { Logo } from '../components/Logo'
 import { Select, type SelectOption } from '../components/Select'
 import { StyleSwatch } from '../components/StyleArt'
@@ -47,6 +47,7 @@ export function Home() {
   const { go, toast } = useApp()
   const [projects, setProjects] = useState<ProjectSummary[] | null>(null)
   const [keys, setKeys] = useState<KeyStatus[]>([])
+  const [accounts, setAccounts] = useState<AccountStatus[]>([])
   const [appSettings, setAppSettings] = useState<AppSettings | null>(null)
   const [filter, setFilter] = useState<(typeof FILTERS)[number]['id']>('all')
   const [query, setQuery] = useState('')
@@ -68,11 +69,13 @@ export function Home() {
   useEffect(() => {
     refresh()
     void window.api.settings.keys().then(setKeys)
+    void window.api.auth.status().then(setAccounts)
     void window.api.settings.get().then((s) => {
       setAppSettings(s)
       setTts(s.defaultTtsProvider)
       setLanguage(s.defaultLanguage)
     })
+    return window.api.on.auth((s) => setAccounts((list) => [...list.filter((a) => a.provider !== s.provider), s]))
   }, [])
 
   // Start on a narrator service that has a working key.
@@ -98,13 +101,18 @@ export function Home() {
     const issues: { what: string; blocks: string }[] = []
     if (!ok('higgsfield')) issues.push({ what: 'kunci Higgsfield', blocks: 'gambar' })
     const llm = appSettings.llmProvider
-    if (!ok(llm)) issues.push({ what: `kunci ${llmName(llm)}`, blocks: 'cerita' })
+    if (llm === 'chatgpt') {
+      // ChatGPT is connected by signing in, and only counts once plan usage was allowed.
+      const a = accounts.find((x) => x.provider === 'chatgpt')
+      if (!a?.signedIn || a.needsReauth || a.planUsageAllowed === false) issues.push({ what: 'login ChatGPT', blocks: 'cerita' })
+      else if (!appSettings.llmModels[llm]) issues.push({ what: `model ${llmName(llm)}`, blocks: 'cerita' })
+    } else if (!ok(llm)) issues.push({ what: `kunci ${llmName(llm)}`, blocks: 'cerita' })
     else if (!appSettings.llmModels[llm]) issues.push({ what: `model ${llmName(llm)}`, blocks: 'cerita' })
     // Narration needs just one working voice service; every project can pick either one.
     const tts = ttsReadiness(keys)
     if (!tts.gemini.ok && !tts.elevenlabs.ok) issues.push({ what: 'kunci Gemini atau ElevenLabs', blocks: 'suara narator' })
     return issues
-  }, [keys, appSettings])
+  }, [keys, accounts, appSettings])
 
   const visible = useMemo(() => {
     const f = FILTERS.find((x) => x.id === filter)!

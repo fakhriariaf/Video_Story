@@ -33,6 +33,49 @@ Pengguna memasukkan kuncinya sendiri di **Pengaturan › Layanan AI dan kunci**.
 - `listModels(source)`: daftar model live dari penyedia, dicache di tabel `cache` dan disegarkan saat basi.
 - **Menambah penyedia LLM baru** yang kompatibel OpenAI: tambahkan ke `LlmProvider` dan `ApiProvider`
   (`types.ts`), `LLM_PROVIDERS` (`shared/models.ts`), konfigurasi base URL di `llm.ts`, dan `DEFAULT_SETTINGS.llmModels`.
+- ChatGPT (langganan) memakai `services/chatgpt.ts`, bukan `/chat/completions`. Lihat bagian Login akun.
+
+## Login akun (`src/main/oauth/`)
+
+Selain API key, sebagian layanan bisa dihubungkan dengan login akun (OAuth). Desainnya ada di
+[superpowers/specs/2026-11-13-login-akun-layanan-ai-design.md](superpowers/specs/2026-11-13-login-akun-layanan-ai-design.md).
+
+- **Alur bersama**: `startLoopback()` membuka server sementara di `http://127.0.0.1:<port acak>/auth/callback`
+  (OpenAI menolak `localhost`), lalu browser dibuka dengan `shell.openExternal`. PKCE S256, `state`, dan `nonce` baru
+  untuk setiap percobaan. Listener berhenti setelah satu callback, setelah 5 menit, atau saat dibatalkan
+  (`auth:cancel`). Klik login kedua membatalkan yang pertama.
+- **Penyimpanan**: tabel `oauth_accounts` (satu baris per penyedia). Token disimpan sebagai JSON terenkripsi
+  `safeStorage`. Client ID hasil registrasi **tidak dihapus** saat keluar, supaya login berikutnya memakai client yang
+  sama. ID host (`ext_agent_host_id`) berupa `urn:uuid:…` dan tersimpan di tabel `settings` dengan key `oauthHostId`.
+- **Refresh**: dilakukan sekitar 5 menit sebelum access token kedaluwarsa, lewat `singleFlight` (satu refresh per
+  penyedia, karena refresh token berotasi). Error permanen (`invalid_grant`, `refresh_token_*`) menghapus token dan
+  menandai `needs_reauth`. Error jaringan atau 5xx tidak menghapus apa pun.
+- **Token tidak pernah** dicetak ke log atau pesan error. Pesan error token hanya memuat kode error OAuth.
+
+### ChatGPT (langganan) — `oauth/chatgpt.ts`, `services/chatgpt.ts`
+
+Program resmi "Sign in with ChatGPT / ChatGPT plan usage" untuk aplikasi open-source lokal
+([dokumentasi](https://developers.openai.com/siwc/token-sharing-open-source)).
+
+- Authorize `https://auth.openai.com/api/accounts/authorize`, dengan `client_id=dynamic_agent_client` saat login
+  pertama dan client hasil registrasi (`oaiapp_…`, dari parameter callback `client_id`) setelahnya. Scope:
+  `openid profile email offline_access resource.invoke chatgpt.tokens.use.direct`, resource `https://api.openai.com/v1`.
+- Tukar kode dan refresh: `https://auth.openai.com/api/accounts/oauth/token` (form-encoded, tanpa secret). ID token
+  dicek dengan JWKS dari `/.well-known/openid-configuration` (issuer, audience = client ID, `nonce`, `exp`).
+- Tanpa scope `chatgpt.tokens.use.direct`, akun tetap tersimpan tapi penyusunan cerita ditolak sebelum memanggil API.
+- Inferensi: `POST https://api.openai.com/v1/responses` dengan `store:false`, `stream:true`, `instructions`, dan
+  `input` array. `temperature`, `max_output_tokens`, dan pesan system ditolak oleh rute ini. Format dicoba
+  `json_schema` dulu, lalu JSON lewat instruksi biasa. Error `*_unavailable`/503 dicoba ulang 2 kali (2 dan 4 detik).
+- Daftar model: `GET https://api.openai.com/v1/models`, ambil yang `visibility == "list"`.
+- Keluar: revoke refresh token ke `revocation_endpoint`, lalu token lokal selalu dihapus.
+- UI mengikuti pedoman OpenAI: tombol **Continue with ChatGPT**, tautan **Kelola pemakaian**
+  (`https://chatgpt.com/settings/usage`), dan modal sekali "Kamu memakai paket ChatGPT" (`chatgptWelcomeSeen`).
+
+### OpenRouter — `oauth/openrouter.ts`
+
+`https://openrouter.ai/auth?callback_url=…&code_challenge=…&code_challenge_method=S256&state=…`, lalu
+`POST https://openrouter.ai/api/v1/auth/keys`. Hasilnya API key biasa yang disimpan dan dites lewat
+`settings:loginOpenRouter`, sama seperti kunci yang ditempel.
 
 ## TTS
 

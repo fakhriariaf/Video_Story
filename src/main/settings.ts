@@ -7,13 +7,14 @@ export const DEFAULT_SETTINGS: AppSettings = {
   defaultLanguage: 'id',
   exportFolder: null,
   llmProvider: 'gemini',
-  llmModels: { gemini: 'gemini-3.8-flash', openrouter: '', groq: '', custom: '' },
+  llmModels: { gemini: 'gemini-3.8-flash', openrouter: '', groq: '', custom: '', chatgpt: '' },
   customBaseUrl: '',
   geminiTtsModel: 'gemini-3.8-flash-tts',
   elevenModel: 'eleven_multilingual_v2',
   imageModel: DEFAULT_IMAGE_MODEL,
   videoModel: DEFAULT_VIDEO_MODEL,
-  whisperAuto: true
+  whisperAuto: true,
+  chatgptWelcomeSeen: false
 }
 
 export function getSettings(): AppSettings {

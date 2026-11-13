@@ -133,6 +133,18 @@ const MIGRATIONS: string[] = [
   ALTER TABLE clips ADD COLUMN voice_in_ms INTEGER NOT NULL DEFAULT 0;
   ALTER TABLE clips ADD COLUMN voice_out_ms INTEGER;
   ALTER TABLE clips ADD COLUMN voice_start_ms INTEGER NOT NULL DEFAULT 0;
+  `,
+  // Account sign-ins (OAuth). The registered client id survives sign-out so the next sign-in reuses it.
+  `
+  CREATE TABLE oauth_accounts (
+    provider TEXT PRIMARY KEY,
+    client_id TEXT,
+    tokens BLOB,
+    label TEXT,
+    needs_reauth INTEGER NOT NULL DEFAULT 0,
+    plan_usage INTEGER,
+    updated_at INTEGER NOT NULL
+  );
   `
 ]
 
