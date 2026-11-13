@@ -75,7 +75,7 @@ Semua data pengguna ada di folder data aplikasi (`app.getPath('userData')`). Di 
 
 ```
 %APPDATA%\Video Story\
-  studio.db                 SQLite: proyek, klip, pemeran, aset, job, pengaturan, kunci terenkripsi, cache
+  studio.db                 SQLite: proyek, klip, pemeran, aset, job, pengaturan, kunci dan sesi login terenkripsi, cache
   projects\<id-proyek>\
     images\  videos\  audio\  music\  overlays\     file hasil generate dan unggahan
   models\whisper\ggml-small.bin                     model Whisper (diunduh dari Pengaturan)
@@ -112,6 +112,9 @@ sebelum IPC yang membaca klip dari database (generate, split, ekspor), supaya ma
   hanya untuk URL https (`setWindowOpenHandler` → `shell.openExternal`).
 - **Kunci API** dienkripsi dengan Electron `safeStorage` (DPAPI di Windows, terikat akun pengguna) di tabel
   `secrets`. Lihat [layanan-ai.md](layanan-ai.md#kunci-api-byok).
+- **Login akun** (OAuth, `src/main/oauth/`): token terenkripsi `safeStorage` di tabel `oauth_accounts`; callback hanya
+  di `127.0.0.1` dengan port acak dan berhenti setelah satu callback. Lihat
+  [layanan-ai.md](layanan-ai.md#login-akun-srcmainoauth).
 
 ## Switch Chromium
 

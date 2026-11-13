@@ -18,7 +18,8 @@ import {
 } from 'lucide-react'
 import { HF_IMAGE_MODELS, HF_VIDEO_MODELS } from '@shared/higgsfield'
 import { LANGUAGES, LLM_PROVIDERS } from '@shared/models'
-import type { ApiProvider, AppSettings, KeyStatus, KeyTestResult, LlmProvider, TtsProvider } from '@shared/types'
+import type { AccountStatus, ApiProvider, AppSettings, KeyStatus, KeyTestResult, LlmProvider, TtsProvider } from '@shared/types'
+import { ChatGptAccount } from '../components/ChatGptAccount'
 import { Logo } from '../components/Logo'
 import { ModelPicker } from '../components/ModelPicker'
 import { ProviderLogo, type ProviderLogoId } from '../components/ProviderLogo'
@@ -37,10 +38,22 @@ interface ProviderOption<T extends string> {
   name: string
   note: string
   logo: ProviderLogoId
-  status?: KeyStatus
+  /** A saved API key, or an account sign-in for services connected by login. */
+  status?: KeyStatus | AccountStatus
 }
 
-function StatusBadge({ status }: { status?: KeyStatus }) {
+function StatusBadge({ status }: { status?: KeyStatus | AccountStatus }) {
+  if (status && 'signedIn' in status) {
+    if (status.needsReauth) return <Badge tone="bad">Perlu login ulang</Badge>
+    if (!status.signedIn) return <Badge tone="draft">Belum login</Badge>
+    if (status.planUsageAllowed === false) return <Badge tone="bad">Izin paket belum ada</Badge>
+    return (
+      <Badge tone="ok">
+        <Check className="size-3" strokeWidth={3} />
+        Masuk
+      </Badge>
+    )
+  }
   if (!status?.configured) return <Badge tone="draft">Belum diatur</Badge>
   if (status.lastOk === false) return <Badge tone="bad">Gagal terhubung</Badge>
   if (status.lastOk)
@@ -162,7 +175,7 @@ function KeyForm({
   const [url, setUrl] = useState(customUrl ?? '')
   const [revealed, setRevealed] = useState<string | null>(null)
   const [showTyped, setShowTyped] = useState(false)
-  const [busy, setBusy] = useState<'save' | 'test' | null>(null)
+  const [busy, setBusy] = useState<'save' | 'test' | 'login' | null>(null)
 
   // A newly saved or removed key puts the field back in its resting state.
   useEffect(() => {
@@ -187,6 +200,22 @@ function KeyForm({
     setBusy('save')
     try {
       const r = isCustom ? await window.api.settings.setCustom(url, key) : await window.api.settings.setKey(provider, key)
+      toast(r.ok ? 'success' : 'error', `${name}: ${r.message}`)
+      setKey('')
+      setEditing(false)
+      onChanged()
+      onSaved?.(r)
+    } catch (e) {
+      toast('error', errorText(e))
+    } finally {
+      setBusy(null)
+    }
+  }
+
+  const loginOpenRouter = async (): Promise<void> => {
+    setBusy('login')
+    try {
+      const r = await window.api.settings.loginOpenRouter()
       toast(r.ok ? 'success' : 'error', `${name}: ${r.message}`)
       setKey('')
       setEditing(false)
@@ -322,6 +351,19 @@ function KeyForm({
           </>
         )}
       </div>
+      {provider === 'openrouter' && !showStored && (
+        <div className="-mt-1 flex items-center gap-2 text-[13px] text-ink-2">
+          <span>Atau tanpa menyalin kunci:</span>
+          <Button className="h-9" loading={busy === 'login'} disabled={!!busy && busy !== 'login'} onClick={() => void loginOpenRouter()}>
+            {busy === 'login' ? 'Menunggu login di browser…' : 'Login dengan OpenRouter'}
+          </Button>
+          {busy === 'login' && (
+            <Button variant="ghost" className="h-9" onClick={() => void window.api.auth.cancel()}>
+              Batal
+            </Button>
+          )}
+        </div>
+      )}
       {unsaved && <p className="-mt-1 text-[13px] font-semibold text-accent-dark">Kunci belum tersimpan. Tekan Enter atau klik Simpan dan tes.</p>}
       {hint && <p className="-mt-1 text-[13px] text-ink-2">{hint}</p>}
       <div className="flex items-center gap-2 text-[13px] text-ink-2">
@@ -361,14 +403,30 @@ function SectionTitle({ icon, title, sub }: { icon: ReactNode; title: string; su
   )
 }
 
-function LlmSection({ settings, statusOf, onChanged, onSettings }: { settings: AppSettings; statusOf: (p: ApiProvider) => KeyStatus | undefined; onChanged: () => void; onSettings: (s: AppSettings) => void }) {
+function LlmSection({
+  settings,
+  statusOf,
+  chatgpt,
+  onChanged,
+  onSettings
+}: {
+  settings: AppSettings
+  statusOf: (p: ApiProvider) => KeyStatus | undefined
+  chatgpt?: AccountStatus
+  onChanged: () => void
+  onSettings: (s: AppSettings) => void
+}) {
   const { toast } = useApp()
   const provider = settings.llmProvider
   const spec = LLM_PROVIDERS.find((p) => p.id === provider)!
-  const status = statusOf(provider)
-  const configured = !!status?.configured
+  const status = provider === 'chatgpt' ? undefined : statusOf(provider)
+  // ChatGPT is connected by signing in; every other provider by a saved key that did not fail its last check.
+  const ready =
+    provider === 'chatgpt'
+      ? !!chatgpt?.signedIn && !chatgpt.needsReauth && chatgpt.planUsageAllowed !== false
+      : !!status?.configured && status.lastOk !== false
   const [openPicker, setOpenPicker] = useState(false)
-  const models = useModels(provider, configured && status?.lastOk !== false, provider === 'custom' ? settings.customBaseUrl : '')
+  const models = useModels(provider, ready, provider === 'custom' ? settings.customBaseUrl : provider === 'chatgpt' ? (chatgpt?.label ?? '') : '')
   const model = settings.llmModels[provider]
   const selected = models.models.find((m) => m.id === model)
 
@@ -377,7 +435,7 @@ function LlmSection({ settings, statusOf, onChanged, onSettings }: { settings: A
     name: p.name,
     note: p.note,
     logo: p.id,
-    status: statusOf(p.id)
+    status: p.id === 'chatgpt' ? chatgpt : statusOf(p.id)
   }))
 
   return (
@@ -396,24 +454,36 @@ function LlmSection({ settings, statusOf, onChanged, onSettings }: { settings: A
         }}
       />
       <Card key={provider}>
-        <KeyForm
-          provider={provider}
-          name={spec.name}
-          status={status}
-          help={provider === 'custom' ? 'Contoh: http://localhost:11434/v1 untuk Ollama, http://localhost:1234/v1 untuk LM Studio, https://api.x.ai/v1 untuk Grok.' : 'Setelah kunci disimpan, daftar model diambil langsung dari penyedianya.'}
-          hint={provider === 'gemini' && settings.defaultTtsProvider === 'gemini' ? 'Kunci ini dipakai bersama untuk suara narator Gemini TTS.' : undefined}
-          link={spec.link}
-          linkLabel={spec.linkLabel}
-          customUrl={settings.customBaseUrl}
-          onChanged={onChanged}
-          onSaved={async (r) => {
-            if (!r.ok) return
-            onSettings(await window.api.settings.get())
-            if (configured) void models.refresh()
-            if (!model) setOpenPicker(true)
-          }}
-        />
-        {configured && status?.lastOk !== false && (
+        {provider === 'chatgpt' ? (
+          <ChatGptAccount
+            account={chatgpt}
+            welcomeSeen={settings.chatgptWelcomeSeen}
+            onWelcomeSeen={async () => onSettings(await window.api.settings.set({ chatgptWelcomeSeen: true }))}
+            onSignedIn={() => {
+              void models.refresh()
+              if (!model) setOpenPicker(true)
+            }}
+          />
+        ) : (
+          <KeyForm
+            provider={provider}
+            name={spec.name}
+            status={status}
+            help={provider === 'custom' ? 'Contoh: http://localhost:11434/v1 untuk Ollama, http://localhost:1234/v1 untuk LM Studio, https://api.x.ai/v1 untuk Grok.' : 'Setelah kunci disimpan, daftar model diambil langsung dari penyedianya.'}
+            hint={provider === 'gemini' && settings.defaultTtsProvider === 'gemini' ? 'Kunci ini dipakai bersama untuk suara narator Gemini TTS.' : undefined}
+            link={spec.link}
+            linkLabel={spec.linkLabel}
+            customUrl={settings.customBaseUrl}
+            onChanged={onChanged}
+            onSaved={async (r) => {
+              if (!r.ok) return
+              onSettings(await window.api.settings.get())
+              if (ready) void models.refresh()
+              if (!model) setOpenPicker(true)
+            }}
+          />
+        )}
+        {ready && (
           <div className="flex flex-col gap-1.5 border-t border-dashed border-line pt-4">
             <span className="text-sm font-semibold">Model untuk menyusun cerita</span>
             <ModelPicker
@@ -553,16 +623,20 @@ export function Settings() {
   const back = route.name === 'settings' && route.back ? route.back : ({ name: 'home' } as const)
   const [tab, setTab] = useState<Tab>('services')
   const [keys, setKeys] = useState<KeyStatus[]>([])
+  const [accounts, setAccounts] = useState<AccountStatus[]>([])
   const [settings, setSettings] = useState<AppSettings | null>(null)
   const [folder, setFolder] = useState('')
 
   const reload = (): void => {
     void window.api.settings.keys().then(setKeys)
+    void window.api.auth.status().then(setAccounts)
     void window.api.settings.get().then(setSettings)
   }
   useEffect(() => {
     reload()
     void window.api.exporter.defaultFolder().then(setFolder)
+    // Sign-ins finish in the browser and refreshes can end a session; the main process reports both.
+    return window.api.on.auth((s) => setAccounts((list) => [...list.filter((a) => a.provider !== s.provider), s]))
   }, [])
 
   const statusOf = (p: ApiProvider): KeyStatus | undefined => keys.find((k) => k.provider === p)
@@ -611,11 +685,17 @@ export function Settings() {
                 <div>
                   <h1 className="font-display text-[34px] font-bold tracking-[-0.015em]">Layanan AI dan kunci</h1>
                   <p className="mt-2 max-w-[700px] text-[15px] text-ink-2">
-                    Video Story memakai akun layanan milikmu sendiri. Kunci disimpan terenkripsi di komputer ini dan hanya dikirim langsung ke
-                    layanan yang bersangkutan.
+                    Video Story memakai akun layanan milikmu sendiri, lewat API key atau login akun. Kunci dan sesi login disimpan terenkripsi di
+                    komputer ini dan hanya dikirim langsung ke layanan yang bersangkutan.
                   </p>
                 </div>
-                <LlmSection settings={settings} statusOf={statusOf} onChanged={reload} onSettings={setSettings} />
+                <LlmSection
+                  settings={settings}
+                  statusOf={statusOf}
+                  chatgpt={accounts.find((a) => a.provider === 'chatgpt')}
+                  onChanged={reload}
+                  onSettings={setSettings}
+                />
                 <TtsSection settings={settings} statusOf={statusOf} onChanged={reload} onSettings={setSettings} />
                 <HiggsfieldSection status={statusOf('higgsfield')} onChanged={reload} />
                 <WhisperSection settings={settings} onSettings={setSettings} />

@@ -12,11 +12,13 @@ Baca file ini dulu sebelum mengubah kode. Detail lengkapnya ada di folder [`docs
 npm install            # pasang dependensi (better-sqlite3 dibangun ulang untuk Electron lewat postinstall)
 npm run dev            # jalankan aplikasi dalam mode pengembangan (hot reload renderer)
 npm run typecheck      # wajib bersih sebelum selesai: tsconfig.node.json + tsconfig.web.json
+npm test               # unit test modul tanpa Electron (src/**/*.test.ts, node:test + esbuild)
 npm run build          # build ke folder out/ (main, preload, renderer)
 npm run dist           # build + installer Windows (NSIS) ke folder dist/
 ```
 
-Tidak ada framework unit test. Verifikasi dilakukan dengan `npm run typecheck`, `npm run build`, dan **dev harness**
+Unit test (`npm test`) hanya untuk modul yang tidak mengimpor Electron atau database, misalnya `src/main/oauth/` dan
+parser di `src/main/services/`. Sisanya diverifikasi dengan `npm run typecheck`, `npm run build`, dan **dev harness**
 yang menjalankan aplikasi dari skrip JSON (lihat [docs/pengembangan.md](docs/pengembangan.md)).
 
 ## Peta kode
