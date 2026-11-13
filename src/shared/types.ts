@@ -1,7 +1,7 @@
 export type ProjectStatus = 'draft' | 'script' | 'storyboard' | 'editing' | 'exported'
 export type AspectRatio = '16:9' | '9:16'
 export type TtsProvider = 'gemini' | 'elevenlabs'
-export type LlmProvider = 'gemini' | 'openrouter' | 'groq' | 'custom'
+export type LlmProvider = 'gemini' | 'openrouter' | 'groq' | 'custom' | 'chatgpt'
 export type ApiProvider = 'higgsfield' | 'gemini' | 'elevenlabs' | 'openrouter' | 'groq' | 'custom'
 /** Where a live model list comes from: an LLM provider, or a TTS catalog. */
 export type ModelSource = LlmProvider | 'gemini-tts' | 'elevenlabs'
@@ -306,6 +306,8 @@ export interface AppSettings {
   videoModel: string
   /** Time captions against the real voice with Whisper after narration is made (when the model is present). */
   whisperAuto: boolean
+  /** The one-time "you're using your ChatGPT plan" notice was dismissed. */
+  chatgptWelcomeSeen: boolean
 }
 
 /** What one Higgsfield request would cost, from the API's estimate endpoint. */
