@@ -77,7 +77,11 @@ export function fitDuration(m: MediaModel, seconds: number): number | null {
 export function durationLabel(m: MediaModel): string | null {
   const d = m.durations
   if (!d) return null
-  return 'values' in d ? `${d.values.join(' / ')} dtk` : `${d.min}–${d.max} dtk`
+  if (!('values' in d)) return `${d.min}–${d.max} dtk`
+  // fal lists every whole second (3, 4, … 15); that reads better as a range.
+  const v = [...d.values].sort((a, b) => a - b)
+  const run = v.length > 3 && v.every((x, i) => i === 0 || x === v[i - 1] + 1)
+  return run ? `${v[0]}–${v[v.length - 1]} dtk` : `${v.join(' / ')} dtk`
 }
 
 function pick(s: FieldSchema | undefined, prefer: (string | number)[]): string | number | undefined {
@@ -197,21 +201,39 @@ export function describeModel(m: MediaModel): string {
   return [durationLabel(m), m.input.mode === 'reference' ? 'gambar klip jadi referensi' : 'mulai dari gambar klip'].filter(Boolean).join(' · ')
 }
 
-/** Picker rows grouped by provider, each provider's recommended model first with a "Rekomendasi" tag. */
-export function mediaModelOptions(kind: 'image' | 'video'): ModelOption[] {
+/**
+ * Picker rows, each provider's recommended model first with a "Rekomendasi" tag: every provider under its own
+ * heading, or one provider's models as a plain list.
+ */
+export function mediaModelOptions(kind: 'image' | 'video', only?: MediaProvider): ModelOption[] {
   const list = kind === 'image' ? IMAGE_MODELS : VIDEO_MODELS
-  return MEDIA_PROVIDERS.flatMap((p) => {
+  return (only ? [only] : MEDIA_PROVIDERS).flatMap((p) => {
     const recommended = RECOMMENDED[p][kind]
     const own = list.filter((m) => m.provider === p)
     return [...own.filter((m) => m.id === recommended), ...own.filter((m) => m.id !== recommended)].map((m) => ({
       id: m.id,
       name: m.name,
       family: m.family,
-      group: PROVIDER_LABEL[p],
+      ...(only ? {} : { group: PROVIDER_LABEL[p] }),
       description: describeModel(m),
       tags: m.id === recommended ? ['Rekomendasi', ...m.tags] : m.tags
     }))
   })
+}
+
+/** The provider new projects start on: the one that owns the saved default image model. */
+export function defaultMediaProvider(saved: { imageModel: string; videoModel: string }): MediaProvider {
+  return getImageModel(saved.imageModel).provider
+}
+
+/** Default models when `provider` is the one for new projects: the saved ones that are its own, else its recommended. */
+export function providerDefaults(provider: MediaProvider, saved: { imageModel: string; videoModel: string }): { imageModel: string; videoModel: string } {
+  const image = getImageModel(saved.imageModel)
+  const video = getVideoModel(saved.videoModel)
+  return {
+    imageModel: image.provider === provider ? image.id : RECOMMENDED[provider].image,
+    videoModel: video.provider === provider ? video.id : RECOMMENDED[provider].video
+  }
 }
 
 /**

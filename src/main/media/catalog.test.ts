@@ -3,6 +3,8 @@ import { test } from 'node:test'
 import {
   DEFAULT_IMAGE_MODEL,
   DEFAULT_VIDEO_MODEL,
+  defaultMediaProvider,
+  durationLabel,
   fitDuration,
   getImageModel,
   getVideoModel,
@@ -12,6 +14,7 @@ import {
   maxRefs,
   mediaModelOptions,
   newProjectModels,
+  providerDefaults,
   RECOMMENDED,
   videoPlan,
   videoRequest,
@@ -162,4 +165,30 @@ test('fal reference fields that take one image get a single URL', () => {
   const r = imageRequest(kontext, 'p', '16:9', ['https://x/a.png', 'https://x/b.png'])
   assert.equal(r.endpoint, 'fal-ai/flux-pro/kontext')
   assert.equal(r.body.image_url, 'https://x/a.png')
+})
+
+test('mediaModelOptions can list one provider, recommended first and without group headings', () => {
+  const fal = mediaModelOptions('video', 'fal')
+  assert.ok(fal.length > 0)
+  assert.ok(fal.every((o) => o.id.startsWith('fal:') && o.group === undefined))
+  assert.equal(fal[0].id, RECOMMENDED.fal.video)
+  assert.ok(mediaModelOptions('image', 'gemini').every((o) => o.id.startsWith('gemini:')))
+})
+
+test('defaultMediaProvider follows the saved image model', () => {
+  assert.equal(defaultMediaProvider({ imageModel: RECOMMENDED.gemini.image, videoModel: DEFAULT_VIDEO_MODEL }), 'gemini')
+  assert.equal(defaultMediaProvider({ imageModel: DEFAULT_IMAGE_MODEL, videoModel: RECOMMENDED.fal.video }), 'higgsfield')
+  assert.equal(defaultMediaProvider({ imageModel: 'gone', videoModel: 'gone' }), 'higgsfield')
+})
+
+test('providerDefaults keeps saved models of that provider and recommends the rest', () => {
+  const saved = { imageModel: DEFAULT_IMAGE_MODEL, videoModel: 'fal:kling/v4/image-to-video' }
+  assert.deepEqual(providerDefaults('fal', saved), { imageModel: RECOMMENDED.fal.image, videoModel: 'fal:kling/v4/image-to-video' })
+  assert.deepEqual(providerDefaults('gemini', saved), { imageModel: RECOMMENDED.gemini.image, videoModel: RECOMMENDED.gemini.video })
+  assert.deepEqual(providerDefaults('higgsfield', saved), { imageModel: DEFAULT_IMAGE_MODEL, videoModel: DEFAULT_VIDEO_MODEL })
+})
+
+test('durationLabel shows a long run of whole seconds as a range', () => {
+  assert.equal(durationLabel(getVideoModel('fal:fal-ai/kling-video/v3/standard/image-to-video')), '3–15 dtk')
+  assert.equal(durationLabel(getVideoModel('fal:fal-ai/minimax/hailuo-2.3-fast/standard/image-to-video')), '6 / 10 dtk')
 })

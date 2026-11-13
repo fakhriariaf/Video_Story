@@ -16,11 +16,12 @@ import {
   SlidersHorizontal,
   Trash2
 } from 'lucide-react'
-import { HF_IMAGE_MODELS, HF_VIDEO_MODELS, IMAGE_MODELS, VIDEO_MODELS } from '@shared/media'
+import { defaultMediaProvider, IMAGE_MODELS, mediaModelOptions, providerDefaults, VIDEO_MODELS, type MediaProvider } from '@shared/media'
 import { LANGUAGES, LLM_PROVIDERS } from '@shared/models'
 import type { AccountStatus, ApiProvider, AppSettings, KeyStatus, KeyTestResult, LlmProvider, TtsProvider } from '@shared/types'
 import { ChatGptAccount } from '../components/ChatGptAccount'
 import { Logo } from '../components/Logo'
+import { ModelLogo } from '../components/ModelLogo'
 import { ModelPicker } from '../components/ModelPicker'
 import { ProviderLogo, type ProviderLogoId } from '../components/ProviderLogo'
 import { Select } from '../components/Select'
@@ -30,9 +31,6 @@ import { Badge, Button, Field, IconButton, confirmDialog, cx, inputCls } from '.
 import { errorText, relativeTime } from '../lib/format'
 import { useModels } from '../lib/useModels'
 import { useApp } from '../store/app'
-
-const FAL_IMAGE_COUNT = IMAGE_MODELS.filter((m) => m.provider === 'fal').length
-const FAL_VIDEO_COUNT = VIDEO_MODELS.filter((m) => m.provider === 'fal').length
 
 type Tab = 'services' | 'general' | 'about'
 
@@ -579,92 +577,111 @@ function TtsSection({ settings, statusOf, onChanged, onSettings }: { settings: A
   )
 }
 
-function MediaSection({ statusOf, onChanged }: { statusOf: (p: ApiProvider) => KeyStatus | undefined; onChanged: () => void }) {
+const MEDIA_KEY_FORMS: Record<MediaProvider, { name: string; placeholder?: string; help: string; link: string; linkLabel: string }> = {
+  higgsfield: {
+    name: 'Higgsfield',
+    placeholder: 'Tempel hasil tombol Copy API key',
+    help: 'Kunci dicek dengan permintaan estimasi biaya, tanpa memakai kredit.',
+    link: 'https://open.higgsfield.ai/explore',
+    linkLabel: 'Buka console Higgsfield'
+  },
+  fal: {
+    name: 'fal.ai',
+    placeholder: 'Tempel kunci fal.ai',
+    help: 'Kunci dicek lewat daftar harga, tanpa memakai saldo.',
+    link: 'https://fal.ai/dashboard/keys',
+    linkLabel: 'Buka fal.ai'
+  },
+  gemini: {
+    name: 'Google Gemini',
+    help: 'Kunci Gemini dari Google AI Studio.',
+    link: 'https://aistudio.google.com/apikey',
+    linkLabel: 'Buat kunci di Google AI Studio'
+  }
+}
+
+const MEDIA_COUNT = (p: MediaProvider, kind: 'image' | 'video'): number =>
+  (kind === 'image' ? IMAGE_MODELS : VIDEO_MODELS).filter((m) => m.provider === p).length
+
+function MediaSection({
+  settings,
+  statusOf,
+  onChanged,
+  onSettings
+}: {
+  settings: AppSettings
+  statusOf: (p: ApiProvider) => KeyStatus | undefined
+  onChanged: () => void
+  onSettings: (s: AppSettings) => void
+}) {
+  const provider = defaultMediaProvider(settings)
+  const status = statusOf(provider)
+  const form = MEDIA_KEY_FORMS[provider]
+  const chosen = providerDefaults(provider, settings)
+  const counts = (p: MediaProvider): string => `${MEDIA_COUNT(p, 'image')} model gambar dan ${MEDIA_COUNT(p, 'video')} model video`
+  const options: ProviderOption<MediaProvider>[] = [
+    { id: 'higgsfield', name: 'Higgsfield', note: `${counts('higgsfield')}, dibayar dengan kredit Higgsfield.`, logo: 'higgsfield', status: statusOf('higgsfield') },
+    { id: 'fal', name: 'fal.ai', note: `${counts('fal')}: Nano Banana, Flux, Seedream, Kling, Seedance, Wan. Dibayar dengan saldo fal.ai.`, logo: 'fal', status: statusOf('fal') },
+    { id: 'gemini', name: 'Google Gemini', note: 'Nano Banana untuk gambar dan Gemini Omni Flash untuk video. Butuh billing aktif.', logo: 'gemini', status: statusOf('gemini') }
+  ]
+  const pickers = [
+    { kind: 'image', label: 'Model gambar bawaan', value: chosen.imageModel, key: 'imageModel' },
+    { kind: 'video', label: 'Model video bawaan', value: chosen.videoModel, key: 'videoModel' }
+  ] as const
   return (
     <>
       <SectionTitle
         icon={<ImageIcon className="size-5" />}
         title="Gambar dan video"
-        sub="Pilih penyedianya per proyek di langkah Ide cerita. Isi kunci untuk penyedia yang mau kamu pakai."
+        sub="Penyedia gambar dan video bawaan untuk proyek baru. Setiap proyek tetap bisa memilih sendiri di langkah Ide cerita."
       />
-      <Card>
-        <div className="flex items-center gap-3">
-          <ProviderLogo id="higgsfield" />
-          <div className="flex flex-1 flex-col">
-            <span className="text-base font-bold">Higgsfield</span>
-            <span className="text-[13px] text-ink-2">
-              {HF_IMAGE_MODELS.length} model gambar dan {HF_VIDEO_MODELS.length} model video, dibayar dengan kredit Higgsfield
-            </span>
-          </div>
-          <StatusBadge status={statusOf('higgsfield')} />
-        </div>
+      <ProviderSelect value={provider} options={options} onChange={async (id) => onSettings(await window.api.settings.set(providerDefaults(id, settings)))} />
+      <Card key={provider}>
         <KeyForm
-          provider="higgsfield"
-          name="Higgsfield"
-          status={statusOf('higgsfield')}
-          placeholder="Tempel hasil tombol Copy API key"
+          provider={provider}
+          name={form.name}
+          status={status}
+          placeholder={form.placeholder}
           hint={
-            <>
-              Di console Higgsfield, buka API Keys lalu klik <strong className="text-ink">Copy API key</strong> dan tempel di sini. Formatnya{' '}
-              <code className="rounded bg-sand px-1 font-mono text-xs">KEY_ID:KEY_SECRET</code>. Kalau kamu memegang Key ID dan Secret terpisah, gabungkan
-              dengan titik dua.
-            </>
+            provider === 'higgsfield' ? (
+              <>
+                Di console Higgsfield, buka API Keys lalu klik <strong className="text-ink">Copy API key</strong> dan tempel di sini. Formatnya{' '}
+                <code className="rounded bg-sand px-1 font-mono text-xs">KEY_ID:KEY_SECRET</code>. Kalau kamu memegang Key ID dan Secret terpisah, gabungkan
+                dengan titik dua.
+              </>
+            ) : provider === 'gemini' ? (
+              'Kunci ini sama dengan kunci Gemini untuk penyusun cerita dan suara narator. Gambar dan video Gemini tidak termasuk kuota gratis, jadi aktifkan billing di Google AI Studio dulu.'
+            ) : undefined
           }
-          help="Kunci dicek dengan permintaan estimasi biaya, tanpa memakai kredit."
-          link="https://open.higgsfield.ai/explore"
-          linkLabel="Buka console Higgsfield"
+          help={form.help}
+          link={form.link}
+          linkLabel={form.linkLabel}
           onChanged={onChanged}
         />
-      </Card>
-      <Card>
-        <div className="flex items-center gap-3">
-          <ProviderLogo id="fal" />
-          <div className="flex flex-1 flex-col">
-            <span className="text-base font-bold">fal.ai</span>
-            <span className="text-[13px] text-ink-2">
-              {FAL_IMAGE_COUNT} model gambar dan {FAL_VIDEO_COUNT} model video (Nano Banana, Flux, Seedream, Kling, Seedance, Wan, dan lainnya), dibayar dengan
-              saldo fal.ai
-            </span>
-          </div>
-          <StatusBadge status={statusOf('fal')} />
-        </div>
-        <KeyForm
-          provider="fal"
-          name="fal.ai"
-          status={statusOf('fal')}
-          placeholder="Tempel kunci fal.ai"
-          help="Kunci dicek lewat daftar harga, tanpa memakai saldo."
-          link="https://fal.ai/dashboard/keys"
-          linkLabel="Buka fal.ai"
-          onChanged={onChanged}
-        />
-      </Card>
-      <Card>
-        <div className="flex items-center gap-3">
-          <ProviderLogo id="gemini" />
-          <div className="flex flex-1 flex-col">
-            <span className="text-base font-bold">Google Gemini</span>
-            <span className="text-[13px] text-ink-2">Nano Banana untuk gambar dan Gemini Omni Flash untuk video</span>
-          </div>
-          <StatusBadge status={statusOf('gemini')} />
+        <div className="grid grid-cols-2 gap-4 border-t border-dashed border-line pt-4">
+          {pickers.map((x) => (
+            <div key={x.kind} className="flex min-w-0 flex-col gap-1.5">
+              <span className="text-sm font-semibold">{x.label}</span>
+              <ModelPicker
+                value={x.value}
+                models={mediaModelOptions(x.kind, provider)}
+                detail="description"
+                renderIcon={(m) => <ModelLogo family={m.family} />}
+                align={x.kind === 'video' ? 'right' : 'left'}
+                menuClassName="w-[430px]"
+                onChange={async (id) => onSettings(await window.api.settings.set({ ...chosen, [x.key]: id }))}
+              />
+            </div>
+          ))}
         </div>
         <p className="flex items-start gap-2.5 text-[13px] leading-relaxed text-ink-2">
-          <Info className="mt-0.5 size-4 shrink-0" />
+          <Film className="mt-0.5 size-4 shrink-0" />
           <span>
-            Memakai kunci Gemini yang sama dengan Suara narator di atas. Gambar dan video Gemini tidak termasuk kuota gratis, jadi aktifkan billing di{' '}
-            <a className="font-medium text-ink underline" href="https://aistudio.google.com/" target="_blank" rel="noreferrer">
-              Google AI Studio
-            </a>{' '}
-            dulu.
+            Dipakai proyek baru. Di langkah <strong className="text-ink">Ide cerita</strong>, bagian Model AI, tiap proyek bisa memakai model dari penyedia
+            mana pun yang kuncinya sudah diisi.
           </span>
         </p>
       </Card>
-      <p className="flex items-start gap-2.5 text-[13px] leading-relaxed text-ink-2">
-        <Film className="mt-0.5 size-4 shrink-0" />
-        <span>
-          Model gambar dan video dipilih per proyek di langkah <strong className="text-ink">Ide cerita</strong>, bagian Model AI.
-        </span>
-      </p>
     </>
   )
 }
@@ -748,7 +765,7 @@ export function Settings() {
                   onSettings={setSettings}
                 />
                 <TtsSection settings={settings} statusOf={statusOf} onChanged={reload} onSettings={setSettings} />
-                <MediaSection statusOf={statusOf} onChanged={reload} />
+                <MediaSection settings={settings} statusOf={statusOf} onChanged={reload} onSettings={setSettings} />
                 <WhisperSection settings={settings} onSettings={setSettings} />
               </>
             )}

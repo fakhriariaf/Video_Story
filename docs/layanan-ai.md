@@ -105,7 +105,11 @@ Model dipilih per proyek (`Project.imageModel`, `Project.videoModel`). Semua mod
   adaptor ini.
 - Job yang sudah terkirim bisa dilanjutkan setelah aplikasi dibuka lagi (`media/payload.ts`, `resumePlan`). Gambar
   Gemini selesai langsung dalam satu permintaan, jadi kalau terputus ditandai gagal.
-- Proyek baru memakai model bawaan Higgsfield, kecuali tidak ada kunci Higgsfield. Dalam kasus itu dipakai model
+- **Penyedia bawaan** dipilih lewat satu dropdown di Pengaturan › Gambar dan video (seperti Penyusun cerita dan
+  Suara narator). Tidak ada setelan tersendiri: penyedia bawaan adalah penyedia dari `settings.imageModel`
+  (`defaultMediaProvider`), dan mengganti penyedia mengisi `imageModel`/`videoModel` dengan model rekomendasinya
+  (`providerDefaults`). Di bawah dropdown hanya tampil kunci dan model bawaan penyedia itu.
+- Proyek baru memakai model bawaan itu, kecuali penyedianya belum punya kunci. Dalam kasus itu dipakai model
   rekomendasi penyedia pertama yang kuncinya ada (`newProjectModels`, urutan Higgsfield, fal.ai, Gemini).
 
 ## fal.ai (`services/fal.ts`, `services/fal-format.ts`)

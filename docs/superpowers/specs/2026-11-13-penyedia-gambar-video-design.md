@@ -150,10 +150,25 @@ Pemilik memilih **A** (2026-11-13) karena memberi pilihan penyedia sekaligus mem
 
 - `ApiProvider` mendapat `'fal'`, dengan nama "fal.ai", logo di `ProviderLogo`, kotak isian kunci, tombol Tes, dan
   tautan "Buat kunci" ke halaman kunci fal.ai. Tes kunci memakai panggilan harga (tidak memakan saldo).
-- Kartu "Gambar dan video" di Pengaturan menjelaskan tiga pilihan penyedia dan kunci mana yang dipakai masing-masing.
+- Bagian "Gambar dan video" di Pengaturan memakai satu dropdown penyedia (lihat perubahan 2026-11-13 di bawah).
   Gemini menyebut bahwa gambar dan video butuh billing aktif.
 - Mengganti kunci fal.ai atau Gemini menghapus cache perkiraan harga penyedia itu (seperti `forgetEstimates` untuk
   Higgsfield sekarang).
+
+#### Perubahan 2026-11-13: satu dropdown penyedia (disetujui pemilik)
+
+Tiga kartu penyedia di Pengaturan diganti **satu dropdown** (`ProviderSelect`), sama seperti Penyusun cerita dan
+Suara narator, supaya ketiga bagian konsisten dan penyedia baru cukup menambah satu baris.
+
+- Pilihan: Higgsfield, fal.ai, Google Gemini, masing-masing dengan logo, keterangan, dan lencana status kuncinya.
+- Di bawah dropdown hanya tampil milik penyedia terpilih: kotak kunci (Gemini memakai kunci yang sama dengan TTS dan
+  catatan billing), lalu **Model gambar bawaan** dan **Model video bawaan** yang isinya hanya model penyedia itu.
+- Penyedia terpilih adalah **bawaan untuk proyek baru**. Tidak ada setelan baru: penyedia terpilih adalah penyedia
+  dari `settings.imageModel`; mengganti penyedia mengisi `imageModel` dan `videoModel` dengan model rekomendasi
+  penyedia itu. Proyek lama tidak berubah, dan di langkah Ide cerita model penyedia lain yang kuncinya ada tetap bisa
+  dipilih.
+- `newProjectModels` tetap berlaku: kalau penyedia bawaan belum punya kunci, proyek baru memakai penyedia pertama
+  yang kuncinya ada.
 
 ### 4. Pemilih model dan tampilan proyek
 
