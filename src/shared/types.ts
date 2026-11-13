@@ -263,6 +263,20 @@ export interface KeyStatus {
   unreadable: boolean
 }
 
+/** Services that can be connected by signing in with an account instead of an API key. */
+export type AuthProvider = 'chatgpt'
+
+export interface AccountStatus {
+  provider: AuthProvider
+  signedIn: boolean
+  /** What identifies the account to the user, usually its email. */
+  label: string | null
+  /** The saved sign-in stopped working (expired or revoked); the user must sign in again. */
+  needsReauth: boolean
+  /** ChatGPT only: whether the user allowed requests to use their plan. Null before the first sign-in. */
+  planUsageAllowed: boolean | null
+}
+
 export interface KeyTestResult {
   ok: boolean
   message: string

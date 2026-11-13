@@ -62,6 +62,12 @@ const api: StudioApi = {
     testKey: call('settings:testKey'),
     voices: call('settings:voices')
   },
+  auth: {
+    status: call('auth:status'),
+    login: call('auth:login'),
+    logout: call('auth:logout'),
+    cancel: call('auth:cancel')
+  },
   models: {
     list: call('models:list')
   },
@@ -88,7 +94,8 @@ const api: StudioApi = {
     job: listen(EVENTS.job),
     clip: listen(EVENTS.clip),
     character: listen(EVENTS.character),
-    asset: listen(EVENTS.asset)
+    asset: listen(EVENTS.asset),
+    auth: listen(EVENTS.auth)
   }
 }
 
