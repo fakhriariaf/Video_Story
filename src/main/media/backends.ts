@@ -1,6 +1,6 @@
 import { stat } from 'node:fs/promises'
 import { nativeImage } from 'electron'
-import type { MediaModel, MediaProvider } from '@shared/media'
+import { listPriceUsd, type MediaModel, type MediaProvider } from '@shared/media'
 import type { Asset, CreditEstimate } from '@shared/types'
 import { assetAbsPath } from '../paths'
 import { updateAssetMeta } from '../repo'
@@ -37,7 +37,13 @@ export interface MediaBackend {
   submit(endpoint: string, body: Record<string, unknown>, kind: 'image' | 'video', signal: AbortSignal): Promise<Submitted | { done: MediaResult }>
   wait(remoteId: string, resume: Record<string, string> | undefined, onTick: Tick, signal: AbortSignal, timeoutMs: number): Promise<MediaResult>
   cancel(remoteId: string, resume?: Record<string, string>): Promise<void>
-  estimate(m: MediaModel, request: { endpoint: string; body: Record<string, unknown> }, kind: 'image' | 'video', seconds: number): Promise<CreditEstimate | null>
+  estimate(
+    m: MediaModel,
+    request: { endpoint: string; body: Record<string, unknown> },
+    kind: 'image' | 'video',
+    seconds: number,
+    resolution: string | null
+  ): Promise<CreditEstimate | null>
 }
 
 const higgsfield: MediaBackend = {
@@ -120,9 +126,9 @@ const gemini: MediaBackend = {
   },
   // Omni has no cancel; the abandoned file expires on its own.
   cancel: async () => {},
-  async estimate(m, _request, _kind, seconds) {
-    if (!m.price) return null
-    return { credits: null, usd: m.price.per === 'second' ? m.price.usd * seconds : m.price.usd }
+  async estimate(m, _request, _kind, seconds, resolution) {
+    const usd = listPriceUsd(m, seconds, resolution)
+    return usd == null ? null : { credits: null, usd }
   }
 }
 

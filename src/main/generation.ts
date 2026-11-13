@@ -230,12 +230,12 @@ export function generateClipImage(clipId: string): Job {
   const existing = activeJobFor({ clipId }, 'image')
   if (existing) return existing
   const clip = getClip(clipId)
-  const provider = getImageModel(getProject(clip.projectId).imageModel).provider
-  const job = insertJob({ projectId: clip.projectId, clipId, kind: 'image', provider })
-  return startMedia(job, provider, async (ctx) => {
+  // Fixed at queue time: switching the project's model while jobs wait must not send this one to another provider.
+  const model = getImageModel(getProject(clip.projectId).imageModel)
+  const job = insertJob({ projectId: clip.projectId, clipId, kind: 'image', provider: model.provider })
+  return startMedia(job, model.provider, async (ctx) => {
     const fresh = getClip(clipId)
     const project = getProject(fresh.projectId)
-    const model = getImageModel(project.imageModel)
     const chars = charactersOf(project.id).filter((c) => fresh.characterIds.includes(c.id))
     const refs = await referenceUrls(model, chars, ctx.signal)
     const prompt = clipPrompt(project, fresh, chars, refs.names, promptLimit(model))
@@ -247,11 +247,10 @@ export function generateCharacterSheet(characterId: string): Job {
   const existing = activeJobFor({ characterId }, 'sheet')
   if (existing) return existing
   const c = getCharacter(characterId)
-  const provider = getImageModel(getProject(c.projectId).imageModel).provider
-  const job = insertJob({ projectId: c.projectId, characterId, kind: 'sheet', provider })
-  return startMedia(job, provider, async () => {
+  const model = getImageModel(getProject(c.projectId).imageModel)
+  const job = insertJob({ projectId: c.projectId, characterId, kind: 'sheet', provider: model.provider })
+  return startMedia(job, model.provider, async () => {
     const project = getProject(c.projectId)
-    const model = getImageModel(project.imageModel)
     const prompt = sheetPrompt(project, getCharacter(characterId))
     return { ...imageRequest(model, prompt, '16:9', []), payload: { target: 'sheet', model: model.id, prompt, provider: model.provider } }
   })
@@ -262,14 +261,13 @@ export function generateClipVideo(clipId: string): Job {
   if (existing) return existing
   const clip = getClip(clipId)
   if (!clip.imageAssetId) throw new Error('Buat gambar klip ini dulu sebelum membuat video AI.')
-  const provider = getVideoModel(getProject(clip.projectId).videoModel).provider
-  const job = insertJob({ projectId: clip.projectId, clipId, kind: 'video', provider })
-  return startMedia(job, provider, async (ctx) => {
+  const model = getVideoModel(getProject(clip.projectId).videoModel)
+  const job = insertJob({ projectId: clip.projectId, clipId, kind: 'video', provider: model.provider })
+  return startMedia(job, model.provider, async (ctx) => {
     const fresh = getClip(clipId)
     const image = getAsset(fresh.imageAssetId)
     if (!image) throw new Error('Gambar klip tidak ditemukan')
     const project = getProject(fresh.projectId)
-    const model = getVideoModel(project.videoModel)
     ctx.progress(0.05, 'Menyiapkan gambar awal')
     const url = await BACKENDS[model.provider].prepareRef(image, ctx.signal)
     let prompt =
@@ -420,8 +418,8 @@ export async function estimateCost(
   if (hit && Date.now() - hit.updatedAt < DAY) return hit.value
   const failedAt = failedEstimates.get(key)
   if (failedAt && Date.now() - failedAt < 10 * 60 * 1000) return null
-  const length = videoPlan(model, seconds, resolution).duration ?? seconds
-  const value = await BACKENDS[model.provider].estimate(model, request, kind, length).catch(() => null)
+  const plan = videoPlan(model, seconds, resolution)
+  const value = await BACKENDS[model.provider].estimate(model, request, kind, plan.duration ?? seconds, plan.resolution).catch(() => null)
   if (value) writeCache(key, value)
   else failedEstimates.set(key, Date.now())
   return value

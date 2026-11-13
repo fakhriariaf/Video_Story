@@ -3,8 +3,8 @@
 Tanggal: 2026-11-13 · Status: draf, menunggu persetujuan pemilik (pertanyaan builder check sudah dijawab)
 
 > **Pembaruan saat membangun (2026-11-13):** Veo 3.1 di Gemini API sudah dimatikan Google pada 22 Oktober 2026.
-> Video Gemini memakai penggantinya, **Gemini Omni Flash** (`gemini-omni-1.1-flash`, `POST /v1beta/interactions`,
-> image-to-video, 3–10 detik, 720p/1080p/4K, sekitar $0,10 per detik). Omni tidak mengikat resolusi ke durasi, jadi
+> Video Gemini memakai penggantinya, **Gemini Omni Flash 1.2** (`gemini-omni-1.2-flash`, `POST /v1beta/interactions`,
+> image-to-video, `response_format.duration` 3–15 detik, 720p/1080p/4K, sekitar $0,07 per detik di 720p). Omni tidak mengikat resolusi ke durasi, jadi
 > aturan "turun ke 720p" di bagian 5 tidak lagi berlaku untuk model mana pun. Model gambar Gemini:
 > `gemini-nano-banana-2.1` (rekomendasi), `gemini-3-pro-image`, `gemini-3.1-flash-lite-image`.
 

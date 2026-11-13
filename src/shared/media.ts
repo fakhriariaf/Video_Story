@@ -44,7 +44,7 @@ export const DEFAULT_VIDEO_MODEL = 'kling-video/v3.0/std/image-to-video'
 export const RECOMMENDED: Record<MediaProvider, { image: string; video: string }> = {
   higgsfield: { image: DEFAULT_IMAGE_MODEL, video: DEFAULT_VIDEO_MODEL },
   fal: { image: 'fal:google/nano-banana-2.1', video: 'fal:fal-ai/kling-video/v3/standard/image-to-video' },
-  gemini: { image: 'gemini:gemini-nano-banana-2.1', video: 'gemini:gemini-omni-1.1-flash' }
+  gemini: { image: 'gemini:gemini-nano-banana-2.1', video: 'gemini:gemini-omni-1.2-flash' }
 }
 
 export function getImageModel(id: string | null | undefined): MediaModel {
@@ -229,4 +229,11 @@ export function newProjectModels(
     return p ? RECOMMENDED[p][kind] : id
   }
   return { imageModel: choose('image', current.imageModel), videoModel: choose('video', current.videoModel) }
+}
+
+/** Dollars for one request from a model's published price (Gemini), or null for providers priced by their API. */
+export function listPriceUsd(m: MediaModel, seconds: number, resolution: string | null): number | null {
+  if (!m.price) return null
+  const rate = m.price.per === 'second' ? (m.price.byResolution?.[effectiveResolution(m, resolution) ?? ''] ?? m.price.usd) * seconds : m.price.usd
+  return Math.round(rate * 10_000) / 10_000
 }

@@ -19,7 +19,7 @@ test('resumePlan resumes fal and Gemini video jobs that were submitted', () => {
   const gemini = resumePlan({
     provider: 'gemini',
     remote_id: 'files/1',
-    payload_json: JSON.stringify({ target: 'clip-video', model: 'gemini:gemini-omni-1.1-flash', prompt: 'p', provider: 'gemini', resume: { file: 'files/1' } })
+    payload_json: JSON.stringify({ target: 'clip-video', model: 'gemini:gemini-omni-1.2-flash', prompt: 'p', provider: 'gemini', resume: { file: 'files/1' } })
   })
   assert.equal(gemini?.provider, 'gemini')
 })

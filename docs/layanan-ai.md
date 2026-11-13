@@ -131,11 +131,12 @@ Model dipilih per proyek (`Project.imageModel`, `Project.videoModel`). Semua mod
 - Gambar (Nano Banana): `POST v1beta/models/<model>:generateContent` dengan `responseModalities: ["TEXT","IMAGE"]`,
   `imageConfig.aspectRatio` dan `imageSize`. Lembar karakter dikirim sebagai `inline_data` (diperkecil kalau lebih
   dari 3 MB). Jawaban tanpa gambar atau yang diblokir keamanan konten dijelaskan ke pengguna.
-- Video (**Gemini Omni Flash**, `gemini-omni-1.1-flash`): Veo 3.1 di Gemini API dimatikan Google pada 22 Oktober
-  2026, jadi video memakai Omni lewat `POST v1beta/interactions` (`video_config.task: image_to_video`,
-  `response_format: { type: video, aspect_ratio, resolution, delivery: uri }`). Hasilnya file `files/<id>` yang
-  di-poll sampai `ACTIVE` lalu diunduh dari `files/<id>:download?alt=media`. Omni tidak punya parameter durasi
-  (3–10 detik), jadi panjang yang diinginkan ditulis di prompt.
+- Video (**Gemini Omni Flash 1.2**, `gemini-omni-1.2-flash`): Veo 3.1 di Gemini API dimatikan Google pada
+  22 Oktober 2026, jadi video memakai Omni lewat `POST v1beta/interactions` (`video_config.task: image_to_video`,
+  `response_format: { type: video, aspect_ratio, resolution, duration: "<n>s", delivery: uri }`, durasi 3–15 detik;
+  tanpa `duration` Omni membuat 10 detik). Video ada di `steps[].content[]` (item `type: video`) dengan URI
+  `…/files/<id>:download?alt=media`; file itu di-poll sampai `ACTIVE` lalu diunduh. Tarif sekitar $0,07/detik
+  (720p), $0,104 (1080p), $0,209 (4K).
 
 ## Higgsfield (`services/higgsfield.ts`)
 

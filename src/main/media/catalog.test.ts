@@ -8,6 +8,7 @@ import {
   getVideoModel,
   IMAGE_MODELS,
   imageRequest,
+  listPriceUsd,
   maxRefs,
   mediaModelOptions,
   newProjectModels,
@@ -40,11 +41,21 @@ test('videoPlan keeps Higgsfield behaviour', () => {
   assert.equal(videoPlan(kling, 4, null).duration, fitDuration(kling, 4))
 })
 
-test('videoPlan fits Gemini video into 3-10 s', () => {
+test('videoPlan fits Gemini video into 3-15 s', () => {
   const omni = getVideoModel(RECOMMENDED.gemini.video)
   assert.deepEqual(videoPlan(omni, 2, null), { duration: 3, resolution: '720p' })
   assert.deepEqual(videoPlan(omni, 6.2, '1080p'), { duration: 7, resolution: '1080p' })
-  assert.deepEqual(videoPlan(omni, 14, null), { duration: 10, resolution: '720p' })
+  assert.deepEqual(videoPlan(omni, 14, null), { duration: 14, resolution: '720p' })
+  assert.deepEqual(videoPlan(omni, 20, null), { duration: 15, resolution: '720p' })
+})
+
+test('listPriceUsd prices Gemini per image and per second at the chosen resolution', () => {
+  assert.equal(listPriceUsd(getImageModel('gemini:gemini-nano-banana-2.1'), 0, null), 0.0504)
+  const omni = getVideoModel(RECOMMENDED.gemini.video)
+  assert.equal(listPriceUsd(omni, 5, '720p'), 0.35)
+  assert.equal(listPriceUsd(omni, 5, '1080p'), 0.52)
+  assert.equal(listPriceUsd(omni, 5, null), 0.35)
+  assert.equal(listPriceUsd(getVideoModel(DEFAULT_VIDEO_MODEL), 5, null), null)
 })
 
 test('geminiImageBody sends prompt, references as inline data and the frame', () => {
@@ -69,14 +80,14 @@ test('omniBody animates the first frame with length, frame and resolution', () =
   const v = getVideoModel(RECOMMENDED.gemini.video)
   const { endpoint, body } = videoRequest(v, 'walks', 'data:image/jpeg;base64,BBB', 4.4, '16:9', '1080p')
   const b = body as any
-  assert.equal(endpoint, 'gemini-omni-1.1-flash')
-  assert.equal(b.model, 'gemini-omni-1.1-flash')
+  assert.equal(endpoint, 'gemini-omni-1.2-flash')
+  assert.equal(b.model, 'gemini-omni-1.2-flash')
   assert.deepEqual(b.input[0], { type: 'image', data: 'BBB', mime_type: 'image/jpeg' })
   assert.match(b.input[1].text, /walks/)
-  assert.match(b.input[1].text, /about 5 seconds/)
+  assert.doesNotMatch(b.input[1].text, /seconds long/)
   assert.match(b.input[1].text, /Silent clip/)
   assert.equal(b.generation_config.video_config.task, 'image_to_video')
-  assert.deepEqual(b.response_format, { type: 'video', aspect_ratio: '16:9', resolution: '1080p', delivery: 'uri' })
+  assert.deepEqual(b.response_format, { type: 'video', aspect_ratio: '16:9', resolution: '1080p', duration: '5s', delivery: 'uri' })
   assert.equal(b.store, false)
 })
 

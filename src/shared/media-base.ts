@@ -45,8 +45,8 @@ export interface MediaModel {
   durations: { values: number[] } | { min: number; max: number } | null
   tags: string[]
   withRefs?: MediaVariant
-  /** Published price, for providers without a price API (Gemini). */
-  price?: { usd: number; per: 'image' | 'second' }
+  /** Published price, for providers without a price API (Gemini); byResolution overrides usd per resolution. */
+  price?: { usd: number; per: 'image' | 'second'; byResolution?: Record<string, number> }
 }
 
 /** Longest prompt the model accepts. Endpoints without a documented limit get a conservative one. */
