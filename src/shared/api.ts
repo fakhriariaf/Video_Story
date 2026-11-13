@@ -85,6 +85,8 @@ export interface StudioApi {
     /** The full stored key, only for the "show key" button. */
     revealKey(provider: ApiProvider): Promise<string | null>
     testKey(provider: ApiProvider): Promise<KeyTestResult>
+    /** Signs in on openrouter.ai in the browser; the key it hands back is saved and tested like a pasted one. */
+    loginOpenRouter(): Promise<KeyTestResult>
     voices(provider: TtsProvider): Promise<VoiceOption[]>
   }
   auth: {

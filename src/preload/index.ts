@@ -60,6 +60,7 @@ const api: StudioApi = {
     clearKey: call('settings:clearKey'),
     revealKey: call('settings:revealKey'),
     testKey: call('settings:testKey'),
+    loginOpenRouter: call('settings:loginOpenRouter'),
     voices: call('settings:voices')
   },
   auth: {
