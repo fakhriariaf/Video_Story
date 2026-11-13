@@ -1,9 +1,10 @@
 import type { Job } from '@shared/types'
 import { emit } from './events'
 import { getJobRaw, updateJob } from './repo'
-import { cancelRequest } from './services/higgsfield'
+import { BACKENDS } from './media/backends'
+import { resumePlan } from './media/payload'
 
-export type QueueName = 'higgsfield' | 'tts' | 'whisper' | 'export'
+export type QueueName = 'higgsfield' | 'fal' | 'gemini' | 'tts' | 'whisper' | 'export'
 
 export interface TaskCtx {
   jobId: string
@@ -16,9 +17,9 @@ export interface TaskCtx {
 export type Task = (ctx: TaskCtx) => Promise<string | void | { message: string }>
 
 // Whisper uses most CPU cores by itself, so it runs one file at a time.
-const LIMITS: Record<QueueName, number> = { higgsfield: 3, tts: 2, whisper: 1, export: 1 }
-const running: Record<QueueName, number> = { higgsfield: 0, tts: 0, whisper: 0, export: 0 }
-const waiting: Record<QueueName, (() => void)[]> = { higgsfield: [], tts: [], whisper: [], export: [] }
+const LIMITS: Record<QueueName, number> = { higgsfield: 3, fal: 3, gemini: 2, tts: 2, whisper: 1, export: 1 }
+const running: Record<QueueName, number> = { higgsfield: 0, fal: 0, gemini: 0, tts: 0, whisper: 0, export: 0 }
+const waiting: Record<QueueName, (() => void)[]> = { higgsfield: [], fal: [], gemini: [], tts: [], whisper: [], export: [] }
 const controllers = new Map<string, AbortController>()
 
 function acquire(q: QueueName): Promise<void> {
@@ -93,7 +94,8 @@ export function runJob(job: Job, queue: QueueName, task: Task): Job {
 export async function cancelJob(id: string): Promise<void> {
   const raw = getJobRaw(id)
   if (!raw) return
-  if (raw.remote_id && raw.provider === 'higgsfield') await cancelRequest(raw.remote_id)
+  const plan = resumePlan(raw)
+  if (plan && raw.remote_id) await BACKENDS[plan.provider].cancel(raw.remote_id, plan.payload.resume).catch(() => {})
   const ctrl = controllers.get(id)
   if (ctrl) ctrl.abort()
   else if (raw.status === 'queued' || raw.status === 'running') emit.job(updateJob(id, { status: 'canceled', message: null }))

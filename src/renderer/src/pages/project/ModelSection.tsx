@@ -41,7 +41,7 @@ function Cost({
         Menghitung kredit…
       </span>
     )
-  if (value === null) return <span className="text-muted">Perkiraan kredit belum tersedia.</span>
+  if (value === null || value.credits == null) return <span className="text-muted">Perkiraan kredit belum tersedia.</span>
   return <span>{children(value.credits)}</span>
 }
 

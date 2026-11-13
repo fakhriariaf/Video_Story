@@ -311,8 +311,9 @@ export interface AppSettings {
 }
 
 /** What one Higgsfield request would cost, from the API's estimate endpoint. */
+/** Higgsfield prices in credits (with dollars when known); fal.ai and Gemini in dollars only. */
 export interface CreditEstimate {
-  credits: number
+  credits: number | null
   usd: number | null
 }
 
