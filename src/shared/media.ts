@@ -43,7 +43,7 @@ export const DEFAULT_VIDEO_MODEL = 'kling-video/v3.0/std/image-to-video'
 /** The safe first choice per provider, offered to new projects and marked "Rekomendasi" in the pickers. */
 export const RECOMMENDED: Record<MediaProvider, { image: string; video: string }> = {
   higgsfield: { image: DEFAULT_IMAGE_MODEL, video: DEFAULT_VIDEO_MODEL },
-  fal: { image: 'fal:fal-ai/nano-banana-2', video: 'fal:fal-ai/kling-video/v3/standard/image-to-video' },
+  fal: { image: 'fal:google/nano-banana-2.1', video: 'fal:fal-ai/kling-video/v3/standard/image-to-video' },
   gemini: { image: 'gemini:gemini-nano-banana-2.1', video: 'gemini:gemini-omni-1.1-flash' }
 }
 
@@ -131,6 +131,8 @@ function common(m: MediaModel, prompt: string, aspect: AspectRatio, resolution?:
     const values = p.aspect_ratio.enum
     if (!values || values.includes(aspect)) body.aspect_ratio = aspect
   }
+  // fal's Flux, Seedream, Qwen and GPT Image size by preset name instead of aspect_ratio.
+  if (p.image_size?.enum?.includes('landscape_16_9')) body.image_size = aspect === '16:9' ? 'landscape_16_9' : 'portrait_16_9'
   const res = resolutionFor(m, resolution)
   if (res !== undefined) body.resolution = res
   if (p.quality?.enum) body.quality = p.quality.enum.includes('high') ? 'high' : p.quality.enum[p.quality.enum.length - 1]
@@ -161,7 +163,8 @@ export function imageRequest(m: MediaModel, prompt: string, aspect: AspectRatio,
   const limit = maxRefs(m)
   const v = view(m, limit > 0 && refs.length ? m.withRefs : undefined)
   const body = common(v, prompt, aspect)
-  if (limit > 0 && refs.length && v.input.field) body[v.input.field] = refs.slice(0, limit)
+  // A field that takes one image (Kontext's image_url) gets the first sheet, not a list.
+  if (limit > 0 && refs.length && v.input.field) body[v.input.field] = v.props[v.input.field]?.type === 'string' ? refs[0] : refs.slice(0, limit)
   return { endpoint: v.endpoint, body: checkRequired(v, body) }
 }
 
@@ -177,7 +180,8 @@ export function videoRequest(
   const plan = videoPlan(m, seconds, resolution)
   if (m.provider === 'gemini') return { endpoint: m.endpoint, body: omniBody(m, prompt, image, plan.duration ?? Math.ceil(seconds), aspect, plan.resolution) }
   const body = common(m, videoPrompt(m, prompt), aspect, resolution)
-  if (plan.duration != null) body.duration = plan.duration
+  // Some schemas (Kling, Seedance on fal) list durations as strings.
+  if (plan.duration != null) body.duration = m.props.duration?.type === 'string' ? String(plan.duration) : plan.duration
   if (m.input.field) body[m.input.field] = m.input.mode === 'reference' ? [image] : image
   return { endpoint: m.endpoint, body: checkRequired(m, body) }
 }

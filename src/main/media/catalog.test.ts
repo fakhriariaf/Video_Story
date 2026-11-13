@@ -6,12 +6,15 @@ import {
   fitDuration,
   getImageModel,
   getVideoModel,
+  IMAGE_MODELS,
   imageRequest,
+  maxRefs,
   mediaModelOptions,
   newProjectModels,
   RECOMMENDED,
   videoPlan,
-  videoRequest
+  videoRequest,
+  VIDEO_MODELS
 } from '@shared/media'
 
 test('legacy Higgsfield ids still resolve unchanged', () => {
@@ -102,4 +105,50 @@ test('options are grouped by provider in a fixed order', () => {
   assert.equal(groups[0], 'Higgsfield')
   assert.equal(groups[groups.length - 1], 'Google Gemini')
   assert.equal(mediaModelOptions('image')[0].id, DEFAULT_IMAGE_MODEL)
+})
+
+test('every fal model builds a request that satisfies its schema', () => {
+  const fal = [...IMAGE_MODELS, ...VIDEO_MODELS].filter((m) => m.provider === 'fal')
+  assert.ok(fal.length >= 10, 'fal catalog has at least 10 models')
+  for (const m of fal) {
+    const refs = m.kind === 'image' && maxRefs(m) ? ['https://x/a.png'] : []
+    const r = m.kind === 'image' ? imageRequest(m, 'p', '16:9', refs) : videoRequest(m, 'p', 'https://x/a.png', 5, '9:16', null)
+    const variant = refs.length && m.withRefs ? m.withRefs : m
+    for (const f of variant.required) assert.ok(r.body[f] !== undefined, `${m.id} misses ${f}`)
+    assert.equal(r.endpoint, variant.endpoint)
+  }
+})
+
+test('fal image models without references use the text-to-image endpoint', () => {
+  const m = IMAGE_MODELS.find((x) => x.provider === 'fal' && x.withRefs)!
+  assert.equal(imageRequest(m, 'p', '16:9', []).endpoint, m.endpoint)
+})
+
+test('recommended models exist in the catalog', () => {
+  for (const p of ['higgsfield', 'fal', 'gemini'] as const) {
+    assert.equal(getImageModel(RECOMMENDED[p].image).id, RECOMMENDED[p].image)
+    assert.equal(getVideoModel(RECOMMENDED[p].video).id, RECOMMENDED[p].video)
+  }
+})
+
+test('fal models that size by image_size get the project frame', () => {
+  const flux = getImageModel('fal:fal-ai/flux-2-pro')
+  assert.equal(imageRequest(flux, 'p', '9:16', []).body.image_size, 'portrait_16_9')
+  assert.equal(imageRequest(flux, 'p', '16:9', []).body.image_size, 'landscape_16_9')
+  const seedream = getImageModel('fal:bytedance/seedream/v5.5/text-to-image')
+  assert.equal(imageRequest(seedream, 'p', '16:9', ['https://x/a.png']).body.image_size, 'landscape_16_9')
+})
+
+test('fal durations keep the type their schema asks for', () => {
+  const kling = getVideoModel('fal:fal-ai/kling-video/v3/standard/image-to-video')
+  assert.equal(videoRequest(kling, 'p', 'https://x/a.png', 4.2, '16:9', null).body.duration, '5')
+  const wan = getVideoModel('fal:alibaba/wan-3.0/image-to-video')
+  assert.equal(videoRequest(wan, 'p', 'https://x/a.png', 4.2, '16:9', null).body.duration, 5)
+})
+
+test('fal reference fields that take one image get a single URL', () => {
+  const kontext = getImageModel('fal:fal-ai/flux-pro/kontext/text-to-image')
+  const r = imageRequest(kontext, 'p', '16:9', ['https://x/a.png', 'https://x/b.png'])
+  assert.equal(r.endpoint, 'fal-ai/flux-pro/kontext')
+  assert.equal(r.body.image_url, 'https://x/a.png')
 })
