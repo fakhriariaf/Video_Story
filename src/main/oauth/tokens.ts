@@ -62,3 +62,11 @@ export function singleFlight<T>(key: string, fn: () => Promise<T>): Promise<T> {
   inFlight.set(key, p)
   return p
 }
+
+/**
+ * A refresh may still be on the wire when the user signs out or signs in again. Its result only applies while the
+ * refresh token it used is the one still stored; otherwise it would bring back or overwrite a session the user changed.
+ */
+export function stillCurrent(used: string, current: { tokens: TokenSet | null } | null): boolean {
+  return !!current?.tokens && current.tokens.refreshToken === used
+}

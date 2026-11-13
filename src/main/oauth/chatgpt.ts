@@ -6,7 +6,7 @@ import { verifyIdToken } from './jwt'
 import { LoginCancelled, startLoopback, type Loopback } from './loopback'
 import { createPkce, randomToken } from './pkce'
 import { accountStatus, clearTokens, hostId, markNeedsReauth, readAccount, saveTokens } from './store'
-import { classifyRefreshError, needsRefresh, planUsageGranted, singleFlight, toTokenSet, type TokenResponse } from './tokens'
+import { classifyRefreshError, needsRefresh, planUsageGranted, singleFlight, stillCurrent, toTokenSet, type TokenResponse } from './tokens'
 
 /*
  * "Sign in with ChatGPT" for open-source apps that run locally: the app registers itself on first sign-in
@@ -140,21 +140,28 @@ export async function loginChatGpt(): Promise<AccountStatus> {
   return publish()
 }
 
-async function refresh(): Promise<string> {
+async function refresh(force = false): Promise<string> {
   // Re-read: a refresh that finished just before this one may already have rotated the tokens.
   const acc = readAccount('chatgpt')
   if (!acc?.tokens || !acc.clientId) throw new Error(acc?.needsReauth ? EXPIRED : NOT_SIGNED_IN)
-  if (!needsRefresh(acc.tokens, Date.now())) return acc.tokens.accessToken
+  if (!force && !needsRefresh(acc.tokens, Date.now())) return acc.tokens.accessToken
   if (!acc.tokens.refreshToken) {
     markNeedsReauth('chatgpt')
     publish()
     throw new Error(EXPIRED)
   }
+  const used = acc.tokens.refreshToken
   let res: Response
   try {
-    res = await tokenPost({ grant_type: 'refresh_token', client_id: acc.clientId, refresh_token: acc.tokens.refreshToken, resource: RESOURCE })
+    res = await tokenPost({ grant_type: 'refresh_token', client_id: acc.clientId, refresh_token: used, resource: RESOURCE })
   } catch {
     throw new Error('Tidak bisa memperbarui sesi ChatGPT karena koneksi bermasalah. Coba lagi.')
+  }
+  // The user may have signed out or in while this was on the wire: never overwrite or wipe that newer state.
+  const latest = readAccount('chatgpt')
+  if (!stillCurrent(used, latest)) {
+    if (latest?.tokens && !latest.needsReauth) return latest.tokens.accessToken
+    throw new Error(latest?.needsReauth ? EXPIRED : NOT_SIGNED_IN)
   }
   if (!res.ok) {
     if (classifyRefreshError(res.status, await errorCode(res)) === 'terminal') {
@@ -174,7 +181,12 @@ export async function chatgptAccessToken(): Promise<string> {
   const acc = readAccount('chatgpt')
   if (!acc?.tokens || acc.needsReauth) throw new Error(acc?.needsReauth ? EXPIRED : NOT_SIGNED_IN)
   if (!needsRefresh(acc.tokens, Date.now())) return acc.tokens.accessToken
-  return singleFlight('chatgpt', refresh)
+  return singleFlight('chatgpt', () => refresh())
+}
+
+/** Refreshes even though the token has not reached its stated expiry, after the API rejected it. */
+export function forceRefreshChatGpt(): Promise<string> {
+  return singleFlight('chatgpt', () => refresh(true))
 }
 
 export async function logoutChatGpt(): Promise<{ revoked: boolean }> {

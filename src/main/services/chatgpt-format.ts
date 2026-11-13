@@ -102,14 +102,23 @@ function completedText(payload: any): string | null {
 /** Reads a Responses stream to its final text. Only response.completed counts as success. */
 export async function readResponsesStream(events: AsyncIterable<SseEvent>): Promise<string> {
   let text = ''
-  for await (const e of events) {
-    const payload = parseJson(e.data)
-    const type = e.event ?? payload?.type
-    if (type === 'response.output_text.delta') text += String(payload?.delta ?? '')
-    else if (type === 'response.completed') return completedText(payload) ?? text
-    else if (type === 'response.incomplete') throw new ChatGptError(0, 'incomplete')
-    else if (type === 'response.failed') throw fromErrorObject(0, payload?.response?.error)
-    else if (type === 'error') throw fromErrorObject(0, payload?.error ?? payload)
+  try {
+    for await (const e of events) {
+      const payload = parseJson(e.data)
+      const type = e.event ?? payload?.type
+      if (type === 'response.output_text.delta') text += String(payload?.delta ?? '')
+      else if (type === 'response.completed') return completedText(payload) ?? text
+      else if (type === 'response.incomplete') throw new ChatGptError(0, 'incomplete')
+      else if (type === 'response.failed') throw fromErrorObject(0, payload?.response?.error)
+      else if (type === 'error') throw fromErrorObject(0, payload?.error ?? payload)
+    }
+  } catch (e) {
+    // A dropped connection surfaces as a bare "terminated"/ECONNRESET from the body reader; cancels and timeouts
+    // keep their own meaning for the caller.
+    if (e instanceof ChatGptError) throw e
+    const name = (e as Error)?.name
+    if (name === 'AbortError' || name === 'TimeoutError') throw e
+    throw new ChatGptError(0, 'interrupted')
   }
   throw new ChatGptError(0, 'interrupted')
 }

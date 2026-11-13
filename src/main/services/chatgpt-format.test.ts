@@ -71,3 +71,19 @@ test('http errors map to Indonesian messages', () => {
   assert.equal(isRetryable(unavailable), true)
   assert.match(unavailable.message, /sedang tidak tersedia/)
 })
+
+test('readResponsesStream maps a network error mid-stream to interrupted', async () => {
+  async function* broken(): AsyncGenerator<{ event: string | null; data: string }> {
+    yield { event: 'response.output_text.delta', data: '{"delta":"{"}' }
+    throw new TypeError('terminated')
+  }
+  await assert.rejects(readResponsesStream(broken()), (e) => e instanceof ChatGptError && e.code === 'interrupted')
+})
+
+test('readResponsesStream lets a user abort through unchanged', async () => {
+  async function* aborted(): AsyncGenerator<{ event: string | null; data: string }> {
+    yield { event: 'response.output_text.delta', data: '{"delta":"{"}' }
+    throw new DOMException('aborted', 'AbortError')
+  }
+  await assert.rejects(readResponsesStream(aborted()), (e) => (e as Error).name === 'AbortError')
+})

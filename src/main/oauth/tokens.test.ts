@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict'
 import { test } from 'node:test'
-import { classifyRefreshError, needsRefresh, planUsageGranted, singleFlight, toTokenSet } from './tokens'
+import { classifyRefreshError, needsRefresh, planUsageGranted, singleFlight, stillCurrent, toTokenSet } from './tokens'
 
 test('toTokenSet computes expiry and splits scope', () => {
   const t = toTokenSet({ access_token: 'a', refresh_token: 'r', expires_in: 3600, scope: 'openid chatgpt.tokens.use.direct' }, 1000)
@@ -50,4 +50,12 @@ test('singleFlight runs once for concurrent callers', async () => {
 test('singleFlight releases the key after a failure', async () => {
   await assert.rejects(singleFlight('f', async () => Promise.reject(new Error('boom'))), /boom/)
   assert.equal(await singleFlight('f', async () => 'ok'), 'ok')
+})
+
+test('stillCurrent only accepts the refresh token that is still stored', () => {
+  const stored = toTokenSet({ access_token: 'a', refresh_token: 'r1' }, 0)
+  assert.equal(stillCurrent('r1', { tokens: stored }), true)
+  assert.equal(stillCurrent('r1', { tokens: toTokenSet({ access_token: 'b', refresh_token: 'r2' }, 0) }), false)
+  assert.equal(stillCurrent('r1', { tokens: null }), false)
+  assert.equal(stillCurrent('r1', null), false)
 })

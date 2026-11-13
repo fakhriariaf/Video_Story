@@ -1,6 +1,7 @@
 import type { ModelOption } from '@shared/types'
-import { chatgptAccessToken } from '../oauth/chatgpt'
+import { chatgptAccessToken, forceRefreshChatGpt } from '../oauth/chatgpt'
 import { readAccount } from '../oauth/store'
+import { withAuthRetry } from './auth-retry'
 import { sleep } from './http'
 import { buildResponsesBody, ChatGptError, chatGptErrorFromHttp, isFormatRejected, isRetryable, readResponsesStream, type ResponsesMode } from './chatgpt-format'
 import { extractJson } from './json'
@@ -11,13 +12,17 @@ const GENERATE_TIMEOUT_MS = 4 * 60 * 1000
 const RETRY_DELAYS_MS = [2000, 4000]
 
 async function authorized(path: string, init: RequestInit = {}): Promise<Response> {
-  const token = await chatgptAccessToken()
   let res: Response
   try {
-    res = await fetch(`${API}${path}`, { ...init, headers: { Authorization: `Bearer ${token}`, ...(init.headers ?? {}) } })
+    res = await withAuthRetry(
+      (token) => fetch(`${API}${path}`, { ...init, headers: { Authorization: `Bearer ${token}`, ...(init.headers ?? {}) } }),
+      chatgptAccessToken,
+      forceRefreshChatGpt
+    )
   } catch (e) {
-    if ((e as Error).name === 'AbortError' || (e as Error).name === 'TimeoutError') throw e
-    throw new Error(`Tidak bisa terhubung ke ChatGPT: ${(e as Error).message}`)
+    // fetch reports network failures as TypeError; sign-in errors from the token refresh already read well.
+    if (e instanceof TypeError) throw new Error(`Tidak bisa terhubung ke ChatGPT: ${e.message}`)
+    throw e
   }
   if (!res.ok) throw chatGptErrorFromHttp(res.status, await res.text().catch(() => ''))
   return res
