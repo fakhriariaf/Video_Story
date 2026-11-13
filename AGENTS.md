@@ -1,7 +1,7 @@
 # AGENTS.md — panduan untuk AI agent dan pengembang
 
 Video Story adalah aplikasi desktop (Electron + React + TypeScript) yang mengubah ide cerita menjadi video YouTube:
-AI menulis naskah dan rencana visual, Higgsfield membuat gambar dan video, Gemini atau ElevenLabs membuat suara
+AI menulis naskah dan rencana visual, Higgsfield, fal.ai, atau Google Gemini membuat gambar dan video, Gemini atau ElevenLabs membuat suara
 narator, lalu semuanya dirangkai di editor timeline dan diekspor jadi MP4 dengan FFmpeg.
 
 Baca file ini dulu sebelum mengubah kode. Detail lengkapnya ada di folder [`docs/`](docs/README.md).
@@ -31,7 +31,8 @@ src/
     repo.ts        akses SQLite (proyek, klip, pemeran, aset, job)
     db/index.ts    skema + migrasi (PRAGMA user_version)
     story.ts       naskah, rencana visual, prompt musik (LLM)
-    generation.ts  gambar/video Higgsfield, lembar karakter, TTS per klip, estimasi kredit
+    generation.ts  gambar/video (semua penyedia), lembar karakter, TTS per klip, estimasi harga
+    media/         lapisan penyedia gambar/video (backends.ts) dan payload job yang bisa dilanjutkan
     narration.ts   narasi satu rekaman utuh lalu dipotong per adegan; sinkron caption
     whisper.ts     whisper.cpp lokal (unduh model, kenali kata)
     align.ts, cuts.ts  cocokkan kata naskah ke hasil Whisper; pilih titik potong antar-adegan
@@ -40,7 +41,7 @@ src/
     fontMetrics.ts lebar teks dari file TTF (untuk kotak caption di ekspor)
     jobs.ts, events.ts  antrean job + event ke renderer
     secrets.ts     kunci API terenkripsi (safeStorage/DPAPI)
-    services/      klien API: gemini, elevenlabs, higgsfield, llm (OpenAI-compatible), audio, http
+    services/      klien API: gemini, gemini-media, elevenlabs, higgsfield, fal, llm (OpenAI-compatible), audio, http
     devharness.ts  otomatisasi uji (hanya mode pengembangan)
   preload/         jembatan aman: window.api (lihat src/shared/api.ts)
   shared/          kode yang dipakai main DAN renderer (tipe, aturan gerak, caption, timeline)

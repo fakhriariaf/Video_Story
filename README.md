@@ -6,7 +6,7 @@
 
 **Ubah ide cerita jadi video YouTube, langsung dari komputermu.**
 
-AI menyusun naskah dan visual, Higgsfield membuat gambar dan video, narator AI mengisi suara,<br>
+AI menyusun naskah dan visual, Higgsfield, fal.ai, atau Google Gemini membuat gambar dan video, narator AI mengisi suara,<br>
 lalu kamu merapikannya di editor timeline dan mengekspor MP4.
 
 [![Versi](https://img.shields.io/badge/versi-1.0.0-4338ca?style=flat-square)](CHANGELOG.md)
@@ -43,7 +43,7 @@ Semua proyek, gambar, video, dan suara disimpan di komputermu. Kamu memakai kunc
   - bahasa dan format (16:9 atau 9:16);
   - gaya visual (2D, 3D, atau realistis);
   - suara narator.
-- Pilih model gambar dan video Higgsfield per proyek, lengkap dengan perkiraan kredit.
+- Pilih penyedia dan model gambar/video per proyek (Higgsfield, fal.ai, atau Google Gemini), lengkap dengan perkiraan harga.
 
 **2. Naskah**
 - AI menulis alur dan narasi (VO) setiap adegan. Adegan bisa diubah, ditambah, dihapus, dan diurutkan ulang.
@@ -55,7 +55,7 @@ Semua proyek, gambar, video, dan suara disimpan di komputermu. Kamu memakai kunc
   - pemeran beserta lembar karakter;
   - gerak kamera dan transisi;
   - arahan gerak untuk video AI.
-- Tersedia 14 model gambar dan 34 model video dari Higgsfield.
+- Tersedia 28 model gambar dan 49 model video dari Higgsfield, fal.ai, dan Google Gemini.
 - Narasi direkam dalam satu rekaman utuh (Gemini TTS atau ElevenLabs), lalu dipotong otomatis per adegan. Suara dan intonasinya jadi konsisten.
 
 **4. Editor**
@@ -98,7 +98,7 @@ Semua proyek, gambar, video, dan suara disimpan di komputermu. Kamu memakai kunc
 
 - **Windows 10/11 64-bit.** Aplikasi juga bisa dijalankan dari kode sumber di macOS, tapi belum diuji penuh. Caption akurat (Whisper) dan installer baru tersedia untuk Windows.
 - **Kunci API** (lihat [Kunci API](#kunci-api)) untuk:
-  - Higgsfield;
+  - satu penyedia gambar dan video (Higgsfield, fal.ai, atau Google Gemini);
   - satu penyusun cerita;
   - satu penyedia suara narator.
 - **Node.js 22 atau lebih baru**, hanya kalau menjalankan dari kode sumber.
@@ -137,7 +137,7 @@ Setiap bagian (penyusun cerita, suara narator) punya satu dropdown penyedia. Han
 
 | Layanan | Dipakai untuk | Wajib |
 |---|---|---|
-| [Higgsfield](https://higgsfield.ai) (satu kunci dari tombol **Copy API key**, format `KEY_ID:KEY_SECRET`) | Gambar, lembar karakter, video AI | Ya |
+| Penyedia gambar dan video, pilih satu atau lebih: [Higgsfield](https://higgsfield.ai) (kunci dari tombol **Copy API key**, format `KEY_ID:KEY_SECRET`), [fal.ai](https://fal.ai), atau Google Gemini (kunci yang sama dengan TTS, butuh billing aktif) | Gambar, lembar karakter, video AI | Ya, salah satu |
 | Penyusun cerita, pilih satu: **ChatGPT (langganan, login akun)**, Google Gemini, OpenRouter (API key atau **Login dengan OpenRouter**), Groq, atau endpoint custom yang kompatibel dengan OpenAI | Naskah, rencana visual, pemeran | Ya, salah satu |
 | Google Gemini | Suara narator Gemini TTS | Kalau memakai Gemini TTS |
 | ElevenLabs | Suara narator dengan waktu per kata yang presisi | Opsional |
@@ -155,10 +155,10 @@ Setiap bagian (penyusun cerita, suara narator) punya satu dropdown penyedia. Han
 <summary><b>Apakah Video Story gratis?</b></summary>
 
 Ya. Aplikasinya gratis dan kodenya terbuka dengan lisensi MIT. Yang berbayar hanya pemakaian layanan AI. Biayanya kamu bayar langsung ke penyedia, dengan kunci API milikmu:
-- kredit Higgsfield untuk gambar dan video;
+- kredit Higgsfield, saldo fal.ai, atau tagihan Google untuk gambar dan video;
 - biaya Gemini, OpenRouter, Groq, atau ElevenLabs sesuai paket akunmu.
 
-Perkiraan kredit tiap model Higgsfield ditampilkan sebelum membuat gambar atau video. Perkiraannya diambil dari endpoint `estimate` Higgsfield, yang tidak memakai kredit.
+Perkiraan harga tiap model ditampilkan sebelum membuat gambar atau video: kredit untuk Higgsfield (dari endpoint `estimate`, tanpa memakai kredit), dolar untuk fal.ai (dari daftar harganya) dan Gemini (dari tarif resmi Google).
 </details>
 
 <details>
@@ -180,9 +180,9 @@ Gemini TTS tidak mengirim waktu per kata, jadi tanpa Whisper waktunya hanya perk
 </details>
 
 <details>
-<summary><b>Kenapa model Seedream tidak ada?</b></summary>
+<summary><b>Di mana model Seedream?</b></summary>
 
-Seedream belum tersedia di API Higgsfield, hanya di aplikasi web mereka. Model bawaannya:
+Seedream belum tersedia di API Higgsfield, tapi Seedream 5.5 bisa dipakai lewat fal.ai. Model bawaan Higgsfield:
 - gambar: GPT Image 2.5 Sunburst;
 - video: Kling 3.0 Standard.
 
@@ -206,7 +206,7 @@ npm run dist         # installer Windows ke folder dist/
 | Penyimpanan | SQLite (better-sqlite3) dan file lokal |
 | Video dan audio | FFmpeg (ffmpeg-static), caption ASS/libass |
 | Caption akurat | whisper.cpp dengan model Whisper Small |
-| Layanan AI | Higgsfield, Google Gemini, OpenRouter, Groq, ElevenLabs |
+| Layanan AI | Higgsfield, fal.ai, Google Gemini, OpenRouter, Groq, ElevenLabs |
 
 ```
 src/

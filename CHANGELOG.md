@@ -9,6 +9,12 @@ Cara menaikkan versi ada di [docs/pengembangan.md](docs/pengembangan.md#versi-da
 ## [Belum dirilis]
 
 ### Ditambahkan
+- Penyedia gambar dan video baru selain Higgsfield: **fal.ai** (25 model terpilih, antara lain Nano Banana,
+  Flux, Seedream, GPT Image, Kling, Seedance, Wan, MiniMax) dan **Google Gemini** (Nano Banana untuk gambar, Gemini
+  Omni Flash untuk video, memakai kunci Gemini yang sama dengan TTS).
+- Pemilih model dikelompokkan per penyedia; model dari penyedia yang kuncinya belum diisi ditandai. Perkiraan harga
+  dalam kredit (Higgsfield) atau dolar (fal.ai, Gemini).
+- Proyek baru otomatis memakai penyedia gambar yang kuncinya ada, kalau kunci Higgsfield belum diisi.
 - Penyusun cerita **ChatGPT (langganan)**: login dengan akun ChatGPT lewat "Sign in with ChatGPT", tanpa API key.
   Penyusunan cerita memakai kuota paket ChatGPT.
 - Tombol **Login dengan OpenRouter**: kunci OpenRouter dibuat otomatis lewat login di browser.

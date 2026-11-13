@@ -14,12 +14,13 @@ Pengguna memasukkan kuncinya sendiri di **Pengaturan › Layanan AI dan kunci**.
 - `requireSecret(provider)` melempar error berbahasa Indonesia kalau kunci belum ada.
 - `revealSecret` hanya dipanggil tombol "tampilkan kunci" di Pengaturan.
 - **Jangan pernah** menulis kunci ke log, pesan error, file, URL, atau mengirimnya ke layanan lain.
-- Mengganti kunci Higgsfield menghapus cache estimasi kredit (`forgetEstimates`).
+- Mengganti kunci Higgsfield, fal.ai, atau Gemini menghapus cache estimasi harga penyedia itu (`forgetEstimates(provider)`).
 
 | Penyedia (`ApiProvider`) | Dipakai untuk |
 |---|---|
 | `higgsfield` | gambar, lembar karakter, video |
-| `gemini` | LLM (naskah/visual) dan Gemini TTS |
+| `fal` | gambar, lembar karakter, video |
+| `gemini` | LLM (naskah/visual), Gemini TTS, gambar (Nano Banana), dan video (Omni Flash) |
 | `elevenlabs` | TTS |
 | `openrouter`, `groq`, `custom` | LLM lewat API kompatibel OpenAI |
 
@@ -86,7 +87,57 @@ Program resmi "Sign in with ChatGPT / ChatGPT plan usage" untuk aplikasi open-so
 
 Narasi selalu dibuat satu rekaman utuh lalu dipotong. Lihat [alur-produksi.md](alur-produksi.md#4-narasi-srcmainnarrationts).
 
-## Higgsfield (`services/higgsfield.ts`, `shared/higgsfield.ts`)
+## Gambar dan video: tiga penyedia
+
+Model dipilih per proyek (`Project.imageModel`, `Project.videoModel`). Semua model ada di satu katalog,
+`src/shared/media.ts`, yang menggabungkan tiga sumber. ID model menentukan penyedianya:
+
+| Penyedia | ID model | Sumber katalog | Harga |
+|---|---|---|---|
+| Higgsfield | tanpa awalan, misalnya `kling-video/v3.0/std/image-to-video` | `shared/higgsfield-catalog.json` | kredit, dari endpoint `estimate` |
+| fal.ai | `fal:<endpoint>`, misalnya `fal:google/nano-banana-2.1` | `shared/fal-catalog.json` (dibuat `scripts/fal-catalog.mjs`) | dolar, dari API harga fal |
+| Google Gemini | `gemini:<model>`, misalnya `gemini:gemini-nano-banana-2.1` | `shared/gemini-media.ts` (ditulis tangan) | dolar, dari tarif resmi yang disimpan di katalog |
+
+- `imageRequest` dan `videoRequest` (di `media.ts`) membuat isian permintaan untuk semua penyedia. Higgsfield dan
+  fal dibentuk dari skema tiap model; Gemini punya pembentuk sendiri (`geminiImageBody`, `omniBody`).
+- `src/main/media/backends.ts` punya satu adaptor per penyedia: menyiapkan gambar referensi (URL publik, atau data
+  base64 untuk Gemini), mengirim, menunggu, membatalkan, dan memperkirakan harga. `generation.ts` hanya memakai
+  adaptor ini.
+- Job yang sudah terkirim bisa dilanjutkan setelah aplikasi dibuka lagi (`media/payload.ts`, `resumePlan`). Gambar
+  Gemini selesai langsung dalam satu permintaan, jadi kalau terputus ditandai gagal.
+- Proyek baru memakai model bawaan Higgsfield, kecuali tidak ada kunci Higgsfield. Dalam kasus itu dipakai model
+  rekomendasi penyedia pertama yang kuncinya ada (`newProjectModels`, urutan Higgsfield, fal.ai, Gemini).
+
+## fal.ai (`services/fal.ts`, `services/fal-format.ts`)
+
+- Antrean: `POST https://queue.fal.run/<endpoint>` dengan header `Authorization: Key <kunci>` → `request_id`,
+  `status_url`, `response_url`, `cancel_url`. Ketiga URL disimpan di payload job supaya bisa dilanjutkan.
+- Gambar referensi dan frame pertama diunggah ke CDN fal (`rest.fal.ai/storage/upload/initiate`), URL-nya disimpan
+  di `meta.falUrl` aset selama 12 jam.
+- Harga: `GET https://api.fal.ai/v1/models/pricing?endpoint_id=…`. Satuan per gambar, per detik, atau per video
+  dihitung (`falUsd`); satuan lain (misalnya megapiksel) tidak diperkirakan. Tes kunci memakai panggilan ini juga,
+  jadi tidak memakai saldo.
+- **Memperbarui daftar model:** ubah daftar kurasi di `scripts/fal-catalog.mjs`, lalu jalankan
+  `node scripts/fal-catalog.mjs`. Skrip mengambil skema OpenAPI tiap endpoint, menyimpan varian `/edit` sebagai
+  `withRefs` (dipakai kalau ada lembar karakter), dan melewati model yang isian wajibnya tidak bisa diisi aplikasi.
+  Setelah itu jalankan `npm test` (`catalog.test.ts` mengecek setiap model fal).
+- Banyak model gambar fal memakai `image_size` (`landscape_16_9`/`portrait_16_9`) dan bukan `aspect_ratio`;
+  sebagian model video meminta `duration` berupa teks. Keduanya ditangani di `media.ts`.
+
+## Gambar dan video Gemini (`services/gemini-media.ts`, `shared/gemini-media.ts`)
+
+- Memakai kunci Gemini yang sama dengan TTS. **Gambar dan video tidak termasuk free tier**; tanpa billing aktif,
+  Google menjawab kuota 0 dan aplikasi menampilkan "Gambar dan video Gemini butuh billing aktif di Google AI Studio."
+- Gambar (Nano Banana): `POST v1beta/models/<model>:generateContent` dengan `responseModalities: ["TEXT","IMAGE"]`,
+  `imageConfig.aspectRatio` dan `imageSize`. Lembar karakter dikirim sebagai `inline_data` (diperkecil kalau lebih
+  dari 3 MB). Jawaban tanpa gambar atau yang diblokir keamanan konten dijelaskan ke pengguna.
+- Video (**Gemini Omni Flash**, `gemini-omni-1.1-flash`): Veo 3.1 di Gemini API dimatikan Google pada 22 Oktober
+  2026, jadi video memakai Omni lewat `POST v1beta/interactions` (`video_config.task: image_to_video`,
+  `response_format: { type: video, aspect_ratio, resolution, delivery: uri }`). Hasilnya file `files/<id>` yang
+  di-poll sampai `ACTIVE` lalu diunduh dari `files/<id>:download?alt=media`. Omni tidak punya parameter durasi
+  (3–10 detik), jadi panjang yang diinginkan ditulis di prompt.
+
+## Higgsfield (`services/higgsfield.ts`)
 
 - Base URL `https://api.higgsfield.ai`, header `Authorization: Key <kunci>`.
 - Alur: `submit(endpoint, body)` → polling `getStatus` → unduh hasil. `uploadFile` mengunggah gambar referensi
@@ -118,13 +169,14 @@ di API Higgsfield (hanya di aplikasi webnya). Satu entri:
 ```
 
 - `input.field`/`mode`/`max`: tempat gambar referensi atau frame pertama dikirim, dan berapa banyak.
-- `props`: skema parameter dari dokumentasi Higgsfield. `imageBody`/`videoBody` di `shared/higgsfield.ts`
+- `props`: skema parameter dari dokumentasi Higgsfield. `imageRequest`/`videoRequest` di `shared/media.ts`
   mengisinya secara umum: rasio, resolusi, kualitas, durasi, mematikan `enhance_prompt`, `prompt_extend`, dan audio.
 - `durations`: rentang (`min`/`max`) atau daftar (`values`) durasi video.
 - **Menambah model**: tambahkan entri baru dengan format yang sama dari dokumentasi API Higgsfield
-  (`https://docs.higgsfield.ai/docs/llms.txt`), lalu pastikan `imageBody`/`videoBody` tidak melempar error
+  (`https://docs.higgsfield.ai/docs/llms.txt`), lalu pastikan `imageRequest`/`videoRequest` tidak melempar error
   "butuh <field>" (`checkRequired`). Ikon keluarga model diatur di `components/ModelLogo.tsx`.
-- Model bawaan: `DEFAULT_IMAGE_MODEL` dan `DEFAULT_VIDEO_MODEL` di `shared/higgsfield.ts`.
+- Model bawaan: `DEFAULT_IMAGE_MODEL` dan `DEFAULT_VIDEO_MODEL` di `shared/media.ts`; rekomendasi per penyedia di
+  `RECOMMENDED`.
 
 ## Whisper lokal (`src/main/whisper.ts`)
 

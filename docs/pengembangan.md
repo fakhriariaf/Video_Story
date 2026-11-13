@@ -105,6 +105,16 @@ Tips:
 - Untuk menguji dengan data proyek asli, salin `studio.db` lewat backup SQLite ke folder uji, **kosongkan tabel
   `secrets`** di salinan, lalu salin folder proyeknya.
 
+## Memperbarui daftar model fal.ai
+
+```bash
+node scripts/fal-catalog.mjs   # ambil ulang skema OpenAPI tiap model di daftar kurasi
+npm test                       # catalog.test.ts mengecek isian setiap model fal
+```
+
+Daftar kurasinya ada di awal `scripts/fal-catalog.mjs`. Model yang tidak ditemukan atau butuh isian yang tidak bisa
+diisi aplikasi dilewati dengan peringatan.
+
 ## Menguji modul bersama tanpa aplikasi
 
 Modul `src/shared/*` murni TypeScript dan bisa dijalankan di Node:
