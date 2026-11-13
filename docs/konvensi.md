@@ -28,7 +28,7 @@
 | `paper` / `surface` / `sand` | `#faf7f2` / `#ffffff` / `#f3efe8` | latar halaman / kartu / isian |
 | `ink`, `ink-2`, `muted` | `#1f1d1a`, `#57524a`, `#6b665e` | teks utama, sekunder, redup |
 | `line`, `line-2`, `line-3` | krem keabuan | garis dan border |
-| `accent` (+ `-dark`, `-soft`) | `#c93a1b` | tombol utama, **tanda terpilih** |
+| `accent` (+ `-dark`, `-soft`) | `#4338ca` | tombol utama, **tanda terpilih** |
 | `sun` (+ `-soft`, `-ink`) | `#ffc93c` | sorotan, pilihan aktif di daftar |
 | `ok-*`, `info-*`, `bad-*` | hijau, biru, merah | status |
 

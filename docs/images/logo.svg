@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="96" height="96" viewBox="0 0 34 34">
-  <title>Bang Story</title>
-  <rect x="1" y="1" width="32" height="32" rx="9" fill="#C93A1B" stroke="#1F1D1A" stroke-width="1.5"/>
-  <circle cx="17" cy="11" r="4.2" fill="#FFFFFF" stroke="#1F1D1A" stroke-width="1.6"/>
-  <path d="M17 15.4v7.1M17 17.6l-5 3.4M17 17.6l5.2-4.2M17 22.5l-3.6 6M17 22.5l3.6 6" fill="none" stroke="#1F1D1A" stroke-width="1.8" stroke-linecap="round"/>
+  <title>Video Story</title>
+  <circle cx="17" cy="17.5" r="15.5" fill="#4338CA" stroke="#1F1D1A" stroke-width="1.5"/>
+  <path d="M13.2 10.6v13.8l12.1-6.9z" fill="#FFFFFF" stroke="#1F1D1A" stroke-width="1.6" stroke-linejoin="round"/>
+  <path d="M27 2.6Q27.55 6.15 31.1 6.7Q27.55 7.25 27 10.8Q26.45 7.25 22.9 6.7Q26.45 6.15 27 2.6Z" fill="#FFC93C" stroke="#1F1D1A" stroke-width="1.2" stroke-linejoin="round"/>
 </svg>

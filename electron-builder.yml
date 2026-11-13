@@ -1,5 +1,5 @@
-appId: id.bangtutorial.bangstory
-productName: Bang Story
+appId: id.fakhriariaf.videostory
+productName: Video Story
 directories:
   buildResources: build
   output: dist
@@ -13,6 +13,8 @@ extraResources:
     to: fonts
   - from: node_modules/ffmpeg-static/ffmpeg.exe.LICENSE
     to: licenses/FFmpeg-LICENSE.txt
+  - from: LICENSE
+    to: licenses/VideoStory-LICENSE.txt
   - from: resources/licenses
     to: licenses
   - from: resources/whisper
@@ -24,10 +26,10 @@ win:
   target:
     - target: nsis
       arch: [x64]
-  artifactName: BangStory-Setup-${version}.${ext}
+  artifactName: VideoStory-Setup-${version}.${ext}
 nsis:
   oneClick: false
   allowToChangeInstallationDirectory: true
   createDesktopShortcut: true
-  shortcutName: Bang Story
+  shortcutName: Video Story
 npmRebuild: true

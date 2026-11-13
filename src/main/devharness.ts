@@ -67,7 +67,7 @@ function addDemoOverlays(projectId: string): void {
           {
             id: 'ov-text',
             kind: 'text',
-            text: 'Bang Story\nby Bang Tutorial',
+            text: 'Video Story\nby Fakhri Ariaf',
             anchor: 5,
             x: 0.5,
             y: 0.42,
