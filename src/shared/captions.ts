@@ -56,7 +56,7 @@ export const CAPTION_STYLES: CaptionStyle[] = [
     weight: 600,
     size: 0.046,
     color: '#1F1D1A',
-    highlight: '#C93A1B',
+    highlight: '#4338CA',
     box: '#FAF7F2',
     boxAlpha: 0.94,
     outline: 0,

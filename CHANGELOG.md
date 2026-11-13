@@ -10,7 +10,7 @@ Cara menaikkan versi ada di [docs/pengembangan.md](docs/pengembangan.md#versi-da
 
 ## [1.0.0] - 2026-10-02
 
-Rilis pertama Bang Story (sebelumnya bernama Studio Cerita).
+Rilis pertama Video Story.
 
 ### Alur produksi
 - Empat langkah: **Ide cerita → Naskah → Storyboard → Editor**, tersimpan otomatis di database lokal.
@@ -53,11 +53,11 @@ Rilis pertama Bang Story (sebelumnya bernama Studio Cerita).
 
 ### Lainnya
 - Kunci API milik pengguna (BYOK), disimpan terenkripsi dengan DPAPI Windows (`safeStorage`).
-- Halaman About menampilkan versi aplikasi, tautan ke channel Bang Tutorial, dan video tutorial.
+- Halaman About menampilkan versi aplikasi, pembuat, dan lisensi.
 - Salinan siap jalan dengan skrip START untuk Windows dan macOS.
 - Dokumentasi pengembang: [AGENTS.md](AGENTS.md) dan folder [docs/](docs/README.md).
 - Kode dirilis dengan [lisensi MIT](LICENSE). README dilengkapi badge dan screenshot.
-- Installer Windows (`BangStory-Setup-1.0.0.exe`) dengan ikon dari logo Bang Story.
+- Installer Windows (`VideoStory-Setup-1.0.0.exe`) dengan ikon dari logo Video Story.
 
 ### Batasan yang diketahui
 Lihat [docs/masalah-diketahui.md](docs/masalah-diketahui.md). Yang paling terasa:

@@ -1,6 +1,6 @@
-# Dokumentasi pengembang Bang Story
+# Dokumentasi pengembang Video Story
 
-Dokumentasi ini untuk siapa pun yang ingin mengembangkan Bang Story, baik sendiri maupun dibantu AI agent
+Dokumentasi ini untuk siapa pun yang ingin mengembangkan Video Story, baik sendiri maupun dibantu AI agent
 (Claude Code, Codex, Cursor, Gemini CLI, dan lainnya). Untuk cara *memakai* aplikasi, lihat
 [README di root](../README.md).
 

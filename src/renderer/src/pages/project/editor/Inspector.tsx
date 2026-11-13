@@ -470,7 +470,7 @@ function CaptionTiming() {
 }
 
 const TEXT_SWATCHES = ['#FFFFFF', '#1F1D1A', '#FFC93C', '#E4572E', '#4DABF7', '#51CF66', '#F783AC']
-const BOX_SWATCHES = ['#1F1D1A', '#FFFFFF', '#C93A1B', '#FFC93C', '#1E4A7A', '#25572B']
+const BOX_SWATCHES = ['#1F1D1A', '#FFFFFF', '#4338CA', '#FFC93C', '#1E4A7A', '#25572B']
 
 /** A row of colour dots plus a free colour picker. */
 function Swatches({ value, colors, label, onChange }: { value: string | null; colors: string[]; label: string; onChange: (c: string) => void }) {

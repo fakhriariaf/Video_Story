@@ -1,0 +1,8 @@
+{
+  "name": "Video Story",
+  "by": "Fakhri Ariaf",
+  "app_id": "id.fakhriariaf.videostory",
+  "avoid": ["Bang Story", "BangStory", "bang-story", "Bang Tutorial", "bangtutorial", "Studio Cerita"],
+  "domains": ["youtube.com/bangtutorial", "id.bangtutorial.bangstory"],
+  "colors": ["#c93a1b", "#9e2c13", "#fff6f2"]
+}
