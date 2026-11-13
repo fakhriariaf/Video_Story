@@ -40,7 +40,8 @@ export function ModelPicker({
   align = 'left',
   menuClassName,
   footerNote,
-  renderIcon
+  renderIcon,
+  renderGroup
 }: {
   value: string
   models: ModelOption[]
@@ -64,6 +65,8 @@ export function ModelPicker({
   footerNote?: string
   /** A mark shown before each model name, e.g. its brand logo. */
   renderIcon?: (m: ModelOption) => ReactNode
+  /** A mark shown before each group heading, e.g. the provider's logo. */
+  renderGroup?: (group: string) => ReactNode
 }) {
   const [menu, setMenu] = useState<{ up: boolean; max: number }>({ up: false, max: 440 })
   const [open, setOpen] = useState(!!defaultOpen)
@@ -108,14 +111,17 @@ export function ModelPicker({
       .map(([t]) => t)
   }, [models, tagFilters])
 
-  // Higgsfield lists carry credit estimates (creditUnit marks them); known prices can be sorted cheapest first.
-  const priced = models.some((m) => m.credits != null)
+  // Image and video lists carry price estimates (creditUnit marks them); known prices can be sorted cheapest first.
+  const priced = models.some((m) => m.credits != null || (m.creditUnit !== undefined && m.usd != null))
 
   const filtered = useMemo(() => {
     const words = query.toLowerCase().split(/\s+/).filter(Boolean)
     const list = models.filter((m) => matches(m, words) && tags.every((t) => m.tags.includes(t)))
     if (!cheapFirst) return list
-    return [...list].sort((a, b) => (a.credits ?? Infinity) - (b.credits ?? Infinity))
+    // Credits and dollars do not compare, so cheapest-first sorts inside each provider group.
+    const groups = [...new Set(models.map((m) => m.group))]
+    const cost = (m: ModelOption): number => m.credits ?? m.usd ?? Infinity
+    return [...list].sort((a, b) => groups.indexOf(a.group) - groups.indexOf(b.group) || cost(a) - cost(b))
   }, [models, query, tags, cheapFirst])
 
   const customId = query.trim()
@@ -142,7 +148,9 @@ export function ModelPicker({
       setActive((a) => Math.max(0, a - 1))
     } else if (e.key === 'Enter') {
       e.preventDefault()
-      if (active < filtered.length) pick(filtered[active].id)
+      if (active < filtered.length) {
+        if (!filtered[active].locked) pick(filtered[active].id)
+      }
       else if (showCustom) pick(customId)
     } else if (e.key === 'Escape') {
       setOpen(false)
@@ -262,20 +270,28 @@ export function ModelPicker({
             {filtered.map((m, i) => {
               const selected = m.id === value
               const price = priceLabel(m)
+              const heading = m.group && m.group !== filtered[i - 1]?.group
               return (
+                <div key={m.id}>
+                  {heading && (
+                    <div className="flex items-center gap-2 px-3 pb-1 pt-2.5 text-[11.5px] font-semibold uppercase tracking-wide text-muted">
+                      {renderGroup?.(m.group!)}
+                      {m.group}
+                    </div>
+                  )}
                 <button
-                  key={m.id}
                   type="button"
                   role="option"
                   aria-selected={selected}
+                  aria-disabled={!!m.locked}
                   data-row={i}
                   onMouseEnter={() => setActive(i)}
-                  onClick={() => pick(m.id)}
-                  title={detail === 'description' ? m.id : undefined}
+                  onClick={() => !m.locked && pick(m.id)}
+                  title={m.locked ?? (detail === 'description' ? m.id : undefined)}
                   // The chosen model is marked by its background, which keeps the list narrow.
                   className={cx(
                     'flex w-full items-start gap-2.5 rounded-xl px-3 py-2 text-left',
-                    selected ? 'bg-sun-soft' : i === active ? 'bg-sand' : 'hover:bg-sand/60'
+                    m.locked ? 'cursor-not-allowed opacity-50' : selected ? 'bg-sun-soft' : i === active ? 'bg-sand' : 'hover:bg-sand/60'
                   )}
                 >
                   {renderIcon?.(m)}
@@ -292,28 +308,39 @@ export function ModelPicker({
                           </span>
                         ))}
                     </span>
-                    {detail === 'description'
-                      ? m.description && <span className="truncate text-[12px] text-ink-2">{m.description}</span>
-                      : m.name !== m.id && <span className="truncate font-mono text-[11.5px] text-muted">{m.id}</span>}
+                    {m.locked ? (
+                      <span className="truncate text-[12px] text-ink-2">{m.locked}</span>
+                    ) : detail === 'description' ? (
+                      m.description && <span className="truncate text-[12px] text-ink-2">{m.description}</span>
+                    ) : (
+                      m.name !== m.id && <span className="truncate font-mono text-[11.5px] text-muted">{m.id}</span>
+                    )}
                   </span>
                   <span className="flex shrink-0 flex-col items-end gap-0.5 text-[11.5px] text-ink-2">
                     {ctxLabel(m.contextLength) && <span className="font-mono">{ctxLabel(m.contextLength)} konteks</span>}
                     {price && <span className={cx('font-mono', price === 'Gratis' && 'font-semibold text-ok-ink')}>{price}</span>}
                     {m.creditUnit !== undefined &&
+                      !m.locked &&
                       (m.credits === undefined ? (
                         <Spinner className="mt-1 size-3.5 text-muted" />
-                      ) : m.credits === null ? (
-                        <span className="text-muted" title="Higgsfield tidak memberi perkiraan untuk model ini">
-                          —
-                        </span>
-                      ) : (
+                      ) : m.credits !== null ? (
                         <>
                           <span className="font-mono text-[12.5px] font-semibold text-ink">{creditLabel(m.credits)} kr</span>
                           <span className="font-mono text-muted">{[m.creditUnit, m.usd != null && usdLabel(m.usd)].filter(Boolean).join(' · ')}</span>
                         </>
+                      ) : m.usd != null ? (
+                        <>
+                          <span className="font-mono text-[12.5px] font-semibold text-ink">{usdLabel(m.usd)}</span>
+                          {m.creditUnit && <span className="font-mono text-muted">{m.creditUnit}</span>}
+                        </>
+                      ) : (
+                        <span className="text-muted" title="Penyedia tidak memberi perkiraan harga untuk model ini">
+                          —
+                        </span>
                       ))}
                   </span>
                 </button>
+                </div>
               )
             })}
             {showCustom && (

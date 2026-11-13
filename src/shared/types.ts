@@ -337,12 +337,17 @@ export interface ModelOption {
   tags: string[]
   /** Provider heading the picker groups this row under, e.g. "fal.ai". */
   group?: string
+  /** Why the row cannot be picked yet, e.g. "Isi kunci fal.ai di Pengaturan". */
+  locked?: string
   /** Model family, e.g. "Kling", for a brand mark next to the name. */
   family?: string
-  /** Higgsfield credits (and dollars) for one request; undefined while unknown, null when it cannot be estimated. */
+  /**
+   * Price of one request: Higgsfield credits (and dollars), or dollars alone for fal.ai and Gemini. credits is
+   * undefined while loading; null credits with null usd means it cannot be estimated.
+   */
   credits?: number | null
   usd?: number | null
-  /** What the credits pay for, e.g. "10 dtk". */
+  /** What the price pays for, e.g. "10 dtk". */
   creditUnit?: string
 }
 
