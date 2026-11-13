@@ -1,4 +1,4 @@
-import { DEFAULT_IMAGE_MODEL, DEFAULT_VIDEO_MODEL, getImageModel, getVideoModel } from '@shared/higgsfield'
+import { DEFAULT_IMAGE_MODEL, DEFAULT_VIDEO_MODEL, getImageModel, getVideoModel } from '@shared/media'
 import type { AppSettings } from '@shared/types'
 import { getDb } from './db'
 

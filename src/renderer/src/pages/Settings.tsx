@@ -16,7 +16,7 @@ import {
   SlidersHorizontal,
   Trash2
 } from 'lucide-react'
-import { HF_IMAGE_MODELS, HF_VIDEO_MODELS } from '@shared/higgsfield'
+import { HF_IMAGE_MODELS, HF_VIDEO_MODELS } from '@shared/media'
 import { LANGUAGES, LLM_PROVIDERS } from '@shared/models'
 import type { AccountStatus, ApiProvider, AppSettings, KeyStatus, KeyTestResult, LlmProvider, TtsProvider } from '@shared/types'
 import { ChatGptAccount } from '../components/ChatGptAccount'

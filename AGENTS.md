@@ -57,7 +57,7 @@ docs/              dokumentasi pengembang
 1. **Pratinjau dan ekspor harus sama.** Semua aturan yang memengaruhi gambar atau suara final ditulis sekali di
    `src/shared/` lalu dipakai pratinjau (renderer) dan ekspor (main):
    `motion.ts` (gerak kamera, transisi), `captions.ts` (gaya, font, pemenggalan baris caption),
-   `timeline.ts` (potongan suara/musik, kata caption per klip), `overlays.ts`, `higgsfield.ts`.
+   `timeline.ts` (potongan suara/musik, kata caption per klip), `overlays.ts`, `media.ts` (model gambar/video dan isian permintaannya).
    Jangan menghitung ulang aturan itu di satu sisi saja.
 2. **Kunci API milik pengguna (BYOK).** Kunci hanya disimpan terenkripsi lewat `secrets.ts`, hanya dikirim ke
    layanannya masing-masing, dan tidak pernah dicetak ke log, error, atau file.

@@ -334,6 +334,8 @@ export interface ModelOption {
   priceOut?: number | null
   /** Short labels the picker can filter on, e.g. "JSON", "Gratis", "Gambar". */
   tags: string[]
+  /** Provider heading the picker groups this row under, e.g. "fal.ai". */
+  group?: string
   /** Model family, e.g. "Kling", for a brand mark next to the name. */
   family?: string
   /** Higgsfield credits (and dollars) for one request; undefined while unknown, null when it cannot be estimated. */

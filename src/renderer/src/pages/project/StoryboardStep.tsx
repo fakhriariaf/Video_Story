@@ -18,7 +18,7 @@ import {
   Trash2,
   Volume2
 } from 'lucide-react'
-import { effectiveResolution, fitDuration, getImageModel, getVideoModel } from '@shared/higgsfield'
+import { effectiveResolution, fitDuration, getImageModel, getVideoModel } from '@shared/media'
 import { CAMERA_PRESETS, MOTION_STRENGTHS, cameraAt, cameraCss } from '@shared/motion'
 import { needsVisual } from '@shared/script'
 import { geminiVoiceName, geminiVoiceTone } from '@shared/models'

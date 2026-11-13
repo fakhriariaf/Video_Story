@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState, type ReactNode } from 'react'
 import { Film, Image as ImageIcon, Move, Users } from 'lucide-react'
-import { effectiveResolution, fitDuration, getImageModel, getVideoModel, hfModelOptions, maxRefs, resolutionOptions } from '@shared/higgsfield'
+import { effectiveResolution, fitDuration, getImageModel, getVideoModel, maxRefs, mediaModelOptions, resolutionOptions } from '@shared/media'
 import type { CreditEstimate, ModelOption, Project } from '@shared/types'
 import { ModelLogo } from '../../components/ModelLogo'
 import { ModelPicker } from '../../components/ModelPicker'
@@ -8,8 +8,8 @@ import { Segmented, Spinner } from '../../components/ui'
 import { creditLabel } from '../../lib/format'
 import { useEstimate, useEstimates } from '../../lib/useEstimate'
 
-const IMAGE_OPTIONS = hfModelOptions('image')
-const VIDEO_OPTIONS = hfModelOptions('video')
+const IMAGE_OPTIONS = mediaModelOptions('image')
+const VIDEO_OPTIONS = mediaModelOptions('video')
 const IMAGE_IDS = IMAGE_OPTIONS.map((o) => o.id)
 const VIDEO_IDS = VIDEO_OPTIONS.map((o) => o.id)
 

@@ -3,7 +3,7 @@ import { mkdirSync, writeFileSync } from 'node:fs'
 import { dirname } from 'node:path'
 import { estimateWordTimings } from '@shared/captions'
 import { stripVoiceTags } from '@shared/speech'
-import { getImageModel, getVideoModel, imageBody, maxRefs, promptLimit, videoBody, type HfModel } from '@shared/higgsfield'
+import { getImageModel, getVideoModel, imageRequest, maxRefs, promptLimit, videoRequest, type MediaModel } from '@shared/media'
 import { getStyle } from '@shared/styles'
 import type { AspectRatio, Asset, Character, Clip, CreditEstimate, Job, Project, WordTiming } from '@shared/types'
 import { getDb } from './db'
@@ -141,7 +141,7 @@ async function waitForSheets(characterIds: string[], signal: AbortSignal): Promi
   }
 }
 
-async function referenceUrls(model: HfModel, chars: Character[], signal: AbortSignal): Promise<{ urls: string[]; names: string[] }> {
+async function referenceUrls(model: MediaModel, chars: Character[], signal: AbortSignal): Promise<{ urls: string[]; names: string[] }> {
   const limit = maxRefs(model)
   if (limit === 0) return { urls: [], names: [] }
   await waitForSheets(
@@ -249,11 +249,7 @@ export function generateClipImage(clipId: string): Job {
     const chars = charactersOf(project.id).filter((c) => fresh.characterIds.includes(c.id))
     const refs = await referenceUrls(model, chars, ctx.signal)
     const prompt = clipPrompt(project, fresh, chars, refs.names, promptLimit(model))
-    return {
-      endpoint: model.id,
-      body: imageBody(model, prompt, project.aspectRatio, refs.urls),
-      payload: { target: 'clip-image', model: model.id, prompt }
-    }
+    return { ...imageRequest(model, prompt, project.aspectRatio, refs.urls), payload: { target: 'clip-image', model: model.id, prompt } }
   })
 }
 
@@ -266,11 +262,7 @@ export function generateCharacterSheet(characterId: string): Job {
     const project = getProject(c.projectId)
     const model = getImageModel(project.imageModel)
     const prompt = sheetPrompt(project, getCharacter(characterId))
-    return {
-      endpoint: model.id,
-      body: imageBody(model, prompt, '16:9', []),
-      payload: { target: 'sheet', model: model.id, prompt }
-    }
+    return { ...imageRequest(model, prompt, '16:9', []), payload: { target: 'sheet', model: model.id, prompt } }
   })
 }
 
@@ -294,8 +286,7 @@ export function generateClipVideo(clipId: string): Job {
     if (model.input.mode === 'reference')
       prompt = `Open on the exact scene of the reference image and keep its art style, characters and composition. ${prompt}`
     return {
-      endpoint: model.id,
-      body: videoBody(model, prompt, url, fresh.durationMs / 1000, project.aspectRatio, project.videoResolution),
+      ...videoRequest(model, prompt, url, fresh.durationMs / 1000, project.aspectRatio, project.videoResolution),
       payload: { target: 'clip-video', model: model.id, prompt }
     }
   })
@@ -426,16 +417,16 @@ export async function estimateCredits(
   resolution?: string | null
 ): Promise<CreditEstimate | null> {
   const model = kind === 'image' ? getImageModel(modelId) : getVideoModel(modelId)
-  const body =
+  const { endpoint, body } =
     kind === 'image'
-      ? imageBody(model, 'estimate', aspect, [])
-      : videoBody(model, 'estimate', 'https://example.com/frame.png', seconds, aspect, resolution)
+      ? imageRequest(model, 'estimate', aspect, [])
+      : videoRequest(model, 'estimate', 'https://example.com/frame.png', seconds, aspect, resolution)
   const key = `estimate:${model.id}:${JSON.stringify(body)}`
   const hit = readCache<CreditEstimate>(key)
   if (hit && Date.now() - hit.updatedAt < DAY) return hit.value
   const failedAt = failedEstimates.get(key)
   if (failedAt && Date.now() - failedAt < 10 * 60 * 1000) return null
-  const value = await hf.estimate(model.id, body)
+  const value = await hf.estimate(endpoint, body)
   if (value) writeCache(key, value)
   else failedEstimates.set(key, Date.now())
   return value
