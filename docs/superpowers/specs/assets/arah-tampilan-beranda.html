@@ -1,0 +1,310 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Video Story: tiga arah tampilan Beranda</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Barlow+Condensed:wght@500;600;700&family=Barlow:wght@400;500;600&family=Onest:wght@400;500;600;700&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: #e9e9ef; color: #1a1838; font-family: 'Onest', 'Segoe UI', sans-serif; padding: 28px 20px 60px; }
+  .page { max-width: 1280px; margin: 0 auto; }
+  .intro h1 { font-size: 26px; font-weight: 700; }
+  .intro p { margin-top: 6px; color: #55546e; font-size: 15px; max-width: 70ch; line-height: 1.5; }
+  .jump { display: flex; gap: 8px; margin: 16px 0 6px; flex-wrap: wrap; }
+  .jump a { text-decoration: none; color: #1a1838; background: #fff; border: 1px solid #cfcedd; padding: 8px 14px; border-radius: 999px; font-size: 14px; font-weight: 600; }
+  .dir { margin-top: 34px; }
+  .dir > h2 { font-size: 21px; font-weight: 700; }
+  .dir > .sum { color: #55546e; font-size: 14.5px; margin: 4px 0 12px; max-width: 80ch; line-height: 1.5; }
+  .fit { width: 100%; overflow: hidden; border-radius: 14px; box-shadow: 0 10px 40px rgba(26, 24, 56, .18); }
+  .canvas { width: 1280px; height: 820px; transform-origin: 0 0; overflow: hidden; position: relative; }
+  .notes { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 14px; margin-top: 14px; font-size: 14px; line-height: 1.5; }
+  .notes b { display: block; font-size: 13px; color: #55546e; font-weight: 600; margin-bottom: 3px; }
+  .sw { display: flex; gap: 6px; margin-top: 4px; }
+  .sw i { width: 30px; height: 30px; border-radius: 8px; border: 1px solid rgba(0,0,0,.12); display: block; }
+  button { font: inherit; cursor: default; }
+
+  /* shared story-frame thumbnails: simple scenes, so cards read as video frames */
+  .t1 { background: radial-gradient(circle at 70% 34%, #ffd98a 0 9%, transparent 9.5%), linear-gradient(#f39a4b, #c8452f 62%, #5a1f2e 62%); }
+  .t2 { background: radial-gradient(circle at 28% 30%, #f4f6ff 0 7%, transparent 7.5%), linear-gradient(#1c2a5e, #2f4f9e 58%, #173a52 58%, #0f2a3d); }
+  .t3 { background: radial-gradient(ellipse at 50% 120%, #f6c453 0 38%, transparent 38.5%), linear-gradient(#ffe9c2, #ffc48a); }
+
+  /* ================= A: Ruang Edit ================= */
+  .A { background: #121026; color: #eceafb; font-family: 'Barlow', 'Segoe UI', sans-serif; display: grid; grid-template-columns: 228px 1fr; }
+  .A .rail { background: #171431; border-right: 1px solid #2a2656; padding: 22px 16px; display: flex; flex-direction: column; }
+  .A .brand { display: flex; align-items: center; gap: 10px; padding: 0 6px 22px; }
+  .A .mark { width: 34px; height: 34px; border-radius: 10px; background: #7c6cff; display: grid; place-items: center; }
+  .A .mark::after { content: ''; border-left: 11px solid #121026; border-top: 7px solid transparent; border-bottom: 7px solid transparent; margin-left: 3px; }
+  .A .brand strong { font-family: 'Barlow Condensed', sans-serif; font-size: 23px; font-weight: 700; letter-spacing: .01em; line-height: 1; }
+  .A .brand small { display: block; font-size: 11.5px; color: #a29ec9; margin-top: 2px; }
+  .A .nav a { display: flex; align-items: center; gap: 10px; padding: 10px 12px; border-radius: 9px; color: #a29ec9; font-size: 15px; font-weight: 500; margin-bottom: 2px; }
+  .A .nav a.on { background: #24204a; color: #fff; box-shadow: inset 3px 0 0 #ffb627; }
+  .A .nav .ico { width: 16px; height: 16px; border: 2px solid currentColor; border-radius: 4px; }
+  .A .svc { margin-top: auto; border-top: 1px solid #2a2656; padding: 14px 8px 0; font-size: 13px; color: #a29ec9; }
+  .A .svc p { color: #eceafb; font-weight: 600; margin-bottom: 8px; font-size: 13px; }
+  .A .svc li { list-style: none; display: flex; justify-content: space-between; padding: 4px 0; }
+  .A .svc span::before { content: ''; display: inline-block; width: 7px; height: 7px; border-radius: 50%; background: #3fd39a; margin-right: 7px; }
+  .A .svc span.off::before { background: #5b568f; }
+  .A main { padding: 34px 44px; overflow: hidden; }
+  .A h1 { font-family: 'Barlow Condensed', sans-serif; font-weight: 600; font-size: 52px; line-height: 1; letter-spacing: -.005em; }
+  .A .lede { color: #a29ec9; font-size: 16px; margin-top: 8px; }
+  .A .composer { margin-top: 22px; background: #1b1838; border: 1px solid #322d63; border-radius: 14px; padding: 18px 20px 16px; }
+  .A .composer .ph { color: #7f7aad; font-size: 18px; line-height: 1.5; min-height: 82px; }
+  .A .row { display: flex; align-items: center; gap: 8px; border-top: 1px solid #2a2656; padding-top: 14px; }
+  .A .chip { background: #24204a; border: 1px solid #322d63; color: #d9d6f5; padding: 8px 13px; border-radius: 8px; font-size: 14px; font-weight: 500; }
+  .A .go { margin-left: auto; background: #ffb627; color: #2a1c00; border: 0; padding: 11px 26px; border-radius: 8px; font-weight: 600; font-size: 16px; }
+  .A .try { margin-top: 12px; font-size: 13.5px; color: #a29ec9; display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+  .A .try span { border: 1px dashed #3a3572; padding: 6px 11px; border-radius: 999px; color: #c9c5ee; }
+  .A .head { display: flex; align-items: baseline; gap: 18px; margin: 30px 0 12px; }
+  .A h2 { font-family: 'Barlow Condensed', sans-serif; font-size: 28px; font-weight: 600; }
+  .A .tabs { display: flex; gap: 18px; font-size: 14.5px; color: #a29ec9; }
+  .A .tabs b { color: #fff; font-weight: 600; border-bottom: 2px solid #ffb627; padding-bottom: 3px; }
+  /* the film strip: projects sit as frames between two rows of sprocket holes */
+  .A .strip { background: #0b0a1a; border-radius: 10px; padding: 22px 16px; display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; position: relative; }
+  .A .strip::before, .A .strip::after { content: ''; position: absolute; left: 12px; right: 12px; height: 8px; background: repeating-linear-gradient(90deg, #2a2656 0 14px, transparent 14px 28px); border-radius: 2px; }
+  .A .strip::before { top: 7px; } .A .strip::after { bottom: 7px; }
+  .A .frame { background: #1b1838; border-radius: 6px; overflow: hidden; }
+  .A .frame .th { aspect-ratio: 16/9; position: relative; }
+  .A .tc { position: absolute; right: 8px; bottom: 8px; background: rgba(11,10,26,.85); color: #fff; font-family: 'Barlow Condensed', sans-serif; font-size: 15px; font-weight: 600; padding: 1px 7px; border-radius: 4px; letter-spacing: .04em; }
+  .A .frame .meta { padding: 10px 12px 12px; }
+  .A .frame .meta strong { font-size: 15.5px; font-weight: 600; display: block; }
+  .A .frame .meta small { color: #a29ec9; font-size: 13px; }
+  .A .st { display: inline-block; font-size: 12px; font-weight: 600; padding: 2px 8px; border-radius: 4px; margin-right: 6px; }
+  .A .st.edit { background: #3b2f00; color: #ffcf66; } .A .st.done { background: #0f3a2b; color: #6fe3b5; } .A .st.draft { background: #2a2656; color: #c9c5ee; }
+  .A .new { border: 1.5px dashed #3a3572; background: transparent; display: grid; place-items: center; text-align: center; color: #c9c5ee; font-weight: 600; font-size: 15px; }
+  .A .new i { display: block; width: 40px; height: 40px; border-radius: 50%; background: #7c6cff; margin: 0 auto 10px; position: relative; }
+  .A .new i::before, .A .new i::after { content: ''; position: absolute; background: #121026; left: 50%; top: 50%; transform: translate(-50%,-50%); }
+  .A .new i::before { width: 16px; height: 2.5px; } .A .new i::after { width: 2.5px; height: 16px; }
+
+  /* ================= B: Terang ================= */
+  .B { background: #f5f5fa; color: #1a1838; font-family: 'Onest', 'Segoe UI', sans-serif; }
+  .B .top { height: 64px; display: flex; align-items: center; padding: 0 32px; background: #fff; border-bottom: 1px solid #e3e2ee; gap: 18px; }
+  .B .brand { display: flex; align-items: center; gap: 10px; font-weight: 700; font-size: 19px; }
+  .B .mark { width: 32px; height: 32px; border-radius: 50%; background: #4338ca; display: grid; place-items: center; }
+  .B .mark::after { content: ''; border-left: 10px solid #fff; border-top: 6.5px solid transparent; border-bottom: 6.5px solid transparent; margin-left: 3px; }
+  .B .brand small { font-weight: 500; font-size: 12px; color: #6b6a85; display: block; line-height: 1; }
+  .B .search { flex: 0 0 340px; margin-left: 20px; background: #f5f5fa; border: 1px solid #e3e2ee; border-radius: 10px; padding: 9px 14px; color: #8b8aa3; font-size: 14.5px; }
+  .B .set { margin-left: auto; border: 1px solid #d5d4e4; background: #fff; padding: 9px 16px; border-radius: 10px; font-weight: 600; font-size: 14.5px; color: #1a1838; }
+  .B main { padding: 44px 0 0; }
+  .B .hero { width: 860px; margin: 0 auto; text-align: center; }
+  .B h1 { font-size: 42px; font-weight: 700; letter-spacing: -.025em; line-height: 1.1; }
+  .B .lede { color: #6b6a85; font-size: 16.5px; margin-top: 10px; }
+  .B .composer { margin-top: 26px; background: #fff; border-radius: 20px; border: 1px solid #dddcf0; box-shadow: 0 14px 34px rgba(67, 56, 202, .13); padding: 20px 22px 16px; text-align: left; }
+  .B .composer .ph { color: #9a99b3; font-size: 17.5px; line-height: 1.55; min-height: 80px; }
+  .B .row { display: flex; align-items: center; gap: 8px; }
+  .B .chip { background: #f5f5fa; border: 1px solid #e3e2ee; padding: 8px 13px; border-radius: 999px; font-size: 14px; font-weight: 500; color: #33325a; }
+  .B .go { margin-left: auto; background: #4338ca; color: #fff; border: 0; padding: 12px 28px; border-radius: 12px; font-weight: 600; font-size: 15.5px; }
+  .B .try { margin-top: 14px; font-size: 13.5px; color: #6b6a85; display: flex; gap: 8px; justify-content: center; align-items: center; }
+  .B .try span { background: #ecebff; color: #3730a3; padding: 6px 12px; border-radius: 999px; font-weight: 500; }
+  .B .list { padding: 34px 48px 0; }
+  .B .head { display: flex; align-items: center; gap: 16px; margin-bottom: 14px; }
+  .B h2 { font-size: 22px; font-weight: 700; letter-spacing: -.01em; }
+  .B .seg { display: flex; background: #e9e8f3; border-radius: 10px; padding: 3px; font-size: 14px; font-weight: 500; color: #55546e; }
+  .B .seg span { padding: 6px 13px; border-radius: 8px; } .B .seg span.on { background: #fff; color: #1a1838; font-weight: 600; box-shadow: 0 1px 3px rgba(26,24,56,.12); }
+  .B .grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 18px; }
+  .B .card { background: #fff; border: 1px solid #e3e2ee; border-radius: 16px; overflow: hidden; }
+  .B .card .th { aspect-ratio: 16/9; margin: 8px 8px 0; border-radius: 10px; position: relative; }
+  .B .tc { position: absolute; right: 8px; bottom: 8px; background: rgba(26,24,56,.8); color: #fff; font-size: 12.5px; font-weight: 600; padding: 2px 7px; border-radius: 6px; }
+  .B .card .meta { padding: 12px 14px 14px; }
+  .B .card strong { font-size: 15.5px; font-weight: 600; display: block; }
+  /* the four production steps as a progress bar: the card says where the project stands */
+  .B .steps { display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px; margin: 10px 0 6px; }
+  .B .steps i { height: 5px; border-radius: 3px; background: #e3e2ee; } .B .steps i.d { background: #4338ca; } .B .steps.fin i { background: #1f9d6b; }
+  .B .card small { font-size: 13px; color: #6b6a85; }
+  .B .new { border: 1.5px dashed #c5c4dc; background: transparent; display: grid; place-items: center; text-align: center; font-weight: 600; font-size: 15px; color: #33325a; }
+  .B .new i { display: block; width: 44px; height: 44px; border-radius: 50%; background: #ecebff; margin: 0 auto 10px; position: relative; }
+  .B .new i::before, .B .new i::after { content: ''; position: absolute; background: #4338ca; left: 50%; top: 50%; transform: translate(-50%,-50%); border-radius: 2px; }
+  .B .new i::before { width: 16px; height: 2.5px; } .B .new i::after { width: 2.5px; height: 16px; }
+
+  /* ================= C: Layar Tancap ================= */
+  .C { background: #fbfaff; color: #1e1b4b; font-family: 'Poppins', 'Segoe UI', sans-serif; }
+  .C .hero { background: #4338ca; height: 372px; position: relative; overflow: hidden; color: #fff; padding: 22px 48px 0; }
+  /* projector beam from the top-right corner, the way an open-air screening lights its screen */
+  .C .hero::before { content: ''; position: absolute; right: -40px; top: -60px; width: 900px; height: 620px; background: conic-gradient(from 222deg at 100% 0, rgba(255,255,255,.17) 0 24deg, transparent 24deg); }
+  .C .top { display: flex; align-items: center; gap: 12px; position: relative; }
+  .C .mark { width: 36px; height: 36px; border-radius: 50%; background: #ffd23f; display: grid; place-items: center; }
+  .C .mark::after { content: ''; border-left: 11px solid #1e1b4b; border-top: 7px solid transparent; border-bottom: 7px solid transparent; margin-left: 3px; }
+  .C .top strong { font-family: 'Archivo Black', sans-serif; font-size: 20px; line-height: 1; }
+  .C .top small { display: block; font-size: 11.5px; opacity: .8; font-weight: 500; }
+  .C .top .search { margin-left: auto; width: 280px; background: rgba(255,255,255,.14); border-radius: 999px; padding: 9px 16px; font-size: 14px; color: rgba(255,255,255,.75); }
+  .C .top .set { background: #fff; color: #1e1b4b; border: 0; padding: 9px 18px; border-radius: 999px; font-weight: 600; font-size: 14px; }
+  .C h1 { font-family: 'Archivo Black', sans-serif; font-size: 66px; line-height: .98; letter-spacing: -.02em; margin-top: 38px; position: relative; max-width: 13ch; }
+  .C .lede { position: absolute; right: 48px; top: 150px; width: 320px; font-size: 16px; line-height: 1.5; opacity: .92; }
+  .C .composer { position: relative; margin: -92px 48px 0; background: #fff; border: 2.5px solid #1e1b4b; border-radius: 22px; padding: 20px 22px 16px; box-shadow: 0 8px 0 #1e1b4b; }
+  .C .composer .ph { color: #9d9bbd; font-size: 17.5px; line-height: 1.55; min-height: 62px; }
+  .C .row { display: flex; align-items: center; gap: 8px; }
+  .C .chip { background: #eeedff; padding: 8px 14px; border-radius: 999px; font-size: 13.5px; font-weight: 600; color: #2f2a8f; }
+  .C .go { margin-left: auto; background: #ffd23f; color: #1e1b4b; border: 2.5px solid #1e1b4b; padding: 10px 30px; border-radius: 999px; font-weight: 700; font-size: 16px; }
+  .C .list { padding: 30px 48px 0; }
+  .C .head { display: flex; align-items: center; gap: 14px; margin-bottom: 14px; }
+  .C h2 { font-family: 'Archivo Black', sans-serif; font-size: 24px; }
+  .C .pill { font-size: 13.5px; font-weight: 600; padding: 6px 14px; border-radius: 999px; border: 2px solid #1e1b4b; }
+  .C .pill.on { background: #1e1b4b; color: #fff; }
+  .C .grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 18px; }
+  .C .poster { border-radius: 18px; overflow: hidden; position: relative; aspect-ratio: 4/3; border: 2.5px solid #1e1b4b; }
+  .C .poster .shade { position: absolute; inset: 40% 0 0 0; background: linear-gradient(transparent, rgba(30,27,75,.92)); }
+  .C .poster strong { position: absolute; left: 14px; right: 14px; bottom: 32px; color: #fff; font-family: 'Archivo Black', sans-serif; font-size: 19px; line-height: 1.1; }
+  .C .poster small { position: absolute; left: 14px; bottom: 12px; color: rgba(255,255,255,.85); font-size: 12.5px; font-weight: 500; }
+  .C .tag { position: absolute; left: 12px; top: 12px; font-size: 12px; font-weight: 700; padding: 4px 10px; border-radius: 999px; border: 2px solid #1e1b4b; transform: rotate(-3deg); }
+  .C .tag.edit { background: #ffd23f; color: #1e1b4b; } .C .tag.done { background: #7ee8b5; color: #0d3b29; } .C .tag.draft { background: #fff; color: #1e1b4b; }
+  .C .new { background: #eeedff; border: 2.5px dashed #4338ca; display: grid; place-items: center; text-align: center; font-weight: 700; font-size: 15.5px; color: #2f2a8f; }
+  .C .new i { display: block; width: 46px; height: 46px; border-radius: 50%; background: #4338ca; margin: 0 auto 10px; position: relative; }
+  .C .new i::before, .C .new i::after { content: ''; position: absolute; background: #fff; left: 50%; top: 50%; transform: translate(-50%,-50%); border-radius: 2px; }
+  .C .new i::before { width: 18px; height: 3px; } .C .new i::after { width: 3px; height: 18px; }
+</style>
+</head>
+<body>
+<div class="page">
+  <div class="intro">
+    <h1>Tiga arah tampilan Beranda Video Story</h1>
+    <p>Isinya sama di ketiganya supaya yang dibandingkan hanya gaya: warna, huruf, bentuk, dan tata letak. Ini gambar rancangan, belum kode aplikasi. Arah yang dipilih akan dipakai di semua halaman.</p>
+    <div class="jump"><a href="#a">A. Ruang Edit</a><a href="#b">B. Terang</a><a href="#c">C. Layar Tancap</a></div>
+  </div>
+
+  <!-- ============ A ============ -->
+  <section class="dir" id="a">
+    <h2>A. Ruang Edit</h2>
+    <p class="sum">Gelap seperti ruang penyuntingan film. Gambar dan video jadi pusat perhatian, proyek berjajar sebagai bingkai di pita film, dan tombol utama berwarna kuning lampu rekam.</p>
+    <div class="fit"><div class="canvas A">
+      <aside class="rail">
+        <div class="brand"><div class="mark"></div><div><strong>Video Story</strong><small>by Fakhri Ariaf</small></div></div>
+        <nav class="nav">
+          <a class="on"><span class="ico"></span>Beranda</a>
+          <a><span class="ico"></span>Semua proyek</a>
+          <a><span class="ico"></span>Pengaturan</a>
+        </nav>
+        <div class="svc">
+          <p>Layanan AI</p>
+          <ul>
+            <li><span>Cerita</span>ChatGPT</li>
+            <li><span>Suara</span>ElevenLabs</li>
+            <li><span>Gambar</span>fal.ai</li>
+            <li><span class="off">Caption</span>Belum diunduh</li>
+          </ul>
+        </div>
+      </aside>
+      <main>
+        <h1>Mau bikin video apa hari ini?</h1>
+        <p class="lede">Tulis idenya. AI menyusun adegan, naskah, dan suaranya, lalu kamu merapikannya di editor.</p>
+        <div class="composer">
+          <p class="ph">Contoh: Gajah Mada bersumpah tidak akan menikmati palapa sebelum Nusantara bersatu. Para menteri menertawakannya, tapi dia membuktikannya…</p>
+          <div class="row">
+            <span class="chip">1 menit</span><span class="chip">Indonesia</span><span class="chip">16:9 YouTube</span><span class="chip">Stickman berwarna</span><span class="chip">Suara ElevenLabs</span>
+            <button class="go">Susun cerita</button>
+          </div>
+        </div>
+        <div class="try">Coba ide ini: <span>Asal-usul Sumpah Palapa</span><span>Misteri Segitiga Bermuda</span><span>Kenapa kucing suka masuk kotak?</span></div>
+        <div class="head"><h2>Proyek kamu</h2><div class="tabs"><b>Semua 3</b><span>Draf 1</span><span>Dalam proses 1</span><span>Diekspor 1</span></div></div>
+        <div class="strip">
+          <div class="frame new"><div><i></i>Proyek baru</div></div>
+          <div class="frame"><div class="th t1"><span class="tc">01:02</span></div><div class="meta"><strong>Sumpah Palapa</strong><small><span class="st edit">Editor</span>12 menit lalu</small></div></div>
+          <div class="frame"><div class="th t2"><span class="tc">00:58</span></div><div class="meta"><strong>Legenda Danau Toba</strong><small><span class="st done">Diekspor</span>Kemarin</small></div></div>
+          <div class="frame"><div class="th t3"><span class="tc">00:31</span></div><div class="meta"><strong>Si Kucing Penjaga Warung</strong><small><span class="st draft">Draf</span>3 hari lalu</small></div></div>
+        </div>
+      </main>
+    </div></div>
+    <div class="notes">
+      <div><b>Kesan</b>Profesional dan sinematik, seperti alat kerja kreator. Paling berbeda dari tampilan lama.</div>
+      <div><b>Yang perlu ditimbang</b>Halaman berisi banyak teks (Naskah, Pengaturan) harus dijaga kontrasnya supaya tetap nyaman dibaca lama.</div>
+      <div><b>Huruf</b>Barlow Condensed untuk judul (seperti papan clapper), Barlow untuk isi.</div>
+      <div><b>Warna</b><div class="sw"><i style="background:#121026"></i><i style="background:#1b1838"></i><i style="background:#7c6cff"></i><i style="background:#ffb627"></i><i style="background:#eceafb"></i></div></div>
+    </div>
+  </section>
+
+  <!-- ============ B ============ -->
+  <section class="dir" id="b">
+    <h2>B. Terang</h2>
+    <p class="sum">Terang, lapang, dan tenang. Kotak ide berada di tengah seperti kolom pencarian, dan setiap proyek menunjukkan sudah sampai langkah mana dari empat langkah produksi.</p>
+    <div class="fit"><div class="canvas B">
+      <header class="top">
+        <div class="brand"><div class="mark"></div><div>Video Story<small>by Fakhri Ariaf</small></div></div>
+        <div class="search">Cari proyek</div>
+        <button class="set">Pengaturan</button>
+      </header>
+      <main>
+        <div class="hero">
+          <h1>Mau bikin video apa hari ini?</h1>
+          <p class="lede">Tulis idenya. AI menyusun adegan, naskah, dan suaranya, lalu kamu merapikannya di editor.</p>
+          <div class="composer">
+            <p class="ph">Contoh: Gajah Mada bersumpah tidak akan menikmati palapa sebelum Nusantara bersatu. Para menteri menertawakannya, tapi dia membuktikannya…</p>
+            <div class="row">
+              <span class="chip">1 menit</span><span class="chip">Indonesia</span><span class="chip">16:9 YouTube</span><span class="chip">Stickman berwarna</span><span class="chip">Suara ElevenLabs</span>
+              <button class="go">Susun cerita</button>
+            </div>
+          </div>
+          <div class="try">Coba ide ini: <span>Asal-usul Sumpah Palapa</span><span>Misteri Segitiga Bermuda</span><span>Kenapa kucing suka masuk kotak?</span></div>
+        </div>
+        <div class="list">
+          <div class="head"><h2>Proyek kamu</h2><div class="seg"><span class="on">Semua 3</span><span>Draf 1</span><span>Dalam proses 1</span><span>Diekspor 1</span></div></div>
+          <div class="grid">
+            <div class="card new"><div><i></i>Proyek baru</div></div>
+            <div class="card"><div class="th t1"><span class="tc">1:02</span></div><div class="meta"><strong>Sumpah Palapa</strong><div class="steps"><i class="d"></i><i class="d"></i><i class="d"></i><i class="d"></i></div><small>Langkah 4 dari 4: Editor</small></div></div>
+            <div class="card"><div class="th t2"><span class="tc">0:58</span></div><div class="meta"><strong>Legenda Danau Toba</strong><div class="steps fin"><i></i><i></i><i></i><i></i></div><small>Sudah diekspor kemarin</small></div></div>
+            <div class="card"><div class="th t3"><span class="tc">0:31</span></div><div class="meta"><strong>Si Kucing Penjaga Warung</strong><div class="steps"><i class="d"></i><i class="d"></i><i></i><i></i></div><small>Langkah 2 dari 4: Naskah</small></div></div>
+          </div>
+        </div>
+      </main>
+    </div></div>
+    <div class="notes">
+      <div><b>Kesan</b>Bersih, ramah untuk pemula, dan nyaman untuk membaca naskah panjang.</div>
+      <div><b>Yang perlu ditimbang</b>Paling aman, tapi juga paling mirip aplikasi modern lain. Ciri khasnya ada di warna indigo dan penanda langkah.</div>
+      <div><b>Huruf</b>Onest untuk judul dan isi, satu keluarga huruf saja.</div>
+      <div><b>Warna</b><div class="sw"><i style="background:#f5f5fa"></i><i style="background:#ffffff"></i><i style="background:#4338ca"></i><i style="background:#ecebff"></i><i style="background:#1a1838"></i></div></div>
+    </div>
+  </section>
+
+  <!-- ============ C ============ -->
+  <section class="dir" id="c">
+    <h2>C. Layar Tancap</h2>
+    <p class="sum">Berani seperti poster film. Blok indigo dengan sorot proyektor, judul besar, tombol kuning, dan proyek tampil sebagai poster dengan judul di atas gambarnya.</p>
+    <div class="fit"><div class="canvas C">
+      <div class="hero">
+        <div class="top">
+          <div class="mark"></div><div><strong>Video Story</strong><small>by Fakhri Ariaf</small></div>
+          <div class="search">Cari proyek</div><button class="set">Pengaturan</button>
+        </div>
+        <h1>Mau bikin video apa hari ini?</h1>
+        <p class="lede">Tulis idenya. AI menyusun adegan, naskah, dan suaranya, lalu kamu merapikannya di editor.</p>
+      </div>
+      <div class="composer">
+        <p class="ph">Contoh: Gajah Mada bersumpah tidak akan menikmati palapa sebelum Nusantara bersatu. Para menteri menertawakannya…</p>
+        <div class="row">
+          <span class="chip">1 menit</span><span class="chip">Indonesia</span><span class="chip">16:9 YouTube</span><span class="chip">Stickman berwarna</span><span class="chip">Suara ElevenLabs</span>
+          <button class="go">Susun cerita</button>
+        </div>
+      </div>
+      <div class="list">
+        <div class="head"><h2>Proyek kamu</h2><span class="pill on">Semua 3</span><span class="pill">Draf 1</span><span class="pill">Dalam proses 1</span><span class="pill">Diekspor 1</span></div>
+        <div class="grid">
+          <div class="poster new"><div><i></i>Proyek baru</div></div>
+          <div class="poster t1"><span class="tag edit">Editor</span><div class="shade"></div><strong>Sumpah Palapa</strong><small>1:02, 12 menit lalu</small></div>
+          <div class="poster t2"><span class="tag done">Diekspor</span><div class="shade"></div><strong>Legenda Danau Toba</strong><small>0:58, kemarin</small></div>
+          <div class="poster t3"><span class="tag draft">Draf</span><div class="shade"></div><strong>Si Kucing Penjaga Warung</strong><small>0:31, 3 hari lalu</small></div>
+        </div>
+      </div>
+    </div></div>
+    <div class="notes">
+      <div><b>Kesan</b>Ceria, percaya diri, dan mudah diingat. Cocok untuk brand kreator YouTube dan Shorts.</div>
+      <div><b>Yang perlu ditimbang</b>Gaya sekuat ini dipakai di Beranda dan judul halaman. Editor timeline tetap dibuat lebih tenang supaya tidak melelahkan.</div>
+      <div><b>Huruf</b>Archivo Black untuk judul dan Poppins untuk isi. Keduanya sudah ada di aplikasi (dipakai caption).</div>
+      <div><b>Warna</b><div class="sw"><i style="background:#4338ca"></i><i style="background:#1e1b4b"></i><i style="background:#ffd23f"></i><i style="background:#eeedff"></i><i style="background:#fbfaff"></i></div></div>
+    </div>
+  </section>
+</div>
+<script>
+  // Each mockup is drawn at 1280 x 820 and scaled to the width it is given.
+  function fit() {
+    document.querySelectorAll('.fit').forEach(function (box) {
+      var c = box.querySelector('.canvas');
+      var s = Math.min(1, box.clientWidth / 1280);
+      c.style.transform = 'scale(' + s + ')';
+      box.style.height = 820 * s + 'px';
+    });
+  }
+  window.addEventListener('resize', fit);
+  fit();
+</script>
+</body>
+</html>
