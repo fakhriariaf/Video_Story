@@ -631,7 +631,7 @@ export function StoryboardStep() {
         </Button>
         {readyForVideo && (
           <Button
-            variant="primary"
+            variant="accent"
             icon={<Clapperboard className="size-[17px]" />}
             loading={stats.videoRunning > 0}
             disabled={stats.videoRunning > 0 || stats.needVideo.length === 0}

@@ -203,7 +203,7 @@ export function Select<T extends string | number>({
                   onClick={() => choose(o)}
                   className={cx(
                     'flex items-center gap-2.5 rounded-lg px-3 py-2 text-sm',
-                    o.disabled ? 'cursor-not-allowed text-muted' : cx('cursor-pointer', selected ? 'bg-sun-soft' : i === active && 'bg-raised')
+                    o.disabled ? 'cursor-not-allowed text-muted' : cx('cursor-pointer', selected ? 'bg-select' : i === active && 'bg-raised')
                   )}
                 >
                   {o.icon && <span className={cx('flex shrink-0', o.disabled && 'opacity-50')}>{o.icon}</span>}

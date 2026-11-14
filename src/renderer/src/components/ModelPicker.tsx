@@ -291,7 +291,7 @@ export function ModelPicker({
                   // The chosen model is marked by its background, which keeps the list narrow.
                   className={cx(
                     'flex w-full items-start gap-2.5 rounded-lg px-3 py-2 text-left',
-                    m.locked ? 'cursor-not-allowed opacity-50' : selected ? 'bg-sun-soft' : i === active ? 'bg-raised' : 'hover:bg-raised/60'
+                    m.locked ? 'cursor-not-allowed opacity-50' : selected ? 'bg-select' : i === active ? 'bg-raised' : 'hover:bg-raised/60'
                   )}
                 >
                   {renderIcon?.(m)}

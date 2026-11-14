@@ -65,7 +65,7 @@ export function TransitionPanel({ clip, next, index }: { clip: Clip; next: Clip;
                 }}
                 className={cx(
                   'flex flex-col items-start gap-1.5 rounded-lg border p-2.5 text-left transition-colors',
-                  on ? 'border-edge bg-sun-soft' : trying === t.id ? 'border-edge bg-canvas' : 'border-line-2 hover:border-edge'
+                  on ? 'border-accent bg-select' : trying === t.id ? 'border-edge bg-canvas' : 'border-line-2 hover:border-edge'
                 )}
               >
                 <span className={cx('flex size-8 items-center justify-center rounded-full border', on ? 'border-edge bg-sun' : 'border-line-2 bg-panel')}>
