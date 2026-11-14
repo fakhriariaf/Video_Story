@@ -1,15 +1,16 @@
 import { useEffect, useMemo, useState } from 'react'
-import { AlertTriangle, ArrowRight, Copy, FolderOpen, MoreHorizontal, Plus, Search, SlidersHorizontal, Trash2 } from 'lucide-react'
+import { AlertTriangle, ArrowRight, Copy, FolderOpen, MoreHorizontal, Plus, Search, Trash2 } from 'lucide-react'
 import { DURATIONS, LANGUAGES, llmName } from '@shared/models'
 import { getStyle } from '@shared/styles'
 import type { AccountStatus, ApiProvider, AppSettings, AspectRatio, KeyStatus, ProjectStatus, ProjectSummary, TtsProvider } from '@shared/types'
-import { Logo } from '../components/Logo'
+import { AppRail } from '../components/AppRail'
 import { Select, type SelectOption } from '../components/Select'
 import { StyleSwatch } from '../components/StyleArt'
 import { StyleMenu } from '../components/StyleMenu'
 import { Badge, Button, Chip, IconButton, Menu, confirmDialog, cx } from '../components/ui'
 import { errorText, mmss, relativeTime } from '../lib/format'
 import { TTS_NAMES, ttsReadiness, usableTts } from '../lib/keys'
+import { useServices } from '../lib/useServices'
 import { useApp } from '../store/app'
 
 const STATUS: Record<ProjectStatus, { label: string; tone: 'draft' | 'info' | 'warn' | 'ok' }> = {
@@ -115,6 +116,8 @@ export function Home() {
     return issues
   }, [keys, accounts, appSettings])
 
+  const services = useServices(appSettings, keys, accounts)
+
   const visible = useMemo(() => {
     const f = FILTERS.find((x) => x.id === filter)!
     const q = query.trim().toLowerCase()
@@ -154,28 +157,10 @@ export function Home() {
   }
 
   return (
-    <div className="flex h-full flex-col">
-      <header className="flex h-[68px] shrink-0 items-center gap-6 border-b border-line bg-panel px-8">
-        <Logo />
-        <label className="flex h-10 w-[360px] items-center gap-2 rounded-full border border-line bg-raised px-3.5 text-muted">
-          <Search className="size-[18px]" />
-          <input
-            type="search"
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-            placeholder="Cari proyek"
-            aria-label="Cari proyek"
-            className="flex-1 bg-transparent text-sm text-fg outline-none"
-          />
-        </label>
-        <div className="flex-1" />
-        <Button icon={<SlidersHorizontal className="size-[18px]" />} onClick={() => go({ name: 'settings', back: { name: 'home' } })}>
-          Pengaturan
-          {setupIssues.length > 0 && <span className="size-2 rounded-full bg-accent" />}
-        </Button>
-      </header>
+    <div className="grid h-full grid-cols-[228px_minmax(0,1fr)]">
+      <AppRail active="home" services={services} />
 
-      <main className="scroll-thin flex-1 overflow-y-auto">
+      <main className="scroll-thin min-h-0 overflow-y-auto">
         <div className="mx-auto flex max-w-[1280px] flex-col gap-5 px-12 pt-11">
           {setupIssues.length > 0 && (
             <div className="flex items-center gap-3 rounded-[14px] border border-sun bg-sun-soft px-4 py-3 text-sm text-sun-ink">
@@ -262,6 +247,18 @@ export function Home() {
                 )
               })}
             </div>
+            <div className="flex-1" />
+            <label className="flex h-9 w-[240px] items-center gap-2 rounded-lg border border-line-2 bg-panel px-3 text-muted">
+              <Search className="size-4" />
+              <input
+                type="search"
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
+                placeholder="Cari proyek"
+                aria-label="Cari proyek"
+                className="min-w-0 flex-1 bg-transparent text-sm text-fg outline-none placeholder:text-faint"
+              />
+            </label>
           </div>
 
           <div className="grid grid-cols-4 gap-5">
