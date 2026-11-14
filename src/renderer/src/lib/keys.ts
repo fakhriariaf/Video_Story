@@ -1,6 +1,7 @@
+import { pickTts, TTS_NAMES } from '@shared/services'
 import type { KeyStatus, TtsProvider } from '@shared/types'
 
-export const TTS_NAMES: Record<TtsProvider, string> = { gemini: 'Gemini TTS', elevenlabs: 'ElevenLabs' }
+export { TTS_NAMES }
 
 /**
  * Whether each narrator voice service can be used: it needs a saved key that did not fail its last check.
@@ -20,7 +21,5 @@ export function ttsReadiness(keys: KeyStatus[]): Record<TtsProvider, { ok: boole
 /** The preferred provider when it is usable, otherwise another usable one, otherwise the preferred one anyway. */
 export function usableTts(preferred: TtsProvider, keys: KeyStatus[]): TtsProvider {
   const ready = ttsReadiness(keys)
-  if (ready[preferred].ok) return preferred
-  const other: TtsProvider = preferred === 'gemini' ? 'elevenlabs' : 'gemini'
-  return ready[other].ok ? other : preferred
+  return pickTts(preferred, (p) => ready[p].ok)
 }

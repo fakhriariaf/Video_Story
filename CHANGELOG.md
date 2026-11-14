@@ -10,7 +10,11 @@ Cara menaikkan versi ada di [docs/pengembangan.md](docs/pengembangan.md#versi-da
 
 ### Diubah
 - Tampilan baru **Ruang Edit**: seluruh aplikasi memakai tema gelap dengan huruf Barlow, tombol utama kuning, dan
-  tanpa bayangan keras. Tata letak halaman belum berubah; hasil video tidak terpengaruh.
+  tanpa bayangan keras. Hasil video tidak terpengaruh.
+- Beranda baru: menu sisi kiri dengan ringkasan Layanan AI (Cerita, Suara, Gambar, Caption), kotak ide, dan daftar
+  proyek berbentuk pita film dengan saringan dan pencarian. Pengaturan memakai menu sisi yang sama.
+- Langkah Ide cerita baru: papan clapper di kanan dengan pratinjau format, ringkasan semua pilihan, dan perkiraan
+  biaya gambar dan video; gaya visual dipilih dari pita film.
 
 ### Ditambahkan
 - Penyedia gambar dan video baru selain Higgsfield: **fal.ai** (25 model terpilih, antara lain Nano Banana,

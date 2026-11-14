@@ -1,18 +1,18 @@
 import { useEffect, useRef, useState } from 'react'
 import { Bot, Play, Sparkles, Square } from 'lucide-react'
-import { getImageModel } from '@shared/media'
+import { MEDIA_PROVIDERS } from '@shared/media'
 import { DURATIONS, LANGUAGES, clipCountFor, llmName } from '@shared/models'
-import { getStyle } from '@shared/styles'
 import type { KeyStatus, LlmProvider, TtsProvider, VoiceOption } from '@shared/types'
 import { Select } from '../../components/Select'
-import { StylePicker } from '../../components/StylePicker'
-import { Button, Chip, Field, Segmented, confirmDialog, cx } from '../../components/ui'
+import { Button, Chip, Segmented, confirmDialog, cx } from '../../components/ui'
 import { errorText } from '../../lib/format'
 import { geminiPreview } from '../../lib/voicePreviews'
 import { TTS_NAMES, ttsReadiness, usableTts } from '../../lib/keys'
 import { useApp } from '../../store/app'
 import { useProject } from '../../store/project'
+import { IdeaSlate } from './IdeaSlate'
 import { ModelSection } from './ModelSection'
+import { StyleStrip } from './StyleStrip'
 
 /** One sample plays at a time, from the list rows or the button beside the picker. */
 function usePreviewPlayer(): { playing: string | null; toggle: (id: string, url: string) => void } {
@@ -33,7 +33,18 @@ function usePreviewPlayer(): { playing: string | null; toggle: (id: string, url:
   }
 }
 
-function VoicePicker({ provider, value, onChange }: { provider: TtsProvider; value: string; onChange: (v: string) => void }) {
+function VoicePicker({
+  provider,
+  value,
+  onChange,
+  onName
+}: {
+  provider: TtsProvider
+  value: string
+  onChange: (v: string) => void
+  /** Tells the page the chosen voice's name once the list is known (the project only stores its id). */
+  onName?: (name: string | null) => void
+}) {
   const [voices, setVoices] = useState<VoiceOption[] | null>(null)
   const [error, setError] = useState<string | null>(null)
   const player = usePreviewPlayer()
@@ -54,6 +65,7 @@ function VoicePicker({ provider, value, onChange }: { provider: TtsProvider; val
 
   const urlOf = (id: string): string | null => voices?.find((v) => v.id === id)?.previewUrl ?? null
   const current = voices?.find((v) => v.id === value)
+  useEffect(() => onName?.(current?.name ?? null), [current?.name])
 
   const playButton = (id: string, size: 'row' | 'field') => {
     const url = urlOf(id)
@@ -108,6 +120,7 @@ export function IdeaStep() {
   const [busy, setBusy] = useState(false)
   const [writer, setWriter] = useState<{ provider: LlmProvider; model: string } | null>(null)
   const [keys, setKeys] = useState<KeyStatus[]>([])
+  const [voiceName, setVoiceName] = useState<string | null>(null)
 
   useEffect(() => {
     void window.api.settings.get().then((s) => setWriter({ provider: s.llmProvider, model: s.llmModels[s.llmProvider] }))
@@ -132,7 +145,8 @@ export function IdeaStep() {
 
   const clipCount = clipCountFor(project.durationSec)
   const perClip = Math.round(project.durationSec / clipCount)
-  const model = getImageModel(project.imageModel)
+  // Providers with a saved key; null until the key list arrives, so nothing claims "no key" too early.
+  const mediaKeys = keys.length ? new Set(MEDIA_PROVIDERS.filter((m) => keys.find((k) => k.provider === m)?.configured)) : null
 
   const compose = async (): Promise<void> => {
     if (!project.synopsis.trim()) {
@@ -163,125 +177,109 @@ export function IdeaStep() {
   return (
     <div className="relative h-full">
       <div className="scroll-thin h-full overflow-y-auto pb-28">
-        <div className="mx-auto grid max-w-[1400px] grid-cols-[minmax(0,1fr)_540px] gap-10 px-14 pt-8">
-          <div className="flex flex-col gap-[22px]">
+        <div className="mx-auto grid max-w-[1320px] grid-cols-[minmax(0,1fr)_372px] items-start gap-7 px-11 pt-8">
+          <div className="flex min-w-0 flex-col gap-5">
             <div>
-              <p className="text-[13px] font-semibold text-accent">Langkah 1 dari 4</p>
-              <h1 className="mt-1.5 font-display text-[40px] font-bold leading-tight tracking-[-0.02em]">Ceritakan idemu</h1>
-              <p className="mt-2 text-[15px] text-fg-2">
-                Sebut tokoh, tempat, dan akhir ceritanya. Makin jelas, makin rapi susunan klip dari AI.
-              </p>
+              <h1 className="font-display text-[44px] font-semibold leading-none">Ceritakan idemu</h1>
+              <p className="mt-2 text-[15px] text-muted">Sebut tokoh, tempat, dan akhir ceritanya. Makin jelas, makin rapi susunan adegan dari AI.</p>
             </div>
 
-            <div className="flex flex-col gap-2 rounded-[14px] border border-edge bg-panel px-[18px] pb-3 pt-4">
-              <label htmlFor="sinopsis" className="text-[13px] font-semibold text-fg-2">
+            <div className="flex flex-col gap-2 rounded-[14px] border border-line-2 bg-panel px-[18px] pb-3 pt-4 focus-within:border-accent">
+              <label htmlFor="sinopsis" className="sr-only">
                 Ide cerita atau sinopsis
               </label>
               <textarea
                 id="sinopsis"
-                rows={5}
+                rows={4}
                 value={project.synopsis}
                 maxLength={4000}
                 onChange={(e) => updateProject({ synopsis: e.target.value })}
                 placeholder="Tahun 1336 di istana Majapahit. Gajah Mada bersumpah tidak akan menikmati palapa sebelum Nusantara bersatu…"
-                className="resize-none bg-transparent text-base leading-relaxed outline-none placeholder:text-muted/70"
+                className="resize-none bg-transparent text-[17px] leading-relaxed outline-none placeholder:text-faint"
               />
-              <div className="flex items-center justify-between text-xs text-muted">
-                <span>Tips: tulis juga suasana yang kamu mau, misalnya tegang, lucu, atau haru.</span>
-                <span className="font-mono">{project.synopsis.length.toLocaleString('id-ID')} / 4.000</span>
+              <div className="flex items-center justify-between gap-4 border-t border-line pt-2.5 text-[13px] text-muted">
+                <span>Tulis juga suasana yang kamu mau, misalnya tegang, lucu, atau haru.</span>
+                <span className="shrink-0 font-mono text-xs">{project.synopsis.length.toLocaleString('id-ID')} / 4.000</span>
               </div>
             </div>
 
-            <div className="flex flex-col gap-2">
-              <span className="text-sm font-semibold">Durasi video</span>
-              <div className="flex flex-wrap gap-2">
-                {DURATIONS.map((d) => (
-                  <Chip key={d.sec} on={project.durationSec === d.sec} onClick={() => updateProject({ durationSec: d.sec })} className="h-10 px-4">
-                    {d.label}
-                  </Chip>
-                ))}
-              </div>
-              <span className="text-[13px] text-muted">
-                Sekitar {clipCount} klip, masing-masing kurang lebih {perClip} detik. Durasi akhir mengikuti panjang suara narasi.
-              </span>
-            </div>
-
-            <div className="grid grid-cols-[minmax(0,1fr)_minmax(0,1.4fr)] gap-5">
-              <Field label="Bahasa naskah dan suara">
-                <Select
-                  label="Bahasa naskah dan suara"
-                  size="lg"
-                  value={project.language}
-                  onChange={(v) => updateProject({ language: v })}
-                  options={LANGUAGES.map((l) => ({ value: l.code, label: l.label }))}
-                />
-              </Field>
-              <div className="flex flex-col gap-1.5">
-                <span className="text-sm font-semibold">Format</span>
-                <div className="grid grid-cols-2 gap-2">
-                  {(
-                    [
-                      { id: '16:9', label: '16:9', sub: 'YouTube', w: 26, h: 15 },
-                      { id: '9:16', label: '9:16', sub: 'Shorts, Reels, TikTok', w: 13, h: 22 }
-                    ] as const
-                  ).map((f) => {
-                    const on = project.aspectRatio === f.id
-                    return (
-                      <button
-                        key={f.id}
-                        type="button"
-                        aria-pressed={on}
-                        onClick={() => updateProject({ aspectRatio: f.id })}
-                        className={cx(
-                          'flex h-12 items-center gap-2.5 rounded-lg px-3 text-left',
-                          on ? 'border-2 border-accent bg-accent-soft' : 'border border-line-2 bg-panel hover:border-edge'
-                        )}
-                      >
-                        <span className="flex w-[26px] justify-center">
-                          <span className="rounded-[3px] border-[1.8px] border-edge" style={{ width: f.w, height: f.h }} />
-                        </span>
-                        <span className="flex flex-col leading-tight">
-                          <span className="text-sm font-semibold">{f.label}</span>
-                          <span className="text-xs text-fg-2">{f.sub}</span>
-                        </span>
-                      </button>
-                    )
-                  })}
+            <div className="@container rounded-[14px] border border-line-2 bg-panel px-4 py-3.5">
+              <div className="grid grid-cols-2 gap-x-4 gap-y-4 @3xl:grid-cols-[1.75fr_1.4fr_1.15fr_1.6fr]">
+                <div className="flex min-w-0 flex-col gap-2">
+                  <span className="text-sm font-semibold">Durasi</span>
+                  <div className="flex flex-wrap gap-1.5">
+                    {DURATIONS.map((d) => (
+                      <Chip key={d.sec} on={project.durationSec === d.sec} onClick={() => updateProject({ durationSec: d.sec })} className="px-2.5">
+                        {d.label}
+                      </Chip>
+                    ))}
+                  </div>
+                </div>
+                <div className="flex min-w-0 flex-col gap-2">
+                  <span className="text-sm font-semibold">Format</span>
+                  <div className="flex flex-wrap gap-1.5">
+                    {(
+                      [
+                        { id: '16:9', label: '16:9 YouTube', title: 'Mendatar, untuk YouTube' },
+                        { id: '9:16', label: '9:16 Shorts', title: 'Tegak, untuk Shorts, Reels, dan TikTok' }
+                      ] as const
+                    ).map((f) => (
+                      <Chip key={f.id} on={project.aspectRatio === f.id} title={f.title} onClick={() => updateProject({ aspectRatio: f.id })} className="px-2.5">
+                        {f.label}
+                      </Chip>
+                    ))}
+                  </div>
+                </div>
+                <div className="flex min-w-0 flex-col gap-2">
+                  <span className="text-sm font-semibold">Bahasa</span>
+                  <Select
+                    label="Bahasa naskah dan suara"
+                    value={project.language}
+                    onChange={(v) => updateProject({ language: v })}
+                    options={LANGUAGES.map((l) => ({ value: l.code, label: l.label }))}
+                  />
+                </div>
+                <div className="flex min-w-0 flex-col gap-2">
+                  <span className="text-sm font-semibold">Suara narator</span>
+                  <Segmented
+                    size="sm"
+                    value={project.ttsProvider}
+                    onChange={(v) => updateProject({ ttsProvider: v, ttsVoice: v === 'gemini' ? 'Charon' : '' })}
+                    options={(['gemini', 'elevenlabs'] as const).map((p) => ({
+                      id: p,
+                      label: TTS_NAMES[p],
+                      disabled: blocked.includes(p),
+                      title: ready[p].reason ?? undefined
+                    }))}
+                  />
+                  <div className="flex items-center gap-2">
+                    <VoicePicker
+                      provider={project.ttsProvider}
+                      value={project.ttsVoice}
+                      onChange={(v) => updateProject({ ttsVoice: v })}
+                      onName={setVoiceName}
+                    />
+                  </div>
                 </div>
               </div>
-            </div>
-
-            <div className="flex flex-col gap-2">
-              <span className="text-sm font-semibold">Suara narator</span>
-              <div className="flex items-center gap-2">
-                <Segmented
-                  value={project.ttsProvider}
-                  onChange={(v) => updateProject({ ttsProvider: v, ttsVoice: v === 'gemini' ? 'Charon' : '' })}
-                  options={(['gemini', 'elevenlabs'] as const).map((p) => ({
-                    id: p,
-                    label: TTS_NAMES[p],
-                    disabled: blocked.includes(p),
-                    title: ready[p].reason ?? undefined
-                  }))}
-                />
-                <VoicePicker provider={project.ttsProvider} value={project.ttsVoice} onChange={(v) => updateProject({ ttsVoice: v })} />
-              </div>
               {blocked.length > 0 && (
-                <span className="text-[13px] text-muted">
+                <p className="mt-3 border-t border-line pt-2.5 text-[13px] text-muted">
                   {blocked.length === 2
                     ? 'Belum ada kunci suara narator yang valid, jadi suara belum bisa dibuat.'
                     : `${ready[blocked[0]].reason}, jadi ${TTS_NAMES[blocked[0]]} belum bisa dipilih.`}{' '}
                   <button type="button" onClick={() => void openSettings()} className="font-semibold text-link hover:underline">
                     Atur di Pengaturan
                   </button>
-                </span>
+                </p>
               )}
             </div>
 
+            <StyleStrip value={project.styleId} onChange={(id) => updateProject({ styleId: id })} />
+
             <ModelSection
               project={project}
-              clipCount={clipCount}
               perClip={perClip}
+              keys={mediaKeys}
               onChange={(patch) => {
                 updateProject(patch)
                 // New projects start with the models picked last; resolution stays with this project.
@@ -290,25 +288,18 @@ export function IdeaStep() {
             />
           </div>
 
-          <aside className="flex flex-col gap-3.5 self-start rounded-[18px] border border-line bg-panel p-5">
-            <div className="flex items-baseline justify-between">
-              <h2 className="font-display text-[22px] font-bold">Gaya visual</h2>
-              <span className="text-[13px] text-muted">{getStyle(project.styleId).name}</span>
-            </div>
-            <p className="-mt-1.5 text-[13px] text-fg-2">Dipakai untuk semua gambar di proyek ini, termasuk lembar karakter.</p>
-            <StylePicker value={project.styleId} onChange={(id) => updateProject({ styleId: id })} />
-          </aside>
+          {/* The slate follows the scroll only in a window tall enough to show all of it above the footer. */}
+          <div className="[@media(min-height:880px)]:sticky [@media(min-height:880px)]:top-0">
+            <IdeaSlate project={project} voiceName={voiceName} hasKey={(m) => (mediaKeys ? mediaKeys.has(m) : null)} />
+          </div>
         </div>
       </div>
 
-      <footer className="absolute inset-x-0 bottom-0 flex h-[84px] items-center gap-4 border-t border-line bg-panel px-14">
-        <div className="flex flex-col gap-0.5">
-          <span className="text-[15px] font-semibold">
-            ± {clipCount} adegan · gambar {model.name}
-          </span>
+      <footer className="absolute inset-x-0 bottom-0 flex h-[78px] items-center gap-3 border-t border-line bg-panel px-11">
+        <div className="flex min-w-0 flex-col gap-0.5">
+          <span className="truncate text-[15px] font-semibold">Naskah disusun oleh {writer ? llmName(writer.provider) : '…'}</span>
           <span className="flex items-center gap-1.5 text-[13px] text-muted">
             <Bot className="size-3.5" />
-            Disusun oleh {writer ? `${llmName(writer.provider)} · ` : ''}
             <span className={cx('font-mono', writer && !writer.model && 'text-link')}>{writer ? writer.model || 'model belum dipilih' : '…'}</span>
             <button type="button" onClick={() => void openSettings()} className="font-semibold text-link hover:underline">
               Ganti
@@ -321,7 +312,7 @@ export function IdeaStep() {
             Lihat naskah
           </Button>
         )}
-        <Button variant="primary" size="lg" className="h-[50px]" loading={busy} icon={!busy && <Sparkles className="size-[18px]" />} onClick={() => void compose()}>
+        <Button variant="primary" size="lg" loading={busy} icon={!busy && <Sparkles className="size-[18px]" />} onClick={() => void compose()}>
           {clips.length ? 'Susun ulang naskah' : 'Susun naskah'}
         </Button>
       </footer>

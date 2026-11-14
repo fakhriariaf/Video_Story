@@ -150,7 +150,7 @@ export function Select<T extends string | number>({
         className={cx(
           'flex min-w-0 items-center text-left transition-colors disabled:cursor-not-allowed disabled:opacity-50',
           variant === 'pill'
-            ? 'inline-flex h-10 gap-2 rounded-full border bg-canvas pl-3.5 pr-3 text-sm font-medium'
+            ? 'inline-flex h-10 gap-2 rounded-lg border bg-raised pl-3.5 pr-3 text-sm font-medium'
             : cx('w-full gap-2.5 rounded-lg border bg-panel px-3.5 text-fg', SIZES[size]),
           open ? 'border-edge' : 'border-line-2 hover:border-edge',
           className

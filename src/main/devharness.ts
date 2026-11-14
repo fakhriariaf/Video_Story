@@ -195,7 +195,10 @@ export function attachDevHarness(win: BrowserWindow): void {
   const planPath = process.env.STUDIO_CAPTURE_PLAN
   if (!planPath) return
   let plan: {
-    main?: 'seed' | 'export' | 'key' | 'overlays' | 'speech' | 'videos'
+    main?: 'seed' | 'export' | 'key' | 'overlays' | 'speech' | 'videos' | 'resize'
+    /** For main "resize": the window size to test a layout at, e.g. the minimum width. */
+    width?: number
+    height?: number
     exportTo?: string
     /** For main "export": an existing project instead of the seeded demo. */
     projectId?: string
@@ -226,6 +229,7 @@ export function attachDevHarness(win: BrowserWindow): void {
     for (const step of plan) {
       try {
         if (step.main === 'seed') demoId = seedDemo()
+        if (step.main === 'resize' && step.width && step.height) win.setSize(step.width, step.height)
         if (step.main === 'overlays' && demoId) addDemoOverlays(demoId)
         if (step.main === 'videos' && demoId) addDemoVideos(demoId)
         if (step.main === 'speech' && demoId) await addDemoSpeech(demoId)

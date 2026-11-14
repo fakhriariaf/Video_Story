@@ -1,6 +1,5 @@
 import { useEffect, useRef, useState, type ReactNode } from 'react'
 import {
-  ArrowLeft,
   Check,
   ChevronDown,
   Cpu,
@@ -10,17 +9,14 @@ import {
   Film,
   FolderOpen,
   Image as ImageIcon,
-  Info,
-  KeyRound,
   Mic,
-  SlidersHorizontal,
   Trash2
 } from 'lucide-react'
 import { defaultMediaProvider, IMAGE_MODELS, mediaModelOptions, providerDefaults, VIDEO_MODELS, type MediaProvider } from '@shared/media'
 import { LANGUAGES, LLM_PROVIDERS } from '@shared/models'
 import type { AccountStatus, ApiProvider, AppSettings, KeyStatus, KeyTestResult, LlmProvider, TtsProvider } from '@shared/types'
+import { AppRail } from '../components/AppRail'
 import { ChatGptAccount } from '../components/ChatGptAccount'
-import { Logo } from '../components/Logo'
 import { ModelLogo } from '../components/ModelLogo'
 import { ModelPicker } from '../components/ModelPicker'
 import { ProviderLogo, type ProviderLogoId } from '../components/ProviderLogo'
@@ -30,6 +26,7 @@ import { WhisperSection } from './WhisperSection'
 import { Badge, Button, Field, IconButton, confirmDialog, cx, inputCls } from '../components/ui'
 import { errorText, relativeTime } from '../lib/format'
 import { useModels } from '../lib/useModels'
+import { useServices } from '../lib/useServices'
 import { useApp } from '../store/app'
 
 type Tab = 'services' | 'general' | 'about'
@@ -708,44 +705,23 @@ export function Settings() {
   }, [])
 
   const statusOf = (p: ApiProvider): KeyStatus | undefined => keys.find((k) => k.provider === p)
+  const services = useServices(settings, keys, accounts)
 
-  const NAV: { id: Tab; label: string; icon: ReactNode }[] = [
-    { id: 'services', label: 'Layanan AI dan kunci', icon: <KeyRound className="size-[18px]" /> },
-    { id: 'general', label: 'Umum', icon: <SlidersHorizontal className="size-[18px]" /> },
-    { id: 'about', label: 'Tentang aplikasi', icon: <Info className="size-[18px]" /> }
+  const NAV: { id: Tab; label: string }[] = [
+    { id: 'services', label: 'Layanan AI dan kunci' },
+    { id: 'general', label: 'Umum' },
+    { id: 'about', label: 'Tentang aplikasi' }
   ]
 
   return (
-    <div className="flex h-full flex-col">
-      <header className="flex h-[68px] shrink-0 items-center gap-3.5 border-b border-line bg-panel px-8">
-        <button type="button" onClick={() => go({ name: 'home' })}>
-          <Logo />
-        </button>
-        <span className="text-xl text-line-3">/</span>
-        <span className="font-semibold">Pengaturan</span>
-        <div className="flex-1" />
-        <Button icon={<ArrowLeft className="size-[18px]" />} onClick={() => go(back)}>
-          {back.name === 'project' ? 'Kembali ke proyek' : 'Kembali ke beranda'}
-        </Button>
-      </header>
-      <div className="grid min-h-0 flex-1 grid-cols-[280px_minmax(0,1fr)]">
-        <nav aria-label="Bagian pengaturan" className="flex flex-col gap-1 border-r border-line pl-6 pr-4 pt-7">
-          {NAV.map((n) => (
-            <button
-              key={n.id}
-              type="button"
-              aria-current={tab === n.id ? 'page' : undefined}
-              onClick={() => setTab(n.id)}
-              className={cx(
-                'flex h-11 items-center gap-3 rounded-lg px-3.5 text-left text-[15px]',
-                tab === n.id ? 'bg-select font-semibold text-fg' : 'font-medium text-fg hover:bg-raised'
-              )}
-            >
-              {n.icon}
-              {n.label}
-            </button>
-          ))}
-        </nav>
+    <div className="grid h-full grid-cols-[228px_minmax(0,1fr)]">
+      <AppRail
+        active="settings"
+        services={services}
+        backToProject={back.name === 'project' ? () => go(back) : undefined}
+        onSettings={() => setTab('services')}
+        sub={NAV.map((n) => ({ id: n.id, label: n.label, on: tab === n.id, onPick: () => setTab(n.id) }))}
+      />
         <main className="scroll-thin overflow-y-auto">
           <div className="flex max-w-[900px] flex-col gap-3.5 px-14 pb-24 pt-8">
             {tab === 'services' && settings && (
@@ -810,7 +786,6 @@ export function Settings() {
             {tab === 'about' && <AboutSection />}
           </div>
         </main>
-      </div>
     </div>
   )
 }
