@@ -5,6 +5,7 @@ import { DURATIONS, LANGUAGES, clipCountFor, llmName } from '@shared/models'
 import type { KeyStatus, LlmProvider, TtsProvider, VoiceOption } from '@shared/types'
 import { Select } from '../../components/Select'
 import { Button, Chip, Segmented, confirmDialog, cx } from '../../components/ui'
+import { WorkNote } from '../../components/WorkNote'
 import { errorText } from '../../lib/format'
 import { geminiPreview } from '../../lib/voicePreviews'
 import { TTS_NAMES, ttsReadiness, usableTts } from '../../lib/keys'
@@ -305,7 +306,8 @@ export function IdeaStep() {
       </div>
 
       <footer className="absolute inset-x-0 bottom-0 flex h-[78px] items-center gap-3 border-t border-line bg-panel px-11">
-        <div className="flex min-w-0 flex-col gap-0.5">
+        {busy && <WorkNote title={`AI sedang menyusun ${clipCount} adegan…`} typicalSec={60} />}
+        <div className={cx('min-w-0 flex-col gap-0.5', busy ? 'hidden' : 'flex')}>
           <span className="truncate text-[15px] font-semibold">Naskah disusun oleh {writer ? llmName(writer.provider) : '…'}</span>
           <span className="flex items-center gap-1.5 text-[13px] text-muted">
             <Bot className="size-3.5" />
@@ -322,7 +324,7 @@ export function IdeaStep() {
           </Button>
         )}
         <Button variant="primary" size="lg" loading={busy} icon={!busy && <Sparkles className="size-[18px]" />} onClick={() => void compose()}>
-          {clips.length ? 'Susun ulang naskah' : 'Susun naskah'}
+          {busy ? 'Menyusun naskah…' : clips.length ? 'Susun ulang naskah' : 'Susun naskah'}
         </Button>
       </footer>
     </div>
