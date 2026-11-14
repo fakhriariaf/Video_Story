@@ -19,7 +19,7 @@ const ORIGIN = LABEL_W + PAD
 const ROW_GAP = 8
 const TICK_STEPS = [1, 2, 5, 10, 15, 30, 60, 120]
 /** The one look for "this is what the panel is editing", on every track. */
-const SELECTED = 'z-[1] ring-2 ring-accent ring-offset-1 ring-offset-surface'
+const SELECTED = 'z-[1] ring-2 ring-accent ring-offset-1 ring-offset-panel'
 /** How close (in pixels) a dragged edge has to come to the playhead or a clip joint to snap to it. */
 const SNAP_PX = 8
 const MAX_IMAGE_MS = 120_000
@@ -85,7 +85,7 @@ function Playhead({ pps }: { pps: number }) {
   const t = usePlayback((s) => s.t)
   return (
     <div className="pointer-events-none absolute bottom-0 top-0 z-10 w-0.5 bg-accent" style={{ left: ORIGIN + t * pps }}>
-      <span className="absolute -left-[6px] -top-0.5 size-3.5 rounded-[3px] border-[1.5px] border-ink bg-accent" />
+      <span className="absolute -left-[6px] -top-0.5 size-3.5 rounded-[3px] border-[1.5px] border-edge bg-accent" />
     </div>
   )
 }
@@ -95,7 +95,7 @@ function Row({ label, icon, height, children }: { label: string; icon?: ReactNod
   return (
     <div className="flex" style={{ height: height + ROW_GAP }}>
       <div
-        className="sticky left-0 z-20 flex shrink-0 items-start gap-2 bg-surface pl-4 text-[13px] font-semibold"
+        className="sticky left-0 z-20 flex shrink-0 items-start gap-2 bg-panel pl-4 text-[13px] font-semibold"
         style={{ width: LABEL_W, marginRight: PAD, paddingTop: Math.max(0, (height - 20) / 2) }}
       >
         {icon}
@@ -246,11 +246,11 @@ export function Timeline({
         {...on(spec, side)}
         title={`Tarik untuk mengatur ${side === 'left' ? 'awal' : 'akhir'} ${label}`}
         className={cx(
-          'group/edge absolute inset-y-0 z-[4] flex w-2.5 cursor-ew-resize items-center justify-center hover:bg-ink/20',
+          'group/edge absolute inset-y-0 z-[4] flex w-2.5 cursor-ew-resize items-center justify-center hover:bg-strip/20',
           side === 'left' ? 'left-0 rounded-l-[inherit]' : 'right-0 rounded-r-[inherit]'
         )}
       >
-        <span className={cx('h-1/2 max-h-6 w-[3px] rounded-full bg-ink/70 transition-opacity', selected ? 'opacity-100' : 'opacity-0 group-hover/edge:opacity-100')} />
+        <span className={cx('h-1/2 max-h-6 w-[3px] rounded-full bg-strip/70 transition-opacity', selected ? 'opacity-100' : 'opacity-0 group-hover/edge:opacity-100')} />
       </span>
     ))
 
@@ -405,11 +405,11 @@ export function Timeline({
   })
 
   const btn =
-    'inline-flex h-8 items-center gap-1.5 rounded-lg border border-line-2 bg-surface px-2.5 text-[13px] font-medium text-ink hover:border-ink-2 disabled:cursor-not-allowed disabled:opacity-40'
+    'inline-flex h-8 items-center gap-1.5 rounded-lg border border-line-2 bg-panel px-2.5 text-[13px] font-medium text-fg hover:border-edge disabled:cursor-not-allowed disabled:opacity-40'
 
   return (
-    <section className="flex min-h-0 min-w-0 flex-col border-t border-line-2 bg-surface">
-      <div className="flex h-12 shrink-0 items-center gap-2 border-b border-line px-4 text-[13px] text-ink-2">
+    <section className="flex min-h-0 min-w-0 flex-col border-t border-line-2 bg-panel">
+      <div className="flex h-12 shrink-0 items-center gap-2 border-b border-line px-4 text-[13px] text-fg-2">
         <button type="button" className={btn} disabled={!canSplit} onClick={onSplit} title="Potong di posisi playhead (S)">
           <Scissors className="size-4" />
           Potong
@@ -460,7 +460,7 @@ export function Timeline({
                   aria-label={`Klip ${it.index + 1} ${it.clip.title}`}
                   aria-pressed={is('clip', it.clip.id)}
                   className={cx(
-                    'absolute top-0 flex h-16 cursor-pointer select-none flex-col justify-between overflow-hidden rounded-lg border border-ink bg-sand bg-cover bg-center p-1.5 text-left',
+                    'absolute top-0 flex h-16 cursor-pointer select-none flex-col justify-between overflow-hidden rounded-lg border border-edge bg-raised bg-cover bg-center p-1.5 text-left',
                     is('clip', it.clip.id) && SELECTED
                   )}
                   style={{
@@ -470,14 +470,14 @@ export function Timeline({
                   }}
                 >
                   <span className="pointer-events-none flex items-center gap-1 self-start">
-                    <span className="rounded-[5px] border border-ink bg-surface px-1 font-mono text-[11px]">{String(it.index + 1).padStart(2, '0')}</span>
+                    <span className="rounded-[5px] border border-edge bg-panel px-1 font-mono text-[11px]">{String(it.index + 1).padStart(2, '0')}</span>
                     {it.clip.motionType === 'video' && it.video && (
-                      <span className="flex size-[18px] items-center justify-center rounded-[5px] bg-ink text-paper">
+                      <span className="flex size-[18px] items-center justify-center rounded-[5px] bg-select text-fg">
                         <Film className="size-3" />
                       </span>
                     )}
                   </span>
-                  <span className="pointer-events-none max-w-full truncate rounded bg-surface/85 px-1 text-xs font-semibold">{it.clip.title}</span>
+                  <span className="pointer-events-none max-w-full truncate rounded bg-panel/85 px-1 text-xs font-semibold">{it.clip.title}</span>
                   {held > 0 && (
                     <span
                       title="Videonya sudah habis di sini; frame terakhirnya ditahan"
@@ -549,7 +549,7 @@ export function Timeline({
                   aria-label={`Suara klip ${it.index + 1}`}
                   aria-pressed={is('voice', it.clip.id)}
                   className={cx(
-                    'absolute top-0 flex h-10 cursor-pointer select-none items-center overflow-hidden rounded-md border border-line-2 bg-[#EFEAE2] px-1 hover:border-ink-2',
+                    'absolute top-0 flex h-10 cursor-pointer select-none items-center overflow-hidden rounded-md border border-line-2 bg-raised px-1 hover:border-edge',
                     is('voice', it.clip.id) && SELECTED
                   )}
                   style={{ left: (it.start + span.startMs / 1000) * pps + 1, width: Math.max(4, (span.playMs / 1000) * pps - 2) }}
@@ -624,7 +624,7 @@ export function Timeline({
       </div>
       {badge && (
         <span
-          className="pointer-events-none fixed z-50 -translate-x-1/2 rounded-md bg-ink px-2 py-1 font-mono text-[11px] text-paper shadow-lg"
+          className="pointer-events-none fixed z-50 -translate-x-1/2 rounded-md bg-select px-2 py-1 font-mono text-[11px] text-fg shadow-lg"
           style={{ left: badge.x, top: badge.y - 34 }}
         >
           {badge.text}

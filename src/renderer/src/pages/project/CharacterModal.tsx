@@ -53,7 +53,7 @@ function NewCharacter({ onClose, onCreated }: { onClose: () => void; onCreated?:
 
   return (
     <Modal open onClose={() => void close()} title="Pemeran baru" subtitle="Isi nama dan penampilannya, lalu simpan. Lembar karakter bisa dibuat setelah itu." width={760}>
-      <div className="flex h-[150px] flex-col items-center justify-center gap-2 rounded-xl border-[1.5px] border-dashed border-line-3 bg-paper text-sm text-ink-2">
+      <div className="flex h-[150px] flex-col items-center justify-center gap-2 rounded-xl border-[1.5px] border-dashed border-line-3 bg-canvas text-sm text-fg-2">
         <UserPlus className="size-6 text-muted" />
         Lembar karakter dibuat setelah pemeran disimpan.
       </div>
@@ -113,11 +113,11 @@ function EditCharacter({ characterId, onClose }: { characterId: string | null; o
 
   return (
     <Modal open onClose={onClose} title="Lembar karakter" subtitle={`Dipakai di ${usedIn} klip sebagai referensi supaya tampilannya konsisten.`} width={760}>
-      <div className="relative aspect-video overflow-hidden rounded-xl border-[1.5px] border-ink bg-paper">
+      <div className="relative aspect-video overflow-hidden rounded-xl border-[1.5px] border-edge bg-canvas">
         {sheet ? (
           <img src={sheet.url} alt={`Lembar karakter ${c.name}`} className="size-full object-contain" />
         ) : running ? null : (
-          <div className="flex size-full flex-col items-center justify-center gap-3 text-ink-2">
+          <div className="flex size-full flex-col items-center justify-center gap-3 text-fg-2">
             <span className="text-sm">Belum ada lembar karakter</span>
             <Button variant="accent" icon={<Sparkles className="size-4" />} disabled={running} onClick={() => void generate()}>
               Buat lembar karakter
@@ -128,7 +128,7 @@ function EditCharacter({ characterId, onClose }: { characterId: string | null; o
           <div
             className={cx(
               'absolute inset-0 flex flex-col items-center justify-center gap-2',
-              sheet ? 'bg-paper/80 backdrop-blur-[3px]' : 'bg-paper'
+              sheet ? 'bg-canvas/80 backdrop-blur-[3px]' : 'bg-canvas'
             )}
           >
             <span className="text-sm font-semibold text-sun-ink">

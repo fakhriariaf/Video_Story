@@ -8,13 +8,13 @@ export function AboutSection() {
   }, [])
 
   return (
-    <section className="flex flex-col gap-5 rounded-2xl border border-line bg-surface p-6 text-[15px] leading-relaxed text-ink-2">
+    <section className="flex flex-col gap-5 rounded-2xl border border-line bg-panel p-6 text-[15px] leading-relaxed text-fg-2">
       <div className="flex items-end justify-between gap-4">
         <div className="flex flex-col">
-          <h1 className="font-display text-[34px] font-bold tracking-[-0.015em] text-ink">Video Story</h1>
+          <h1 className="font-display text-[34px] font-bold tracking-[-0.015em] text-fg">Video Story</h1>
           <span className="text-sm font-medium text-muted">by Fakhri Ariaf</span>
         </div>
-        {version && <span className="rounded-full border border-line-2 px-3 py-1 font-mono text-xs text-ink">Versi {version}</span>}
+        {version && <span className="rounded-full border border-line-2 px-3 py-1 font-mono text-xs text-fg">Versi {version}</span>}
       </div>
 
       <p>Semua proyek, gambar, video, dan suara disimpan di komputer ini.</p>

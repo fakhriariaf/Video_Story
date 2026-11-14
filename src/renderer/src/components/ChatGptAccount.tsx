@@ -79,7 +79,7 @@ export function ChatGptAccount({
     <button
       type="button"
       onClick={() => void window.api.app.openExternal(USAGE_URL)}
-      className="inline-flex shrink-0 items-center gap-1 font-semibold text-accent-dark hover:underline"
+      className="inline-flex shrink-0 items-center gap-1 font-semibold text-link hover:underline"
     >
       Kelola pemakaian
       <ExternalLink className="size-3.5" />
@@ -94,7 +94,7 @@ export function ChatGptAccount({
             <Check className="size-4 shrink-0 text-ok-ink" strokeWidth={3} />
             <span className="truncate">{account?.label ?? 'Akun ChatGPT'}</span>
           </span>
-          <span className="text-[13px] text-ink-2">Memakai paket ChatGPT</span>
+          <span className="text-[13px] text-fg-2">Memakai paket ChatGPT</span>
           <span className="text-[13px]">{usageLink}</span>
           <span className="flex-1" />
           <Button className="h-10" loading={busy === 'logout'} onClick={() => void logout()}>
@@ -103,7 +103,7 @@ export function ChatGptAccount({
         </div>
       ) : (
         <>
-          <p className="text-[13px] text-ink-2">
+          <p className="text-[13px] text-fg-2">
             {account?.needsReauth
               ? 'Sesi ChatGPT berakhir. Login ulang untuk melanjutkan.'
               : account?.signedIn && account.planUsageAllowed === false
@@ -123,7 +123,7 @@ export function ChatGptAccount({
         </>
       )}
       <Modal open={welcome} onClose={closeWelcome} title="Kamu memakai paket ChatGPT" width={480}>
-        <p className="text-[15px] leading-relaxed text-ink-2">
+        <p className="text-[15px] leading-relaxed text-fg-2">
           Permintaan menyusun cerita memakai kuota paket ChatGPT-mu, terpisah dari biaya layanan lain. Atur batasnya di pengaturan ChatGPT.
         </p>
         <div className="flex justify-end">

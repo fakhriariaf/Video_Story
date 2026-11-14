@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict'
-import { readFileSync } from 'node:fs'
-import { join } from 'node:path'
+import { readdirSync, readFileSync } from 'node:fs'
+import { join, relative } from 'node:path'
 import { test } from 'node:test'
 
 // Guards for the renderer's theme: the tests run from the repository root (npm test).
@@ -64,4 +64,33 @@ test('the theme defines every token of the Ruang Edit palette', () => {
   for (const name of names) assert.ok(color(name), name)
   assert.equal(color('canvas').toLowerCase(), '#121026')
   assert.equal(color('sun').toLowerCase(), '#ffb627')
+})
+
+function rendererFiles(dir = RENDERER): string[] {
+  return readdirSync(dir, { withFileTypes: true }).flatMap((e) => {
+    const path = join(dir, e.name)
+    if (e.isDirectory()) return rendererFiles(path)
+    return /\.(tsx?|css)$/.test(e.name) ? [path] : []
+  })
+}
+
+test('no legacy class, font or colour names remain in the renderer', () => {
+  const LEGACY = [
+    /shadow-ink/,
+    /\b[a-z]+-(paper|surface|sand|accent-dark)\b/,
+    /\b(text|bg|border|ring|fill|stroke|outline|divide|decoration|caret|placeholder)-ink(-2)?\b/,
+    /--color-(ink|paper|surface|sand)\b/,
+    /Bricolage|Plus Jakarta/i,
+    /#(faf7f2|f3efe8|1f1d1a|57524a|6b665e|e6dfd3|d4cbbb|bfb5a4|efeae2)\b/i
+  ]
+  // Caption and overlay colour presets end up in the exported video; they are content, not app theme.
+  const VIDEO_COLOURS = /_SWATCHES = \[|captionBg:/
+  const hits = rendererFiles().flatMap((file) =>
+    readFileSync(file, 'utf8')
+      .split(/\r?\n/)
+      .map((text, i) => ({ text, at: `${relative(RENDERER, file)}:${i + 1}` }))
+      .filter((l) => LEGACY.some((r) => r.test(l.text)) && !VIDEO_COLOURS.test(l.text))
+      .map((l) => l.at)
+  )
+  assert.deepEqual(hits, [])
 })

@@ -46,7 +46,7 @@ export function TransitionPanel({ clip, next, index }: { clip: Clip; next: Clip;
         </span>
       </div>
       <Section title="Jenis transisi">
-        <p className="truncate text-[13px] text-ink-2" title={`${clip.title} → ${next.title}`}>
+        <p className="truncate text-[13px] text-fg-2" title={`${clip.title} → ${next.title}`}>
           {clip.title} → {next.title}
         </p>
         <div className="grid grid-cols-2 gap-2" onMouseLeave={() => trying && preview()}>
@@ -65,10 +65,10 @@ export function TransitionPanel({ clip, next, index }: { clip: Clip; next: Clip;
                 }}
                 className={cx(
                   'flex flex-col items-start gap-1.5 rounded-xl border p-2.5 text-left transition-colors',
-                  on ? 'border-ink bg-sun-soft' : trying === t.id ? 'border-ink-2 bg-paper' : 'border-line-2 hover:border-ink-2'
+                  on ? 'border-edge bg-sun-soft' : trying === t.id ? 'border-edge bg-canvas' : 'border-line-2 hover:border-edge'
                 )}
               >
-                <span className={cx('flex size-8 items-center justify-center rounded-full border', on ? 'border-ink bg-sun' : 'border-line-2 bg-surface')}>
+                <span className={cx('flex size-8 items-center justify-center rounded-full border', on ? 'border-edge bg-sun' : 'border-line-2 bg-panel')}>
                   <Icon className="size-4" />
                 </span>
                 <span className={cx('text-sm', on && 'font-semibold')}>{t.label}</span>

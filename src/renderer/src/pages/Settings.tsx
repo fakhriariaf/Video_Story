@@ -95,20 +95,20 @@ function ProviderSelect<T extends string>({ value, options, onChange }: { value:
         aria-expanded={open}
         onClick={() => setOpen(!open)}
         className={cx(
-          'flex w-full items-center gap-3 rounded-2xl border-[1.5px] border-ink bg-surface px-4 py-3 text-left transition-shadow',
-          open ? 'shadow-none' : 'shadow-ink hover:shadow-ink-md'
+          'flex w-full items-center gap-3 rounded-2xl border-[1.5px] border-edge bg-panel px-4 py-3 text-left transition-shadow',
+          open ? 'shadow-none' : ''
         )}
       >
         <ProviderLogo id={cur.logo} />
         <span className="flex min-w-0 flex-1 flex-col">
           <span className="text-base font-bold">{cur.name}</span>
-          <span className="truncate text-[13px] text-ink-2">{cur.note}</span>
+          <span className="truncate text-[13px] text-fg-2">{cur.note}</span>
         </span>
         <StatusBadge status={cur.status} />
         <ChevronDown className={cx('size-5 shrink-0 transition-transform', open && 'rotate-180')} />
       </button>
       {open && (
-        <div role="listbox" className="absolute inset-x-0 top-full z-40 mt-1.5 flex flex-col gap-0.5 rounded-2xl border-[1.5px] border-ink bg-surface p-1.5 shadow-ink-lg">
+        <div role="listbox" className="absolute inset-x-0 top-full z-40 mt-1.5 flex flex-col gap-0.5 rounded-2xl border-[1.5px] border-edge bg-panel p-1.5 shadow-pop">
           {options.map((o) => {
             const on = o.id === value
             return (
@@ -121,12 +121,12 @@ function ProviderSelect<T extends string>({ value, options, onChange }: { value:
                   setOpen(false)
                   if (!on) onChange(o.id)
                 }}
-                className={cx('flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left', on ? 'bg-accent-soft' : 'hover:bg-sand')}
+                className={cx('flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left', on ? 'bg-accent-soft' : 'hover:bg-raised')}
               >
                 <ProviderLogo id={o.logo} size={36} />
                 <span className="flex min-w-0 flex-1 flex-col">
                   <span className="text-[15px] font-semibold">{o.name}</span>
-                  <span className="truncate text-[13px] text-ink-2">{o.note}</span>
+                  <span className="truncate text-[13px] text-fg-2">{o.note}</span>
                 </span>
                 <StatusBadge status={o.status} />
                 <span className="flex size-5 shrink-0 items-center justify-center">{on && <Check className="size-4 text-accent" strokeWidth={2.6} />}</span>
@@ -284,7 +284,7 @@ function KeyForm({
                 readOnly
                 value={revealed ?? preview ?? ''}
                 aria-label={`${label} tersimpan`}
-                className={cx(inputCls, 'h-11 cursor-default bg-paper pr-11 font-mono text-sm')}
+                className={cx(inputCls, 'h-11 cursor-default bg-canvas pr-11 font-mono text-sm')}
               />
             ) : (
               <input
@@ -307,7 +307,7 @@ function KeyForm({
                 aria-label={visible ? 'Sembunyikan kunci' : 'Tampilkan kunci'}
                 title={visible ? 'Sembunyikan kunci' : 'Tampilkan kunci'}
                 onClick={() => void toggleEye()}
-                className="absolute right-1.5 top-1/2 flex size-8 -translate-y-1/2 items-center justify-center rounded-lg text-muted hover:bg-sand hover:text-ink"
+                className="absolute right-1.5 top-1/2 flex size-8 -translate-y-1/2 items-center justify-center rounded-lg text-muted hover:bg-raised hover:text-fg"
               >
                 {visible ? <EyeOff className="size-[17px]" /> : <Eye className="size-[17px]" />}
               </button>
@@ -353,7 +353,7 @@ function KeyForm({
         )}
       </div>
       {provider === 'openrouter' && !showStored && (
-        <div className="-mt-1 flex items-center gap-2 text-[13px] text-ink-2">
+        <div className="-mt-1 flex items-center gap-2 text-[13px] text-fg-2">
           <span>Atau tanpa menyalin kunci:</span>
           <Button className="h-9" loading={busy === 'login'} disabled={!!busy && busy !== 'login'} onClick={() => void loginOpenRouter()}>
             {busy === 'login' ? 'Menunggu login di browser…' : 'Login dengan OpenRouter'}
@@ -365,9 +365,9 @@ function KeyForm({
           )}
         </div>
       )}
-      {unsaved && <p className="-mt-1 text-[13px] font-semibold text-accent-dark">Kunci belum tersimpan. Tekan Enter atau klik Simpan dan tes.</p>}
-      {hint && <p className="-mt-1 text-[13px] text-ink-2">{hint}</p>}
-      <div className="flex items-center gap-2 text-[13px] text-ink-2">
+      {unsaved && <p className="-mt-1 text-[13px] font-semibold text-link">Kunci belum tersimpan. Tekan Enter atau klik Simpan dan tes.</p>}
+      {hint && <p className="-mt-1 text-[13px] text-fg-2">{hint}</p>}
+      <div className="flex items-center gap-2 text-[13px] text-fg-2">
         <span className={cx('flex-1', configured && status?.lastOk === false && 'text-bad-ink')}>
           {configured && status?.lastMessage
             ? `${status.lastMessage}${status.checkedAt && !status.unreadable ? ` · dicek ${relativeTime(status.checkedAt)}` : ''}`
@@ -377,7 +377,7 @@ function KeyForm({
           <button
             type="button"
             onClick={() => void window.api.app.openExternal(link)}
-            className="inline-flex shrink-0 items-center gap-1 font-semibold text-accent-dark hover:underline"
+            className="inline-flex shrink-0 items-center gap-1 font-semibold text-link hover:underline"
           >
             {linkLabel}
             <ExternalLink className="size-3.5" />
@@ -389,16 +389,16 @@ function KeyForm({
 }
 
 function Card({ children }: { children: ReactNode }) {
-  return <section className="flex flex-col gap-4 rounded-2xl border border-line bg-surface px-5 py-[18px]">{children}</section>
+  return <section className="flex flex-col gap-4 rounded-2xl border border-line bg-panel px-5 py-[18px]">{children}</section>
 }
 
 function SectionTitle({ icon, title, sub }: { icon: ReactNode; title: string; sub: ReactNode }) {
   return (
     <div className="mt-5 flex items-start gap-3">
-      <span className="mt-1 text-ink">{icon}</span>
+      <span className="mt-1 text-fg">{icon}</span>
       <div className="flex flex-col gap-1">
         <h2 className="font-display text-[22px] font-bold leading-tight">{title}</h2>
-        <p className="text-sm text-ink-2">{sub}</p>
+        <p className="text-sm text-fg-2">{sub}</p>
       </div>
     </div>
   )
@@ -645,8 +645,8 @@ function MediaSection({
           hint={
             provider === 'higgsfield' ? (
               <>
-                Di console Higgsfield, buka API Keys lalu klik <strong className="text-ink">Copy API key</strong> dan tempel di sini. Formatnya{' '}
-                <code className="rounded bg-sand px-1 font-mono text-xs">KEY_ID:KEY_SECRET</code>. Kalau kamu memegang Key ID dan Secret terpisah, gabungkan
+                Di console Higgsfield, buka API Keys lalu klik <strong className="text-fg">Copy API key</strong> dan tempel di sini. Formatnya{' '}
+                <code className="rounded bg-raised px-1 font-mono text-xs">KEY_ID:KEY_SECRET</code>. Kalau kamu memegang Key ID dan Secret terpisah, gabungkan
                 dengan titik dua.
               </>
             ) : provider === 'gemini' ? (
@@ -674,10 +674,10 @@ function MediaSection({
             </div>
           ))}
         </div>
-        <p className="flex items-start gap-2.5 text-[13px] leading-relaxed text-ink-2">
+        <p className="flex items-start gap-2.5 text-[13px] leading-relaxed text-fg-2">
           <Film className="mt-0.5 size-4 shrink-0" />
           <span>
-            Dipakai proyek baru. Di langkah <strong className="text-ink">Ide cerita</strong>, bagian Model AI, tiap proyek bisa memakai model dari penyedia
+            Dipakai proyek baru. Di langkah <strong className="text-fg">Ide cerita</strong>, bagian Model AI, tiap proyek bisa memakai model dari penyedia
             mana pun yang kuncinya sudah diisi.
           </span>
         </p>
@@ -717,7 +717,7 @@ export function Settings() {
 
   return (
     <div className="flex h-full flex-col">
-      <header className="flex h-[68px] shrink-0 items-center gap-3.5 border-b border-line bg-surface px-8">
+      <header className="flex h-[68px] shrink-0 items-center gap-3.5 border-b border-line bg-panel px-8">
         <button type="button" onClick={() => go({ name: 'home' })}>
           <Logo />
         </button>
@@ -738,7 +738,7 @@ export function Settings() {
               onClick={() => setTab(n.id)}
               className={cx(
                 'flex h-11 items-center gap-3 rounded-xl px-3.5 text-left text-[15px]',
-                tab === n.id ? 'bg-ink font-semibold text-paper' : 'font-medium text-ink hover:bg-sand'
+                tab === n.id ? 'bg-select font-semibold text-fg' : 'font-medium text-fg hover:bg-raised'
               )}
             >
               {n.icon}
@@ -752,7 +752,7 @@ export function Settings() {
               <>
                 <div>
                   <h1 className="font-display text-[34px] font-bold tracking-[-0.015em]">Layanan AI dan kunci</h1>
-                  <p className="mt-2 max-w-[700px] text-[15px] text-ink-2">
+                  <p className="mt-2 max-w-[700px] text-[15px] text-fg-2">
                     Video Story memakai akun layanan milikmu sendiri, lewat API key atau login akun. Kunci dan sesi login disimpan terenkripsi di
                     komputer ini dan hanya dikirim langsung ke layanan yang bersangkutan.
                   </p>
@@ -774,9 +774,9 @@ export function Settings() {
               <>
                 <div>
                   <h1 className="font-display text-[34px] font-bold tracking-[-0.015em]">Umum</h1>
-                  <p className="mt-2 text-[15px] text-ink-2">Pilihan bawaan untuk proyek baru.</p>
+                  <p className="mt-2 text-[15px] text-fg-2">Pilihan bawaan untuk proyek baru.</p>
                 </div>
-                <section className="flex flex-col gap-5 rounded-2xl border border-line bg-surface p-6">
+                <section className="flex flex-col gap-5 rounded-2xl border border-line bg-panel p-6">
                   <Field label="Bahasa default naskah dan suara">
                     <Select
                       label="Bahasa default naskah dan suara"
@@ -788,8 +788,8 @@ export function Settings() {
                   </Field>
                   <Field label="Folder ekspor">
                     <div className="flex gap-2">
-                      <div className="flex h-11 min-w-0 flex-1 items-center gap-2.5 rounded-xl border border-line bg-sand px-3.5 font-mono text-[13px]">
-                        <FolderOpen className="size-[17px] shrink-0 text-ink-2" />
+                      <div className="flex h-11 min-w-0 flex-1 items-center gap-2.5 rounded-xl border border-line bg-raised px-3.5 font-mono text-[13px]">
+                        <FolderOpen className="size-[17px] shrink-0 text-fg-2" />
                         <span className="truncate">{folder}</span>
                       </div>
                       <Button

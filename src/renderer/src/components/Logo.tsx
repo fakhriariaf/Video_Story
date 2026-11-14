@@ -1,15 +1,10 @@
 export function LogoMark({ size = 34 }: { size?: number }) {
   return (
     <svg width={size} height={size} viewBox="0 0 34 34" aria-hidden="true">
-      <circle cx="17" cy="17.5" r="15.5" fill="#4338CA" stroke="#1F1D1A" strokeWidth="1.5" />
-      <path d="M13.2 10.6v13.8l12.1-6.9z" fill="#FFFFFF" stroke="#1F1D1A" strokeWidth="1.6" strokeLinejoin="round" />
-      <path
-        d="M27 2.6Q27.55 6.15 31.1 6.7Q27.55 7.25 27 10.8Q26.45 7.25 22.9 6.7Q26.45 6.15 27 2.6Z"
-        fill="#FFC93C"
-        stroke="#1F1D1A"
-        strokeWidth="1.2"
-        strokeLinejoin="round"
-      />
+      {/* Same shapes as the app icon (build/icon.ico); only the colours follow the dark theme. */}
+      <circle cx="17" cy="17.5" r="15.5" fill="#7C6CFF" />
+      <path d="M13.2 10.6v13.8l12.1-6.9z" fill="#121026" strokeLinejoin="round" />
+      <path d="M27 2.6Q27.55 6.15 31.1 6.7Q27.55 7.25 27 10.8Q26.45 7.25 22.9 6.7Q26.45 6.15 27 2.6Z" fill="#FFB627" />
     </svg>
   )
 }

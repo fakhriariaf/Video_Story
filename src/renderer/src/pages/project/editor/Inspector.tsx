@@ -54,7 +54,7 @@ function Section({ title, children, className }: { title: string; children: Reac
 function ClipHeader({ clip, index }: { clip: Clip; index: number }) {
   return (
     <div className="flex h-14 shrink-0 items-center gap-2 border-b border-line px-[18px]">
-      <span className="rounded-md bg-ink px-[7px] py-0.5 font-mono text-xs text-paper">{clipNumber(index)}</span>
+      <span className="rounded-md bg-select px-[7px] py-0.5 font-mono text-xs text-fg">{clipNumber(index)}</span>
       <span className="truncate text-[15px] font-semibold">{clip.title}</span>
       <span className="flex-1" />
       <span className="font-mono text-xs text-muted">{secLabel(clip.durationMs)}</span>
@@ -95,9 +95,9 @@ function ClipTab({ clip, index }: { clip: Clip; index: number }) {
       {clip.motionType === 'video' ? (
         <Section title="Video AI">
           {video ? (
-            <p className="text-[13px] text-ink-2">Klip ini memakai video dari {providerLabel(video.provider)}.</p>
+            <p className="text-[13px] text-fg-2">Klip ini memakai video dari {providerLabel(video.provider)}.</p>
           ) : (
-            <p className="text-[13px] text-ink-2">Video belum dibuat. Sampai video siap, pratinjau memakai gambar diam.</p>
+            <p className="text-[13px] text-fg-2">Video belum dibuat. Sampai video siap, pratinjau memakai gambar diam.</p>
           )}
           <div className="flex flex-wrap gap-2">
             <Button
@@ -120,7 +120,7 @@ function ClipTab({ clip, index }: { clip: Clip; index: number }) {
             </span>
           )}
           <div className="mt-1 flex flex-col gap-2">
-            <span className="text-[13px] font-medium text-ink-2">Gerak kamera di atas video</span>
+            <span className="text-[13px] font-medium text-fg-2">Gerak kamera di atas video</span>
             <div className="grid grid-cols-[minmax(0,1fr)_120px] gap-2">
               <Select
                 label="Gerak kamera video"
@@ -199,7 +199,7 @@ function DbSlider({ label, value, min, max, onChange }: { label: string; value: 
         type="button"
         onClick={() => onChange(0)}
         disabled={value === 0}
-        className="text-xs font-semibold text-accent-dark hover:underline disabled:invisible"
+        className="text-xs font-semibold text-link hover:underline disabled:invisible"
       >
         Normal
       </button>
@@ -258,13 +258,13 @@ function VoiceTab({ clip, index }: { clip: Clip; index: number }) {
     <>
       <ClipHeader clip={clip} index={index} />
       <Section title="Suara narasi">
-        <p className="text-[13px] leading-relaxed text-ink-2">{clip.narration || 'Naskah masih kosong.'}</p>
+        <p className="text-[13px] leading-relaxed text-fg-2">{clip.narration || 'Naskah masih kosong.'}</p>
         {/* Voices come from one take of the whole script, so a change is fixed by re-recording that take. */}
         {narration.running ? (
           <span className="text-xs text-sun-ink">Suara narasi sedang dibuat…</span>
         ) : !voice || stale ? (
           <div className="flex flex-col items-start gap-2">
-            <span className="text-xs text-ink-2">{voice ? 'Naskah berubah sejak suara dibuat.' : 'Klip ini belum punya suara.'}</span>
+            <span className="text-xs text-fg-2">{voice ? 'Naskah berubah sejak suara dibuat.' : 'Klip ini belum punya suara.'}</span>
             <Button size="sm" variant="accent" icon={<Volume2 className="size-4" />} onClick={() => void narration.start()}>
               {narration.voiced ? 'Rekam ulang suara narasi' : 'Buat suara narasi'}
             </Button>
@@ -430,7 +430,7 @@ function CaptionTiming() {
   return (
     <Section title="Waktu caption">
       {!voiced.length ? (
-        <p className="text-[13px] text-ink-2">Caption muncul setelah suara narasi dibuat.</p>
+        <p className="text-[13px] text-fg-2">Caption muncul setelah suara narasi dibuat.</p>
       ) : running ? (
         <span className="text-[13px] text-sun-ink">
           {job!.message ?? 'Menyinkronkan'} {Math.round(job!.progress * 100)}%
@@ -446,7 +446,7 @@ function CaptionTiming() {
         </>
       ) : (
         <>
-          <p className="text-[13px] leading-relaxed text-ink-2">
+          <p className="text-[13px] leading-relaxed text-fg-2">
             {estimated} klip belum disinkronkan dengan suaranya, jadi caption bisa mendahului atau tertinggal.
           </p>
           {whisper ? (
@@ -454,7 +454,7 @@ function CaptionTiming() {
               Sinkronkan dengan Whisper
             </Button>
           ) : (
-            <p className="text-[13px] text-ink-2">
+            <p className="text-[13px] text-fg-2">
               Unduh model Whisper Small di{' '}
               <button
                 type="button"
@@ -462,7 +462,7 @@ function CaptionTiming() {
                   await flush()
                   go({ name: 'settings', back: { name: 'project', id: project.id } })
                 }}
-                className="font-semibold text-accent-dark hover:underline"
+                className="font-semibold text-link hover:underline"
               >
                 Pengaturan
               </button>{' '}
@@ -492,7 +492,7 @@ function Swatches({ value, colors, label, onChange }: { value: string | null; co
             aria-label={`${label} ${c}`}
             aria-pressed={on}
             onClick={() => onChange(c)}
-            className={cx('size-7 rounded-full border', on ? 'border-ink ring-2 ring-accent ring-offset-2 ring-offset-surface' : 'border-line-3')}
+            className={cx('size-7 rounded-full border', on ? 'border-edge ring-2 ring-accent ring-offset-2 ring-offset-panel' : 'border-line-3')}
             style={{ background: c }}
           />
         )
@@ -501,7 +501,7 @@ function Swatches({ value, colors, label, onChange }: { value: string | null; co
         title="Warna lain"
         className={cx(
           'relative size-7 cursor-pointer overflow-hidden rounded-full border',
-          custom ? 'border-ink ring-2 ring-accent ring-offset-2 ring-offset-surface' : 'border-line-3'
+          custom ? 'border-edge ring-2 ring-accent ring-offset-2 ring-offset-panel' : 'border-line-3'
         )}
         style={{ background: custom ? value! : 'conic-gradient(#e03131, #ffd43b, #51cf66, #22b8cf, #4c6ef5, #cc5de8, #e03131)' }}
       >
@@ -561,7 +561,7 @@ function CaptionCustom() {
           <>
             <Swatches value={r.box} colors={BOX_SWATCHES} label="Warna latar" onChange={(c) => updateEditor({ captionBg: { color: c, opacity: r.boxAlpha } })} />
             <label className="flex items-center gap-3 text-[13px]">
-              <span className="w-16 text-ink-2">Opasitas</span>
+              <span className="w-16 text-fg-2">Opasitas</span>
               <input
                 type="range"
                 min={15}
@@ -598,7 +598,7 @@ function CaptionTab() {
             return (
               <button key={s.id} type="button" aria-pressed={on} onClick={() => updateEditor({ captionStyle: s.id, captionColor: undefined, captionHighlight: undefined, captionBg: undefined })} className="flex flex-col gap-1 text-left">
                 <span
-                  className={cx('flex h-[52px] w-full items-center justify-center rounded-[10px] bg-[#E99A5B]', on ? 'border-2 border-accent' : 'border border-ink')}
+                  className={cx('flex h-[52px] w-full items-center justify-center rounded-[10px] bg-[#E99A5B]', on ? 'border-2 border-accent' : 'border border-edge')}
                 >
                   <span
                     className="whitespace-nowrap rounded-md px-1.5 py-0.5 text-[12px]"
@@ -614,7 +614,7 @@ function CaptionTab() {
                     {s.uppercase ? 'NUSANTARA' : 'Nusantara'} <span style={{ color: s.highlight }}>{s.uppercase ? 'BERSATU' : 'bersatu'}</span>
                   </span>
                 </span>
-                <span className="text-xs font-medium text-ink-2">{s.name}</span>
+                <span className="text-xs font-medium text-fg-2">{s.name}</span>
               </button>
             )
           })}
@@ -625,7 +625,7 @@ function CaptionTab() {
           onClick={() => updateEditor({ captionStyle: 'none' })}
           className={cx(
             'flex h-9 items-center justify-center gap-1.5 rounded-[10px] text-[13px] font-medium',
-            e.captionStyle === 'none' ? 'border-2 border-accent bg-accent-soft' : 'border border-line-2 hover:border-ink-2'
+            e.captionStyle === 'none' ? 'border-2 border-accent bg-accent-soft' : 'border border-line-2 hover:border-edge'
           )}
         >
           <X className="size-3.5" />
@@ -652,7 +652,7 @@ function CaptionTab() {
           <span className="text-base font-semibold text-muted">A</span>
           <span className="w-12 text-right font-mono">{Math.round(captionScaleOf(e) * 100)}%</span>
         </label>
-        <button type="button" onClick={() => updateEditor({ captionScale: 1, captionSize: 'sedang' })} className="self-start text-xs font-semibold text-accent-dark hover:underline">
+        <button type="button" onClick={() => updateEditor({ captionScale: 1, captionSize: 'sedang' })} className="self-start text-xs font-semibold text-link hover:underline">
           Kembalikan ke 100%
         </button>
       </Section>
@@ -677,7 +677,7 @@ function PromptField({ label, hint, value, rows, onChange }: { label: string; hi
         <button
           type="button"
           onClick={() => void window.api.app.copyText(value).then(() => setCopied(true))}
-          className={cx('inline-flex h-7 items-center gap-1 rounded-lg px-2 text-xs font-semibold', copied ? 'text-ok-ink' : 'text-accent-dark hover:bg-accent-soft')}
+          className={cx('inline-flex h-7 items-center gap-1 rounded-lg px-2 text-xs font-semibold', copied ? 'text-ok-ink' : 'text-link hover:bg-accent-soft')}
         >
           {copied ? <Check className="size-3.5" /> : <Copy className="size-3.5" />}
           {copied ? 'Tersalin' : 'Salin'}
@@ -725,7 +725,7 @@ function MusicPromptSection() {
   }
   return (
     <Section title="Prompt musik AI">
-      <p className="text-[13px] leading-relaxed text-ink-2">
+      <p className="text-[13px] leading-relaxed text-fg-2">
         {mp?.reason || 'Buat prompt musik latar yang cocok dengan cerita ini, lalu tempel di Suno atau AI musik lain. Hasilnya bisa dipilih lewat tombol Pilih musik di bawah.'}
       </p>
       {mp && (
@@ -743,7 +743,7 @@ function MusicPromptSection() {
                 key={s.name}
                 type="button"
                 onClick={() => void window.api.app.openExternal(s.url)}
-                className="inline-flex h-8 items-center gap-1.5 rounded-full border border-line-2 px-3 text-xs font-semibold text-ink-2 hover:border-ink-2 hover:text-ink"
+                className="inline-flex h-8 items-center gap-1.5 rounded-full border border-line-2 px-3 text-xs font-semibold text-fg-2 hover:border-edge hover:text-fg"
               >
                 Buka {s.name}
                 <ExternalLink className="size-3.5" />
@@ -784,12 +784,12 @@ function MusicTab() {
           <div className="flex items-center gap-2.5 rounded-xl border border-[#9CC596] bg-ok-soft px-3 py-2.5 text-[13px] text-ok-ink">
             <Music className="size-4 shrink-0" />
             <span className="flex-1 truncate">{music.prompt}</span>
-            <button type="button" aria-label="Lepas musik" onClick={() => updateEditor({ musicAssetId: null })} className="hover:text-ink">
+            <button type="button" aria-label="Lepas musik" onClick={() => updateEditor({ musicAssetId: null })} className="hover:text-fg">
               <X className="size-4" />
             </button>
           </div>
         ) : (
-          <p className="text-[13px] text-ink-2">Belum ada musik. Pilih file MP3 atau WAV dari komputer.</p>
+          <p className="text-[13px] text-fg-2">Belum ada musik. Pilih file MP3 atau WAV dari komputer.</p>
         )}
         <Button size="sm" className="self-start" icon={<Music className="size-4" />} onClick={() => void pick()}>
           {music ? 'Ganti musik' : 'Pilih musik'}
@@ -852,7 +852,7 @@ export function Inspector({
   transitionId: string | null
 }) {
   return (
-    <aside className="scroll-thin flex min-h-0 flex-col overflow-y-auto border-l border-line bg-surface">
+    <aside className="scroll-thin flex min-h-0 flex-col overflow-y-auto border-l border-line bg-panel">
       {tab === 'klip' && (clip ? <ClipTab clip={clip} index={index} /> : <p className="p-5 text-sm text-muted">Pilih klip di timeline.</p>)}
       {tab === 'suara' && (clip ? <VoiceTab clip={clip} index={index} /> : <p className="p-5 text-sm text-muted">Pilih suara klip di timeline.</p>)}
       {tab === 'caption' && <CaptionTab />}

@@ -46,7 +46,7 @@ export function ProjectPage({ id }: { id: string }) {
 
   if (!loaded || !project)
     return (
-      <div className="flex h-full items-center justify-center gap-2 text-ink-2">
+      <div className="flex h-full items-center justify-center gap-2 text-fg-2">
         <Spinner />
         Membuka proyek…
       </div>
