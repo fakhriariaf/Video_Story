@@ -40,9 +40,28 @@ bukan warnanya, supaya tema lain (misalnya mode terang) bisa ditambahkan tanpa m
 Aturan pemakaian:
 
 - **Kuning hanya untuk satu tindakan utama per layar** (`Button variant="primary"`) dan penanda posisi (langkah
-  aktif, playhead, klip terpilih). Tindakan penting kedua memakai `variant="accent"`; sisanya `secondary`, `ghost`,
+  aktif, playhead, klip terpilih). Satu pengecualian: titik kecil di item "Pengaturan" menu sisi saat layanan AI
+  belum siap. Tindakan penting kedua memakai `variant="accent"`; sisanya `secondary`, `ghost`,
   atau `danger`.
 - Teks di atas isian terang memakai warna gelap: `text-sun-on` di atas `sun`, `text-canvas` di atas `accent`.
+- **Tanda "terpilih" punya dua tingkat.** Pilihan di dalam daftar atau deretan (tab, chip, baris menu, tab alat
+  Editor) memakai isian `bg-select text-fg`. Kartu pilihan besar memakai garis `border-accent` dengan isian
+  `bg-accent-soft` (kartu penyedia) atau `bg-select` (kartu transisi); bingkai gaya memakai garis `outline-accent`
+  di dalam gambar.
+  Menu sisi punya tandanya sendiri: `bg-raised` dengan garis `sun` di kiri.
+- **Titik transisi** di timeline berwarna `accent` (potong langsung: `panel`); kuning hanya pada titik yang sedang
+  diedit.
+- **`Button` nonaktif** menjadi pelat abu (`bg-raised text-muted`), bukan salinan pudar dari warnanya, supaya
+  tulisannya tetap terbaca; varian `ghost` diredupkan dengan `opacity`. `Button` yang sedang bekerja (`loading`)
+  tetap berwarna dan menampilkan pemutar. Aturan warnanya ada di `components/buttonTone.ts`. Kontrol lain
+  (`IconButton`, `Select`, pemilih model) masih memakai `opacity` saat nonaktif.
+- **Fokus keyboard** memakai garis bawaan (`:focus-visible`, 2 px `accent`, berjarak 2 px) dan harus terlihat
+  berbeda dari tanda "terpilih". Kalau isi elemen menutupi garisnya (kartu proyek dengan gambar sampul), garis
+  dipasang di pembungkusnya dengan `has-[>button:focus-visible]`. Kolom isian tanpa garis sendiri menandai fokus
+  di pembungkusnya dengan `focus-within:border-accent`.
+- **Judul** memakai `font-display font-semibold`. Judul halaman langkah Ide cerita dan Naskah 44 px dengan
+  `leading-none`; Pengaturan 34 px; Storyboard 28 px karena berada di baris alat. Hanya tulisan merek
+  "Video Story" yang tebal (`font-bold`).
 - Tanpa bayangan keras. Permukaan dibedakan lewat isiannya; hanya menu dan dialog melayang yang memakai
   `shadow-pop`.
 - Sudut: panel besar `rounded-[14px]`, tombol/chip/kolom isian `rounded-lg`, bingkai gambar `rounded-md`.
@@ -51,8 +70,9 @@ Aturan pemakaian:
 `npm test` menjaga dua hal (`src/main/theme.test.ts`): setiap pasangan teks dan latar di tabel mencapai kontras
 4,5:1, dan tidak ada nama kelas, font, atau warna dari desain lama yang tersisa di `src/renderer/src`.
 
-Font UI: Barlow (teks), Barlow Condensed (judul dan kode waktu, `font-display`), JetBrains Mono (kunci API dan ID
-model). Font caption ada terpisah di `captions.ts`.
+Font UI: Barlow (teks), Barlow Condensed (judul, dan kode waktu yang tampil di kartu atau papan clapper,
+`font-display`), JetBrains Mono (`font-mono`: kunci API, ID model, dan angka teknis seperti kode waktu pemutar dan
+nomor klip). Font caption ada terpisah di `captions.ts`.
 
 ### Komponen yang dipakai ulang
 
@@ -81,8 +101,9 @@ model). Font caption ada terpisah di `captions.ts`.
 ### Aturan UI (hasil masukan pemilik aplikasi)
 
 1. **Jangan pakai `<select>` bawaan.** Pakai `Select`/`Popover` supaya tampilannya seragam.
-2. **Pilihan visual** (gaya gambar dll.) dipilih dari **grid thumbnail persegi 1:1**, bukan daftar teks. Contoh
-   gambarnya berfokus pada karakter, menghadap kamera, dengan subjek berbeda tiap pilihan.
+2. **Pilihan visual** (gaya gambar dll.) dipilih dari **thumbnail**, bukan daftar teks: bingkai 4:3 di pita film
+   langkah Ide cerita, grid persegi 1:1 di menu gaya Beranda. Contoh gambarnya berfokus pada karakter, menghadap
+   kamera, dengan subjek berbeda tiap pilihan.
 3. **Satu dropdown penyedia per bagian** (misalnya LLM atau TTS): hanya formulir penyedia terpilih yang
    ditampilkan. Kunci Higgsfield cukup satu kolom (format `KEY_ID:KEY_SECRET` dari tombol "Copy API key").
 4. **Pilihan yang tidak bisa dipakai dinonaktifkan**, misalnya penyedia TTS tanpa kunci valid.

@@ -357,7 +357,7 @@ export function Player({
             if (!playing && t >= total - 0.05) seek(0)
             toggle()
           }}
-          className="flex size-12 items-center justify-center rounded-full border border-edge bg-select text-fg hover:bg-select"
+          className="flex size-12 items-center justify-center rounded-full border border-edge bg-select text-fg hover:brightness-125"
         >
           {playing ? <Pause className="size-5" fill="currentColor" /> : <Play className="ml-0.5 size-5" fill="currentColor" />}
         </button>

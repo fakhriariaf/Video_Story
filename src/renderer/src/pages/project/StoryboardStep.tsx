@@ -160,7 +160,7 @@ function ClipPanel({ clip, index, total }: { clip: Clip; index: number; total: n
             value={clip.title}
             onChange={(e) => updateClip(clip.id, { title: e.target.value })}
             aria-label="Judul klip"
-            className="-ml-1 rounded-md bg-transparent px-1 font-display text-[19px] font-bold outline-none hover:bg-raised focus:bg-raised"
+            className="-ml-1 rounded-md bg-transparent px-1 font-display text-[19px] font-semibold outline-none hover:bg-raised focus:bg-raised"
           />
         </div>
         <IconButton label="Klip sebelumnya" size={38} disabled={index === 0} onClick={() => select(clips[index - 1].id)}>
@@ -563,7 +563,7 @@ export function StoryboardStep() {
   if (!clips.length)
     return (
       <div className="flex h-full flex-col items-center justify-center gap-4 text-center">
-        <h2 className="font-display text-3xl font-bold">Storyboard masih kosong</h2>
+        <h2 className="font-display text-3xl font-semibold">Storyboard masih kosong</h2>
         <p className="max-w-md text-fg-2">Tulis naskahnya dulu di langkah Naskah, lalu buat visual tiap adegan. Kamu juga bisa menambah klip sendiri.</p>
         <div className="flex gap-2.5">
           <Button onClick={() => updateProject({ step: 2 })}>Ke Naskah</Button>
@@ -653,7 +653,7 @@ export function StoryboardStep() {
       <div className="grid min-h-0 grid-cols-[minmax(0,1fr)_540px]">
         <section className="scroll-thin flex min-h-0 flex-col gap-3.5 overflow-y-auto px-6 pb-6 pt-[18px]">
           <div className="flex items-center gap-3">
-            <h1 className="font-display text-2xl font-bold">Storyboard</h1>
+            <h1 className="font-display text-[28px] font-semibold leading-none">Storyboard</h1>
             <span className="text-sm text-muted">
               {clips.length} klip · {mmss(stats.total)}
             </span>

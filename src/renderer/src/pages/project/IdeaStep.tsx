@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { Bot, Play, Sparkles, Square } from 'lucide-react'
 import { MEDIA_PROVIDERS } from '@shared/media'
 import { DURATIONS, LANGUAGES, clipCountFor, llmName } from '@shared/models'
@@ -119,12 +119,17 @@ export function IdeaStep() {
   const { toast, go } = useApp()
   const [busy, setBusy] = useState(false)
   const [writer, setWriter] = useState<{ provider: LlmProvider; model: string } | null>(null)
-  const [keys, setKeys] = useState<KeyStatus[]>([])
+  // null until the key list arrives; a failed load counts as "no keys" so nothing waits forever.
+  const [loadedKeys, setKeys] = useState<KeyStatus[] | null>(null)
+  const keys = loadedKeys ?? []
   const [voiceName, setVoiceName] = useState<string | null>(null)
 
   useEffect(() => {
     void window.api.settings.get().then((s) => setWriter({ provider: s.llmProvider, model: s.llmModels[s.llmProvider] }))
-    void window.api.settings.keys().then(setKeys)
+    window.api.settings
+      .keys()
+      .then(setKeys)
+      .catch(() => setKeys([]))
   }, [])
 
   // Before any narration exists, move to a narrator service that has a working key.
@@ -134,6 +139,12 @@ export function IdeaStep() {
     const use = usableTts(project.ttsProvider, keys)
     if (use !== project.ttsProvider) updateProject({ ttsProvider: use, ttsVoice: use === 'gemini' ? 'Charon' : '' })
   }, [keys, project?.id])
+
+  // Providers with a saved key; null while loading, so nothing claims "no key" too early.
+  const mediaKeys = useMemo(
+    () => (loadedKeys ? new Set(MEDIA_PROVIDERS.filter((m) => loadedKeys.find((k) => k.provider === m)?.configured)) : null),
+    [loadedKeys]
+  )
 
   if (!project) return null
   const ready = ttsReadiness(keys)
@@ -145,8 +156,6 @@ export function IdeaStep() {
 
   const clipCount = clipCountFor(project.durationSec)
   const perClip = Math.round(project.durationSec / clipCount)
-  // Providers with a saved key; null until the key list arrives, so nothing claims "no key" too early.
-  const mediaKeys = keys.length ? new Set(MEDIA_PROVIDERS.filter((m) => keys.find((k) => k.provider === m)?.configured)) : null
 
   const compose = async (): Promise<void> => {
     if (!project.synopsis.trim()) {

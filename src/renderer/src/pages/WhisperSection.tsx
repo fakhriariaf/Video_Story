@@ -34,7 +34,7 @@ export function WhisperSection({ settings, onSettings }: { settings: AppSettings
           <Captions className="size-5" />
         </span>
         <div className="flex flex-col gap-1">
-          <h2 className="font-display text-[22px] font-bold leading-tight">Caption akurat</h2>
+          <h2 className="font-display text-[22px] font-semibold leading-tight">Caption akurat</h2>
           <p className="text-sm text-fg-2">Menyamakan waktu tiap kata caption dengan suara narasi, langsung di komputer ini.</p>
         </div>
       </div>

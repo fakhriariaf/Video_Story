@@ -98,12 +98,13 @@ export function StyleMenu({ value, onChange }: { value: string; onChange: (id: s
                 onClick={() => pick(s.id)}
                 onMouseEnter={() => setPeek(s.id)}
                 onFocus={() => setPeek(s.id)}
-                className="group flex flex-col gap-1.5 rounded-lg text-left outline-none"
+                className="group flex flex-col gap-1.5 rounded-lg text-left"
               >
                 <span
                   className={cx(
-                    'relative block aspect-square w-full overflow-hidden rounded-[11px] bg-raised transition-shadow',
-                    on ? 'border-2 border-accent' : 'border border-line group-hover:border-edge group-focus-visible:ring-2 group-focus-visible:ring-accent'
+                    // Chosen is drawn inside the picture, so the browser's focus outline around the tile stays a separate sign.
+                    'relative block aspect-square w-full overflow-hidden rounded-[11px] border bg-raised',
+                    on ? 'border-accent outline outline-2 -outline-offset-2 outline-accent' : 'border-line group-hover:border-edge'
                   )}
                 >
                   <StyleSwatch styleId={s.id} className="size-full transition-transform duration-500 ease-out group-hover:scale-[1.07]" iconSize={24} />

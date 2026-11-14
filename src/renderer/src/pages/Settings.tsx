@@ -92,8 +92,8 @@ function ProviderSelect<T extends string>({ value, options, onChange }: { value:
         aria-expanded={open}
         onClick={() => setOpen(!open)}
         className={cx(
-          'flex w-full items-center gap-3 rounded-[14px] border border-edge bg-panel px-4 py-3 text-left transition-shadow',
-          open ? 'shadow-none' : ''
+          'flex w-full items-center gap-3 rounded-[14px] border bg-panel px-4 py-3 text-left transition-colors',
+          open ? 'border-accent' : 'border-edge hover:border-fg/40'
         )}
       >
         <ProviderLogo id={cur.logo} />
@@ -118,7 +118,7 @@ function ProviderSelect<T extends string>({ value, options, onChange }: { value:
                   setOpen(false)
                   if (!on) onChange(o.id)
                 }}
-                className={cx('flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-left', on ? 'bg-accent-soft' : 'hover:bg-raised')}
+                className={cx('flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-left', on ? 'bg-select' : 'hover:bg-raised')}
               >
                 <ProviderLogo id={o.logo} size={36} />
                 <span className="flex min-w-0 flex-1 flex-col">
@@ -394,7 +394,7 @@ function SectionTitle({ icon, title, sub }: { icon: ReactNode; title: string; su
     <div className="mt-5 flex items-start gap-3">
       <span className="mt-1 text-fg">{icon}</span>
       <div className="flex flex-col gap-1">
-        <h2 className="font-display text-[22px] font-bold leading-tight">{title}</h2>
+        <h2 className="font-display text-[22px] font-semibold leading-tight">{title}</h2>
         <p className="text-sm text-fg-2">{sub}</p>
       </div>
     </div>
@@ -727,7 +727,7 @@ export function Settings() {
             {tab === 'services' && settings && (
               <>
                 <div>
-                  <h1 className="font-display text-[34px] font-bold tracking-[-0.015em]">Layanan AI dan kunci</h1>
+                  <h1 className="font-display text-[34px] font-semibold">Layanan AI dan kunci</h1>
                   <p className="mt-2 max-w-[700px] text-[15px] text-fg-2">
                     Video Story memakai akun layanan milikmu sendiri, lewat API key atau login akun. Kunci dan sesi login disimpan terenkripsi di
                     komputer ini dan hanya dikirim langsung ke layanan yang bersangkutan.
@@ -749,7 +749,7 @@ export function Settings() {
             {tab === 'general' && settings && (
               <>
                 <div>
-                  <h1 className="font-display text-[34px] font-bold tracking-[-0.015em]">Umum</h1>
+                  <h1 className="font-display text-[34px] font-semibold">Umum</h1>
                   <p className="mt-2 text-[15px] text-fg-2">Pilihan bawaan untuk proyek baru.</p>
                 </div>
                 <section className="flex flex-col gap-5 rounded-[14px] border border-line bg-panel p-6">

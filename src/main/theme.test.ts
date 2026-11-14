@@ -81,7 +81,9 @@ test('no legacy class, font or colour names remain in the renderer', () => {
     /\b(text|bg|border|ring|fill|stroke|outline|divide|decoration|caret|placeholder)-ink(-2)?\b/,
     /--color-(ink|paper|surface|sand)\b/,
     /Bricolage|Plus Jakarta/i,
-    /#(faf7f2|f3efe8|1f1d1a|57524a|6b665e|e6dfd3|d4cbbb|bfb5a4|efeae2)\b/i
+    /#(faf7f2|f3efe8|1f1d1a|57524a|6b665e|e6dfd3|d4cbbb|bfb5a4|efeae2)(?![0-9a-f])/i,
+    // The old ink written as rgb, e.g. in a gradient.
+    /rgba?\(\s*31,\s*29,\s*26/
   ]
   // Caption and overlay colour presets end up in the exported video; they are content, not app theme.
   const VIDEO_COLOURS = /_SWATCHES = \[|captionBg:/
@@ -112,8 +114,9 @@ test('dark text is only used on the bright accent and sun fills', () => {
 })
 
 test('light fills carry dark text', () => {
-  // A bright yellow fill with the default light text is unreadable. The playhead line and its handle carry no text.
-  const TEXTLESS = /w-0.5 bg-sun|size-3.5 rounded-.3px. bg-sun/
+  // A bright yellow fill with the default light text is unreadable. The playhead line, its handle and the rail's
+  // attention dot carry no text.
+  const TEXTLESS = /w-0.5 bg-sun|size-3.5 rounded-.3px. bg-sun|size-2 shrink-0 rounded-full bg-sun/
   const hits = rendererLines()
     .filter((l) => !TEXTLESS.test(l.text))
     .filter((l) => /\bbg-sun\b(?![-/])/.test(l.text) && !/\btext-sun-on\b/.test(l.text) && /className|cx\(|'/.test(l.text))
@@ -131,4 +134,19 @@ test('outlines and borders never use the canvas colour', () => {
 test('the window opens on the canvas colour, not on the old cream', () => {
   const main = readFileSync(join(process.cwd(), 'src', 'main', 'index.ts'), 'utf8')
   assert.match(main, new RegExp(`backgroundColor: '${color('canvas')}'`, 'i'))
+})
+
+test('the bold sans weight used in the UI is loaded', () => {
+  // font-bold and <strong> on body text need Barlow 700; without it the browser fakes the weight.
+  const entry = readFileSync(join(RENDERER, 'main.tsx'), 'utf8')
+  assert.match(entry, /@fontsource\/barlow\/700\.css/)
+})
+
+test('font packages are build-time only', () => {
+  // Vite bundles the font files; as runtime dependencies they would be copied into the installer a second time.
+  const pkg = JSON.parse(readFileSync(join(process.cwd(), 'package.json'), 'utf8')) as { dependencies: Record<string, string> }
+  assert.deepEqual(
+    Object.keys(pkg.dependencies).filter((name) => name.startsWith('@fontsource')),
+    []
+  )
 })

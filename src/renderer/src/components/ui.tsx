@@ -2,22 +2,13 @@ import { useEffect, useRef, useState, type ButtonHTMLAttributes, type ReactNode 
 import { Loader2, X } from 'lucide-react'
 import { create } from 'zustand'
 
+import { buttonTone, type ButtonVariant } from './buttonTone'
 import { cx } from './cx'
 import { Popover } from './Popover'
 
 export { cx }
 
-type Variant = 'primary' | 'secondary' | 'accent' | 'ghost' | 'danger'
 type Size = 'sm' | 'md' | 'lg'
-
-const VARIANTS: Record<Variant, string> = {
-  // Yellow is the one action that moves the flow forward; a screen shows at most one of these.
-  primary: 'bg-sun text-sun-on hover:brightness-105 font-semibold',
-  secondary: 'bg-raised text-fg border border-line-2 hover:border-edge font-medium',
-  accent: 'bg-accent text-canvas hover:bg-accent-press font-semibold',
-  ghost: 'bg-transparent text-fg-2 border border-transparent hover:bg-raised hover:text-fg font-medium',
-  danger: 'bg-bad-soft text-bad-ink hover:brightness-110 font-medium'
-}
 
 const SIZES: Record<Size, string> = {
   sm: 'h-9 px-3 text-[13px] gap-1.5 rounded-lg',
@@ -34,17 +25,13 @@ export function Button({
   children,
   disabled,
   ...rest
-}: ButtonHTMLAttributes<HTMLButtonElement> & { variant?: Variant; size?: Size; icon?: ReactNode; loading?: boolean }) {
+}: ButtonHTMLAttributes<HTMLButtonElement> & { variant?: ButtonVariant; size?: Size; icon?: ReactNode; loading?: boolean }) {
   return (
     <button
       type="button"
       disabled={disabled || loading}
-      className={cx(
-        'inline-flex shrink-0 items-center justify-center whitespace-nowrap transition-colors disabled:cursor-not-allowed disabled:opacity-50',
-        VARIANTS[variant],
-        SIZES[size],
-        className
-      )}
+      aria-busy={loading || undefined}
+      className={cx('inline-flex shrink-0 items-center justify-center whitespace-nowrap transition-colors', buttonTone(variant, !!loading), SIZES[size], className)}
       {...rest}
     >
       {loading ? <Loader2 className="size-4 animate-[spin_0.8s_linear_infinite]" /> : icon}
@@ -235,7 +222,7 @@ export function Modal({
       >
         <div className="flex items-start gap-3">
           <div className="flex-1">
-            <h2 className="font-display text-[26px] font-bold leading-tight">{title}</h2>
+            <h2 className="font-display text-[26px] font-semibold leading-tight">{title}</h2>
             {subtitle && <p className="mt-1 text-sm text-fg-2">{subtitle}</p>}
           </div>
           <IconButton label="Tutup" onClick={onClose}>

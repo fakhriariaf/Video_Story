@@ -15,6 +15,9 @@ Cara menaikkan versi ada di [docs/pengembangan.md](docs/pengembangan.md#versi-da
   proyek berbentuk pita film dengan saringan dan pencarian. Pengaturan memakai menu sisi yang sama.
 - Langkah Ide cerita baru: papan clapper di kanan dengan pratinjau format, ringkasan semua pilihan, dan perkiraan
   biaya gambar dan video; gaya visual dipilih dari pita film.
+- Perapian tampilan: tombol nonaktif tetap terbaca, judul halaman seragam, tanda pilihan aktif seragam, titik
+  transisi kuning hanya saat sedang diedit, dan fokus keyboard terlihat di kartu proyek dan bingkai gaya.
+- Menu sisi menandai "Pengaturan" dengan titik kuning kalau layanan Cerita, Suara, atau Gambar belum siap.
 
 ### Ditambahkan
 - Penyedia gambar dan video baru selain Higgsfield: **fal.ai** (25 model terpilih, antara lain Nano Banana,
@@ -30,6 +33,10 @@ Cara menaikkan versi ada di [docs/pengembangan.md](docs/pengembangan.md#versi-da
 - Tombol **Login dengan OpenRouter**: kunci OpenRouter dibuat otomatis lewat login di browser.
 - Modul login akun bersama (`src/main/oauth/`) dengan penyimpanan token terenkripsi dan refresh otomatis.
 - Unit test untuk modul tanpa Electron: `npm test`.
+
+### Diperbaiki
+- Klik ganda pada "Mulai" tidak lagi membuat dua proyek.
+- Perkiraan biaya tidak lagi sempat menampilkan harga model sebelumnya saat model diganti.
 
 ## [1.0.0] - 2026-10-02
 

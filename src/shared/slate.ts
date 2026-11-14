@@ -1,5 +1,6 @@
 import { fitDuration, getImageModel, getVideoModel, PROVIDER_LABEL } from './media'
 import { clipCountFor, LANGUAGES } from './models'
+import { costLabel } from './price'
 import { TTS_NAMES } from './services'
 import { getStyle, VISUAL_STYLES, type StyleCategory, type VisualStyle } from './styles'
 import type { AspectRatio, CreditEstimate, TtsProvider } from './types'
@@ -74,18 +75,6 @@ export function slateVideoSeconds(videoModel: string | null, durationSec: number
   return fitDuration(getVideoModel(videoModel), perClip) ?? perClip
 }
 
-function price(e: CreditEstimate, times = 1): string | null {
-  if (e.credits != null) {
-    const n = e.credits * times
-    return `${(n >= 10 ? Math.round(n) : Math.round(n * 10) / 10).toLocaleString('id-ID')} kr`
-  }
-  if (e.usd != null) {
-    const n = e.usd * times
-    return `US$${n.toLocaleString('id-ID', { minimumFractionDigits: 2, maximumFractionDigits: n < 1 ? 3 : 2 })}`
-  }
-  return null
-}
-
 /** The cost sentences of the slate, or one line saying why no price is known. */
 export function costLines(a: {
   clipCount: number
@@ -107,8 +96,8 @@ export function costLines(a: {
     if (!hasKey) return `Perkiraan harga ${what} muncul setelah kunci ${provider} diisi di Pengaturan.`
     return text ?? `Perkiraan harga ${what} belum tersedia.`
   }
-  const imagePrice = a.image && price(a.image, a.clipCount)
-  const videoPrice = a.video && price(a.video)
+  const imagePrice = costLabel(a.image, a.clipCount)
+  const videoPrice = costLabel(a.video)
   return [
     line('gambar', a.imageKey, a.imageProvider, imagePrice ? `${a.clipCount} gambar ≈ ${imagePrice}${a.imageListPrice ? LIST : ''}` : null),
     line(
