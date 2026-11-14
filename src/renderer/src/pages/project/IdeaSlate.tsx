@@ -1,6 +1,6 @@
 import { effectiveResolution, getImageModel, getVideoModel, PROVIDER_LABEL, type MediaProvider } from '@shared/media'
 import { clipCountFor } from '@shared/models'
-import { costLines, slateRows, slateTimecode } from '@shared/slate'
+import { costLines, slateRows, slateTimecode, slateVideoSeconds } from '@shared/slate'
 import type { Project } from '@shared/types'
 import { StyleSwatch } from '../../components/StyleArt'
 import { cx } from '../../components/ui'
@@ -27,12 +27,16 @@ export function IdeaSlate({
   const imageKey = hasKey(image.provider)
   const videoKey = hasKey(video.provider)
   const imageCost = useEstimate('image', image.id, project.aspectRatio, undefined, undefined, imageKey === true)
-  const videoCost = useEstimate('video', video.id, project.aspectRatio, perClip, effectiveResolution(video, project.videoResolution), videoKey === true)
+  const resolution = effectiveResolution(video, project.videoResolution)
+  const videoCost = useEstimate('video', video.id, project.aspectRatio, perClip, resolution, videoKey === true)
   const rows = slateRows({ ...project, voiceName })
   const loading = imageKey === null || (imageKey && imageCost === undefined) || (videoKey && videoCost === undefined)
   const costs = costLines({
     clipCount,
-    perClipSec: perClip,
+    videoSec: slateVideoSeconds(project.videoModel, project.durationSec),
+    videoResolution: resolution,
+    imageListPrice: image.provider === 'gemini',
+    videoListPrice: video.provider === 'gemini',
     image: imageCost ?? null,
     video: videoCost ?? null,
     imageKey: imageKey === true,
@@ -69,7 +73,8 @@ export function IdeaSlate({
             </div>
           ))}
         </dl>
-        <div className="mt-3 flex flex-col gap-1 rounded-lg bg-canvas px-3 py-2.5 text-[13.5px] leading-snug text-fg-2">
+        <p className="mt-2 text-[12.5px] text-muted">Durasi akhir mengikuti panjang suara narasi.</p>
+        <div className="mt-2.5 flex flex-col gap-1 rounded-lg bg-canvas px-3 py-2.5 text-[13.5px] leading-snug text-fg-2">
           {loading ? <span className="text-muted">Menghitung perkiraan harga…</span> : costs.map((c) => <span key={c}>{c}</span>)}
         </div>
       </div>

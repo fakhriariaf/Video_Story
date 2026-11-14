@@ -1,4 +1,4 @@
-import { getImageModel, getVideoModel, PROVIDER_LABEL } from './media'
+import { fitDuration, getImageModel, getVideoModel, PROVIDER_LABEL } from './media'
 import { clipCountFor, LANGUAGES } from './models'
 import { TTS_NAMES } from './services'
 import { getStyle, VISUAL_STYLES, type StyleCategory, type VisualStyle } from './styles'
@@ -48,16 +48,30 @@ export function slateTimecode(durationSec: number): string {
 }
 
 /**
- * Styles of a category for the strip: all of them when expanded, else `max` of them. A narrow strip shows one frame
- * fewer, so the chosen style always sits within the first `max - 1`: when it is further down the list it takes the
- * place before last.
+ * Styles of a category for the strip: all of them when expanded, else `max` of them. A style that is already among
+ * the first `max` keeps its place (frames must not jump when clicked); a chosen style further down the list takes
+ * the place before last, where a narrow strip still shows it.
  */
 export function stripStyles(category: StyleCategory | 'all', selectedId: string, expanded: boolean, max = 5): VisualStyle[] {
   const list = VISUAL_STYLES.filter((s) => category === 'all' || s.category === category)
   if (expanded || list.length <= max) return list
   const at = list.findIndex((s) => s.id === selectedId)
-  if (at < max - 1) return list.slice(0, max)
+  if (at < max) return list.slice(0, max)
   return [...list.slice(0, max - 2), list[at], list[max - 2]]
+}
+
+/**
+ * A narrow strip has room for four of the five frames. It drops the last one, or the one before it when the last
+ * frame is the chosen style, so the current choice is never the frame that disappears.
+ */
+export function narrowHiddenIndex(shown: VisualStyle[], selectedId: string): number {
+  return shown[4]?.id === selectedId ? 3 : 4
+}
+
+/** How long the AI video of one clip really is: models with fixed lengths round the clip up, and bill for that. */
+export function slateVideoSeconds(videoModel: string | null, durationSec: number): number {
+  const perClip = Math.round(durationSec / clipCountFor(durationSec))
+  return fitDuration(getVideoModel(videoModel), perClip) ?? perClip
 }
 
 function price(e: CreditEstimate, times = 1): string | null {
@@ -75,14 +89,20 @@ function price(e: CreditEstimate, times = 1): string | null {
 /** The cost sentences of the slate, or one line saying why no price is known. */
 export function costLines(a: {
   clipCount: number
-  perClipSec: number
+  /** Length of one AI video as the model makes it (see slateVideoSeconds). */
+  videoSec: number
+  videoResolution?: string | null
   image: CreditEstimate | null
   video: CreditEstimate | null
   imageKey: boolean
   videoKey: boolean
   imageProvider: string
   videoProvider: string
+  /** The price comes from the provider's published rates (Gemini), not from a price API. */
+  imageListPrice?: boolean
+  videoListPrice?: boolean
 }): string[] {
+  const LIST = ' (perkiraan dari tarif Google)'
   const line = (what: 'gambar' | 'video', hasKey: boolean, provider: string, text: string | null): string => {
     if (!hasKey) return `Perkiraan harga ${what} muncul setelah kunci ${provider} diisi di Pengaturan.`
     return text ?? `Perkiraan harga ${what} belum tersedia.`
@@ -90,12 +110,14 @@ export function costLines(a: {
   const imagePrice = a.image && price(a.image, a.clipCount)
   const videoPrice = a.video && price(a.video)
   return [
-    line('gambar', a.imageKey, a.imageProvider, imagePrice ? `${a.clipCount} gambar ≈ ${imagePrice}` : null),
+    line('gambar', a.imageKey, a.imageProvider, imagePrice ? `${a.clipCount} gambar ≈ ${imagePrice}${a.imageListPrice ? LIST : ''}` : null),
     line(
       'video',
       a.videoKey,
       a.videoProvider,
-      videoPrice ? `Video AI ≈ ${videoPrice} per klip ${a.perClipSec} detik, hanya untuk klip yang kamu jadikan video.` : null
+      videoPrice
+        ? `Video AI ≈ ${videoPrice} per klip ${a.videoSec} detik${a.videoResolution ? `, ${a.videoResolution}` : ''}${a.videoListPrice ? LIST : ''}, hanya untuk klip yang kamu jadikan video.`
+        : null
     )
   ]
 }
