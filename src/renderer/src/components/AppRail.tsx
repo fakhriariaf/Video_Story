@@ -36,7 +36,7 @@ function Item({
       className={cx(
         'flex w-full items-center gap-2.5 rounded-lg px-3 text-left transition-colors',
         small ? 'h-9 text-sm' : 'h-10 text-[15px]',
-        // The yellow bar marks where you are; the rail has no other yellow.
+        // The yellow bar marks where you are. The only other yellow in the rail is the small "needs setup" dot.
         on ? 'bg-raised font-semibold text-fg shadow-[inset_3px_0_0_var(--color-sun)]' : 'font-medium text-muted hover:bg-raised hover:text-fg'
       )}
     >
