@@ -1,13 +1,14 @@
 import { useEffect, useMemo, useState } from 'react'
-import { AlertTriangle, ArrowRight, Copy, FolderOpen, MoreHorizontal, Plus, Search, Trash2 } from 'lucide-react'
+import { AlertTriangle, Copy, FolderOpen, MoreHorizontal, Plus, Search, Trash2 } from 'lucide-react'
 import { DURATIONS, LANGUAGES, llmName } from '@shared/models'
 import { getStyle } from '@shared/styles'
 import type { AccountStatus, ApiProvider, AppSettings, AspectRatio, KeyStatus, ProjectStatus, ProjectSummary, TtsProvider } from '@shared/types'
 import { AppRail } from '../components/AppRail'
+import { FilmStrip } from '../components/FilmStrip'
 import { Select, type SelectOption } from '../components/Select'
 import { StyleSwatch } from '../components/StyleArt'
 import { StyleMenu } from '../components/StyleMenu'
-import { Badge, Button, Chip, IconButton, Menu, confirmDialog, cx } from '../components/ui'
+import { Badge, Button, IconButton, Menu, confirmDialog, cx } from '../components/ui'
 import { errorText, mmss, relativeTime } from '../lib/format'
 import { TTS_NAMES, ttsReadiness, usableTts } from '../lib/keys'
 import { useServices } from '../lib/useServices'
@@ -161,9 +162,9 @@ export function Home() {
       <AppRail active="home" services={services} />
 
       <main className="scroll-thin min-h-0 overflow-y-auto">
-        <div className="mx-auto flex max-w-[1280px] flex-col gap-5 px-12 pt-11">
+        <div className="flex max-w-[1240px] flex-col px-11 pb-12 pt-9">
           {setupIssues.length > 0 && (
-            <div className="flex items-center gap-3 rounded-[14px] border border-sun bg-sun-soft px-4 py-3 text-sm text-sun-ink">
+            <div className="mb-6 flex items-center gap-3 rounded-lg bg-sun-soft px-4 py-3 text-sm text-sun-ink">
               <AlertTriangle className="size-[18px] shrink-0" />
               <span className="flex-1">
                 Sebelum mulai, atur dulu {joinList(setupIssues.map((i) => i.what))} di Pengaturan. Tanpa itu,{' '}
@@ -174,14 +175,12 @@ export function Home() {
               </Button>
             </div>
           )}
-          <div>
-            <h1 className="font-display text-[46px] font-bold leading-[1.08] tracking-[-0.025em]">Mau bikin video apa hari ini?</h1>
-            <p className="mt-3 text-[17px] text-fg-2">
-              Tulis idenya. AI menyusun klip, naskah, dan suaranya, lalu kamu tinggal merapikan di editor.
-            </p>
-          </div>
-          <div className="flex flex-col gap-3 rounded-[18px] border border-edge bg-panel py-5 pl-6 pr-5 shadow-pop">
-            <label htmlFor="ide" className="text-[13px] font-semibold text-fg-2">
+
+          <h1 className="font-display text-[52px] font-semibold leading-none">Mau bikin video apa hari ini?</h1>
+          <p className="mt-2.5 text-base text-muted">Tulis idenya. AI menyusun adegan, naskah, dan suaranya, lalu kamu merapikannya di editor.</p>
+
+          <div className="mt-6 flex flex-col gap-3 rounded-[14px] border border-line-2 bg-panel px-5 pb-4 pt-[18px]">
+            <label htmlFor="ide" className="sr-only">
               Ide cerita atau sinopsis
             </label>
             <textarea
@@ -190,9 +189,9 @@ export function Home() {
               value={synopsis}
               onChange={(e) => setSynopsis(e.target.value)}
               placeholder="Contoh: Gajah Mada bersumpah tidak akan menikmati palapa sebelum Nusantara bersatu. Para menteri menertawakannya, tapi dia membuktikannya…"
-              className="resize-none bg-transparent text-lg leading-relaxed outline-none placeholder:text-muted/70"
+              className="resize-none bg-transparent text-lg leading-relaxed outline-none placeholder:text-faint"
             />
-            <div className="flex flex-wrap items-center gap-2 border-t border-dashed border-line pt-3.5">
+            <div className="flex flex-wrap items-center gap-2 border-t border-line pt-3.5">
               <Select
                 variant="pill"
                 label="Durasi"
@@ -211,39 +210,43 @@ export function Home() {
               <Select variant="pill" label="Format" value={aspectRatio} onChange={setAspectRatio} options={ASPECTS} menuWidth={200} />
               <StyleMenu value={styleId} onChange={setStyleId} />
               <Select variant="pill" label="Suara narator" value={tts} onChange={setTts} options={ttsOptions} menuWidth={280} />
-              <div className="flex-1" />
-              <Button variant="primary" size="lg" loading={creating} onClick={() => void start()}>
+              {/* ml-auto keeps the action on the right edge, also when the row wraps in a narrow window. */}
+              <Button variant="primary" size="lg" className="ml-auto px-7" loading={creating} onClick={() => void start()}>
                 Mulai
-                <ArrowRight className="size-[18px]" />
               </Button>
             </div>
           </div>
-          <div className="flex flex-wrap items-center gap-2 text-[13px] text-fg-2">
+
+          <div className="mt-3 flex flex-wrap items-center gap-2 text-[13.5px] text-muted">
             <span>Coba ide ini:</span>
             {SUGGESTIONS.map((s) => (
               <button
                 key={s}
                 type="button"
                 onClick={() => setSynopsis(s)}
-                className="h-9 rounded-full border border-dashed border-line-3 px-3.5 text-[13px] text-fg-2 hover:border-edge hover:text-fg"
+                className="h-8 rounded-full border border-dashed border-line-3 px-3 text-[13.5px] text-fg-2 hover:border-edge hover:text-fg"
               >
                 {s}
               </button>
             ))}
           </div>
-        </div>
 
-        <section className="mx-auto flex max-w-[1280px] flex-col gap-[18px] px-12 pb-12 pt-11">
-          <div className="flex items-center gap-4">
-            <h2 className="font-display text-[27px] font-bold tracking-[-0.015em]">Proyek kamu</h2>
-            <div className="ml-2 flex gap-1.5">
+          <div className="mb-3 mt-9 flex items-end gap-5">
+            <h2 className="font-display text-[28px] font-semibold leading-none">Proyek kamu</h2>
+            <div className="flex gap-[18px] pb-px" role="group" aria-label="Saring proyek">
               {FILTERS.map((f) => {
                 const count = (projects ?? []).filter((p) => f.match(p.status)).length
+                const on = filter === f.id
                 return (
-                  <Chip key={f.id} on={filter === f.id} onClick={() => setFilter(f.id)}>
-                    {f.label}
-                    <span className={cx('text-xs', filter === f.id ? 'text-line-2' : 'text-muted')}>{count}</span>
-                  </Chip>
+                  <button
+                    key={f.id}
+                    type="button"
+                    aria-pressed={on}
+                    onClick={() => setFilter(f.id)}
+                    className={cx('border-b-2 pb-1 text-[14.5px]', on ? 'border-sun font-semibold text-fg' : 'border-transparent text-muted hover:text-fg')}
+                  >
+                    {f.label} {count}
+                  </button>
                 )
               })}
             </div>
@@ -261,48 +264,45 @@ export function Home() {
             </label>
           </div>
 
-          <div className="grid grid-cols-4 gap-5">
+          <FilmStrip>
             <button
               type="button"
               onClick={() => void start()}
-              className="flex min-h-[262px] flex-col items-center justify-center gap-2.5 rounded-[14px] border border-dashed border-line-3 text-fg-2 hover:border-edge hover:bg-panel"
+              className="flex min-h-[190px] flex-col items-center justify-center gap-2.5 rounded-md border border-dashed border-line-3 text-fg-2 hover:border-edge hover:bg-panel"
             >
-              <span className="flex size-[54px] items-center justify-center rounded-full bg-accent text-canvas">
-                <Plus className="size-6" strokeWidth={2.2} />
+              <span className="flex size-10 items-center justify-center rounded-full bg-accent text-canvas">
+                <Plus className="size-5" strokeWidth={2.4} />
               </span>
-              <span className="text-base font-semibold text-fg">Proyek baru</span>
-              <span className="text-[13px]">Mulai dari ide atau sinopsis</span>
+              <span className="text-[15px] font-semibold text-fg">Proyek baru</span>
             </button>
 
             {visible.map((p) => {
               const st = STATUS[p.status]
               return (
-                <article key={p.id} className="flex flex-col overflow-hidden rounded-[14px] border border-line bg-panel">
+                <article key={p.id} className="flex flex-col overflow-hidden rounded-md bg-panel">
                   <button type="button" onClick={() => go({ name: 'project', id: p.id })} className="text-left">
-                    <div className="relative aspect-video w-full overflow-hidden border-b border-line">
+                    <div className="relative aspect-video w-full overflow-hidden">
                       {p.coverUrl ? (
                         <img src={p.coverUrl} alt="" className="size-full object-cover" />
                       ) : (
                         <StyleSwatch styleId={p.styleId} className="size-full" iconSize={40} />
                       )}
-                      <span className="absolute left-2.5 top-2.5 rounded-full border border-edge bg-panel px-2.5 py-[3px] text-xs font-semibold">
-                        {getStyle(p.styleId).name}
-                      </span>
+                      <span className="absolute left-2 top-2 rounded bg-strip/80 px-2 py-0.5 text-xs font-medium text-fg">{getStyle(p.styleId).name}</span>
                       {p.totalMs > 0 && (
-                        <span className="absolute bottom-2.5 right-2.5 rounded-md bg-select px-2 py-[3px] font-mono text-xs text-fg">
+                        <span className="absolute bottom-2 right-2 rounded bg-strip/85 px-1.5 font-display text-[15px] font-semibold tracking-wide text-fg">
                           {mmss(p.totalMs)}
                         </span>
                       )}
                     </div>
-                    <div className="line-clamp-2 min-h-[46px] px-4 pb-0.5 pt-3.5 text-base font-semibold leading-snug">{p.title}</div>
+                    <div className="truncate px-3 pt-2.5 text-[15.5px] font-semibold">{p.title}</div>
                   </button>
-                  <div className="flex items-center gap-2 py-2 pl-4 pr-2">
+                  <div className="flex items-center gap-2 pb-1.5 pl-3 pr-1.5 pt-0.5">
                     <Badge tone={st.tone}>{st.label}</Badge>
                     <span className="truncate text-[13px] text-muted">{relativeTime(p.updatedAt)}</span>
                     <div className="flex-1" />
                     <Menu
                       trigger={(open) => (
-                        <IconButton label="Opsi proyek" onClick={open} className="border-transparent" size={36}>
+                        <IconButton label="Opsi proyek" onClick={open} className="border-transparent bg-transparent" size={32}>
                           <MoreHorizontal className="size-[18px]" />
                         </IconButton>
                       )}
@@ -316,11 +316,12 @@ export function Home() {
                 </article>
               )
             })}
-          </div>
-          {projects && projects.length === 0 && (
-            <p className="text-sm text-muted">Belum ada proyek. Tulis ide di atas lalu klik Mulai.</p>
+          </FilmStrip>
+          {projects && projects.length === 0 && <p className="mt-3 text-sm text-muted">Belum ada proyek. Tulis ide di atas lalu klik Mulai.</p>}
+          {projects && projects.length > 0 && visible.length === 0 && (
+            <p className="mt-3 text-sm text-muted">Tidak ada proyek yang cocok dengan saringan atau pencarian ini.</p>
           )}
-        </section>
+        </div>
       </main>
     </div>
   )

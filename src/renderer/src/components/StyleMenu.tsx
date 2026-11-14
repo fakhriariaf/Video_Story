@@ -50,7 +50,7 @@ export function StyleMenu({ value, onChange }: { value: string; onChange: (id: s
         aria-label={`Gaya visual: ${current.name}`}
         onClick={() => setOpen(!open)}
         className={cx(
-          'inline-flex h-10 min-w-0 items-center gap-2 rounded-full border bg-canvas pl-3.5 pr-3 text-sm font-medium transition-colors',
+          'inline-flex h-10 min-w-0 items-center gap-2 rounded-lg border bg-raised pl-3.5 pr-3 text-sm font-medium transition-colors',
           open ? 'border-edge' : 'border-line-2 hover:border-edge'
         )}
       >
