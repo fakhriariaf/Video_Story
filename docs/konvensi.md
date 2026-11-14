@@ -63,9 +63,11 @@ model). Font caption ada terpisah di `captions.ts`.
 | `Popover` | `components/Popover.tsx` | panel mengambang di portal; menghentikan event agar tidak bocor ke elemen di belakangnya |
 | `ModelPicker`, `ModelLogo`, `ProviderLogo` | `components/` | pemilih model AI dengan ikon dan biaya |
 | `AutoTextarea` | `components/AutoTextarea.tsx` | textarea yang tumbuh mengikuti isi dan tetap bisa diubah ukurannya |
-| `StyleMenu`, `StylePicker` | `components/` | pemilih gaya visual berupa grid thumbnail 1:1 |
+| `StyleMenu` | `components/StyleMenu.tsx` | pemilih gaya visual di Beranda, berupa grid thumbnail 1:1 dalam popover |
 | `AppRail` | `components/AppRail.tsx` | menu sisi kiri Beranda dan Pengaturan: logo, menu, sub-menu tab Pengaturan, ringkasan Layanan AI |
-| `FilmStrip` | `components/FilmStrip.tsx` | daftar proyek sebagai pita film; 3 kolom, 4 kolom kalau pitanya cukup lebar |
+| `FilmStrip` | `components/FilmStrip.tsx` | daftar sebagai pita film; `columns="projects"` (3 atau 4 kolom) untuk Beranda, `columns="styles"` (4 atau 5 kolom) untuk gaya |
+| `IdeaSlate` | `pages/project/IdeaSlate.tsx` | papan clapper langkah Ide cerita: pratinjau format, tujuh baris pilihan, perkiraan biaya; isinya dihitung `src/shared/slate.ts` |
+| `StyleStrip` | `pages/project/StyleStrip.tsx` | gaya visual di pita film: tab kategori, satu baris gaya, "Lihat semua" membentangkan di tempat |
 
 ### Kerangka halaman
 
