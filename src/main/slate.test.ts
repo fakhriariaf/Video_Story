@@ -48,10 +48,17 @@ test('stripStyles shows five styles and keeps the chosen one in view', () => {
   const first = stripStyles('all', 'stickman', false)
   assert.equal(first.length, 5)
   assert.equal(first[0].id, 'stickman')
+  // A chosen style further down takes the fourth place: a narrow strip shows four frames, and it must be one of them.
   const late = stripStyles('all', 'epic', false)
-  assert.equal(late.length, 5)
-  assert.equal(late[4].id, 'epic')
-  assert.equal(late[0].id, 'stickman')
+  assert.deepEqual(
+    late.map((s) => s.id),
+    ['stickman', 'flat', 'whiteboard', 'epic', 'collage']
+  )
+  // The fifth frame is hidden in a narrow strip, so a chosen fifth style moves up too.
+  assert.deepEqual(
+    stripStyles('all', 'watercolor', false).map((s) => s.id),
+    ['stickman', 'flat', 'whiteboard', 'watercolor', 'collage']
+  )
   assert.equal(stripStyles('all', 'epic', true).length, VISUAL_STYLES.length)
   assert.ok(stripStyles('3d', 'stickman', false).every((s) => s.category === '3d'))
 })

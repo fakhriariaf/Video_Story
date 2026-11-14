@@ -38,10 +38,18 @@ export function StyleStrip({ value, onChange }: { value: string; onChange: (id: 
         ) : null}
       </div>
       <FilmStrip columns="styles">
-        {shown.map((s) => {
+        {shown.map((s, i) => {
           const on = s.id === value
           return (
-            <button key={s.id} type="button" aria-pressed={on} onClick={() => onChange(s.id)} title={s.niche} className="group flex min-w-0 flex-col gap-1.5 text-left">
+            <button
+              key={s.id}
+              type="button"
+              aria-pressed={on}
+              onClick={() => onChange(s.id)}
+              title={s.niche}
+              // The short strip is one row: its fifth frame only shows where the strip has five columns.
+              className={cx('group min-w-0 flex-col gap-1.5 text-left', !expanded && i === 4 ? 'hidden @2xl:flex' : 'flex')}
+            >
               <StyleSwatch
                 styleId={s.id}
                 className={cx('aspect-[4/3] w-full rounded-md', on ? 'outline outline-2 outline-offset-2 outline-accent' : 'group-hover:brightness-110')}

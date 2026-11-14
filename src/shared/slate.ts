@@ -47,14 +47,17 @@ export function slateTimecode(durationSec: number): string {
   return `${two(Math.floor(durationSec / 60))}:${two(Math.round(durationSec % 60))}`
 }
 
-/** Styles of a category for the strip: all of them when expanded, else the first `max` with the chosen one kept in view. */
+/**
+ * Styles of a category for the strip: all of them when expanded, else `max` of them. A narrow strip shows one frame
+ * fewer, so the chosen style always sits within the first `max - 1`: when it is further down the list it takes the
+ * place before last.
+ */
 export function stripStyles(category: StyleCategory | 'all', selectedId: string, expanded: boolean, max = 5): VisualStyle[] {
   const list = VISUAL_STYLES.filter((s) => category === 'all' || s.category === category)
   if (expanded || list.length <= max) return list
-  const head = list.slice(0, max)
-  const chosen = list.find((s) => s.id === selectedId)
-  // A chosen style further down the list takes the last place, so the strip never hides the current choice.
-  return !chosen || head.includes(chosen) ? head : [...head.slice(0, max - 1), chosen]
+  const at = list.findIndex((s) => s.id === selectedId)
+  if (at < max - 1) return list.slice(0, max)
+  return [...list.slice(0, max - 2), list[at], list[max - 2]]
 }
 
 function price(e: CreditEstimate, times = 1): string | null {

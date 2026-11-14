@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState, type ReactNode } from 'react'
+import { useMemo, type ReactNode } from 'react'
 import { Film, Image as ImageIcon, Move, Users } from 'lucide-react'
 import {
   effectiveResolution,
@@ -12,16 +12,14 @@ import {
   PROVIDER_LABEL,
   resolutionOptions,
   VIDEO_MODELS,
-  type MediaModel,
   type MediaProvider
 } from '@shared/media'
 import type { CreditEstimate, ModelOption, Project } from '@shared/types'
 import { ModelLogo } from '../../components/ModelLogo'
 import { ModelPicker } from '../../components/ModelPicker'
 import { ProviderLogo } from '../../components/ProviderLogo'
-import { Segmented, Spinner } from '../../components/ui'
-import { costLabel } from '../../lib/format'
-import { useEstimate, useEstimates } from '../../lib/useEstimate'
+import { Segmented } from '../../components/ui'
+import { useEstimates } from '../../lib/useEstimate'
 
 const IMAGE_OPTIONS = mediaModelOptions('image')
 const VIDEO_OPTIONS = mediaModelOptions('video')
@@ -42,38 +40,9 @@ function decorate(options: ModelOption[], costs: Record<string, CreditEstimate |
   })
 }
 
-function Cost({
-  value,
-  model,
-  hasKey,
-  children
-}: {
-  value: CreditEstimate | null | undefined
-  model: MediaModel
-  hasKey: boolean | null
-  children: (label: string, each: CreditEstimate) => ReactNode
-}) {
-  if (hasKey === false) return <span className="text-muted">Perkiraan harga muncul setelah kunci {PROVIDER_LABEL[model.provider]} diisi di Pengaturan.</span>
-  if (value === undefined)
-    return (
-      <span className="flex items-center gap-1.5 text-muted">
-        <Spinner className="size-3" />
-        Menghitung harga…
-      </span>
-    )
-  const label = costLabel(value)
-  if (!value || !label) return <span className="text-muted">Perkiraan harga belum tersedia.</span>
-  return (
-    <span>
-      {children(label, value)}
-      {model.provider === 'gemini' && <span className="text-muted"> (perkiraan dari tarif Google)</span>}
-    </span>
-  )
-}
-
 function Card({ icon, title, children }: { icon: ReactNode; title: string; children: ReactNode }) {
   return (
-    <div className="flex min-w-0 flex-col gap-2 rounded-[14px] border border-line-2 bg-panel p-3">
+    <div className="flex min-w-0 flex-col gap-2 rounded-[14px] border border-line-2 bg-panel p-3.5">
       <span className="flex items-center gap-2 text-[13px] font-semibold text-fg-2">
         {icon}
         {title}
@@ -83,36 +52,27 @@ function Card({ icon, title, children }: { icon: ReactNode; title: string; child
   )
 }
 
-/** Which provider and model draw and animate this project's clips. */
+/**
+ * Which provider and model draw and animate this project's clips. What the choice costs is shown on the slate
+ * beside the form; the pickers still list a price per model.
+ */
 export function ModelSection({
   project,
-  clipCount,
   perClip,
+  keys,
   onChange
 }: {
   project: Project
-  clipCount: number
   perClip: number
+  /** Providers with a saved key; null while the keys are still loading. */
+  keys: Set<MediaProvider> | null
   onChange: (patch: { imageModel?: string; videoModel?: string; videoResolution?: string | null }) => void
 }) {
   const image = getImageModel(project.imageModel)
   const video = getVideoModel(project.videoModel)
-  const seconds = fitDuration(video, perClip) ?? perClip
   const resolutions = resolutionOptions(video)
   const resolution = effectiveResolution(video, project.videoResolution)
-  const [keys, setKeys] = useState<Set<MediaProvider> | null>(null)
-
-  useEffect(() => {
-    void window.api.settings.keys().then((list) =>
-      setKeys(new Set(MEDIA_PROVIDERS.filter((p) => list.find((k) => k.provider === p)?.configured)))
-    )
-  }, [])
-
   const hasKey = (p: MediaProvider): boolean => !!keys?.has(p)
-  const imageKey = keys ? hasKey(image.provider) : null
-  const videoKey = keys ? hasKey(video.provider) : null
-  const imageCost = useEstimate('image', image.id, project.aspectRatio, undefined, undefined, imageKey === true)
-  const videoCost = useEstimate('video', video.id, project.aspectRatio, perClip, resolution, videoKey === true)
   const imageIds = useMemo(() => IMAGE_OPTIONS.filter((o) => keys?.has(PROVIDER_OF.get(o.id)!)).map((o) => o.id), [keys])
   const videoIds = useMemo(() => VIDEO_OPTIONS.filter((o) => keys?.has(PROVIDER_OF.get(o.id)!)).map((o) => o.id), [keys])
   const imageCosts = useEstimates('image', imageIds, project.aspectRatio, undefined, imageIds.length > 0)
@@ -125,9 +85,9 @@ export function ModelSection({
   const anyKey = !!keys?.size
 
   return (
-    <div className="flex flex-col gap-2">
-      <div className="flex items-baseline gap-2">
-        <span className="text-sm font-semibold">Model AI</span>
+    <section className="flex flex-col gap-2.5" aria-label="Model AI">
+      <div className="flex items-baseline gap-3">
+        <h2 className="font-display text-2xl font-semibold leading-none">Model AI</h2>
         <span className="text-[13px] text-muted">
           {IMAGE_OPTIONS.length} model gambar dan {VIDEO_OPTIONS.length} model video dari {MEDIA_PROVIDERS.length} penyedia
         </span>
@@ -145,15 +105,6 @@ export function ModelSection({
             menuClassName="w-[430px]"
             onChange={(id) => onChange({ imageModel: id })}
           />
-          <p className="text-[12.5px] leading-snug text-fg-2">
-            <Cost value={imageCost} model={image} hasKey={imageKey}>
-              {(label, each) => (
-                <>
-                  ≈ {label} per gambar · {clipCount} gambar ≈ <b className="font-semibold text-fg">{costLabel(each, clipCount)}</b>
-                </>
-              )}
-            </Cost>
-          </p>
           <p className="flex items-start gap-1.5 text-[12.5px] leading-snug text-muted">
             <Users className="mt-px size-3.5 shrink-0" />
             {maxRefs(image)
@@ -188,21 +139,12 @@ export function ModelSection({
           ) : (
             resolution && <p className="text-[12.5px] text-fg-2">Resolusi {resolution} (satu-satunya pilihan model ini)</p>
           )}
-          <p className="text-[12.5px] leading-snug text-fg-2">
-            <Cost value={videoCost} model={video} hasKey={videoKey}>
-              {(label) => (
-                <>
-                  ≈ {label} per video {seconds} detik{resolution ? `, ${resolution}` : ''}
-                </>
-              )}
-            </Cost>
-          </p>
           <p className="flex items-start gap-1.5 text-[12.5px] leading-snug text-muted">
             <Move className="mt-px size-3.5 shrink-0" />
             Hanya untuk klip yang kamu jadikan Video AI. Gerak kamera tetap gratis.
           </p>
         </Card>
       </div>
-    </div>
+    </section>
   )
 }

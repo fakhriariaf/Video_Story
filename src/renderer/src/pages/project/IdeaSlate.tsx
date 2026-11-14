@@ -52,7 +52,7 @@ export function IdeaSlate({
       <div className="flex flex-col px-4 pb-4 pt-3.5">
         <h2 className="line-clamp-2 font-display text-[22px] font-semibold leading-tight">{project.title}</h2>
         <div className="mb-1 mt-3 flex justify-center rounded-md bg-strip">
-          <div className={cx('relative overflow-hidden rounded-md', portrait ? 'aspect-[9/16] w-[46%]' : 'aspect-video w-full')}>
+          <div className={cx('relative overflow-hidden rounded-md', portrait ? 'aspect-[9/16] w-[32%]' : 'aspect-video w-full')}>
             <StyleSwatch styleId={project.styleId} className="size-full" iconSize={40} />
             <span className="absolute bottom-2 right-2 rounded bg-strip/85 px-1.5 font-display text-[15px] font-semibold tracking-wide text-fg">
               {slateTimecode(project.durationSec)}
