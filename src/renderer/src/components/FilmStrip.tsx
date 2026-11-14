@@ -12,16 +12,22 @@ function Holes({ className }: { className: string }) {
   )
 }
 
+// Column counts follow the strip's own width (container query), so they adapt to the space beside a rail or a slate.
+const COLUMNS = {
+  projects: 'grid-cols-3 @4xl:grid-cols-4',
+  styles: 'grid-cols-4 @2xl:grid-cols-5'
+}
+
 /**
- * The project list drawn as a strip of film: each child is a frame. Frames wrap to further rows, three per row in a
- * narrow window and four once the strip is wide enough.
+ * A list drawn as a strip of film: each child is a frame. Frames wrap to further rows. Used for the projects on Home
+ * and the visual styles in the Idea step.
  */
-export function FilmStrip({ children }: { children: ReactNode }) {
+export function FilmStrip({ children, columns = 'projects' }: { children: ReactNode; columns?: keyof typeof COLUMNS }) {
   return (
     <div className="@container relative rounded-[10px] bg-strip px-4 py-[22px]">
       <Holes className="top-[7px]" />
       <Holes className="bottom-[7px]" />
-      <div className="grid grid-cols-3 gap-3.5 @4xl:grid-cols-4">{children}</div>
+      <div className={cx('grid', columns === 'styles' ? 'gap-2.5' : 'gap-3.5', COLUMNS[columns])}>{children}</div>
     </div>
   )
 }
