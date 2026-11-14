@@ -24,7 +24,7 @@ function SaveStatus() {
     )
   if (saveState === 'dirty')
     return (
-      <span className="flex items-center gap-1.5 text-xs text-accent-dark">
+      <span className="flex items-center gap-1.5 text-xs text-link">
         <span className="size-[7px] rounded-full bg-accent" />
         Ada perubahan belum disimpan
       </span>
@@ -61,7 +61,7 @@ export function ProjectHeader({ doneSteps, right }: { doneSteps: Step[]; right?:
   }
 
   return (
-    <header className="grid h-[68px] shrink-0 grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center gap-4 border-b border-line bg-surface px-6">
+    <header className="grid h-[68px] shrink-0 grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center gap-4 border-b border-line bg-panel px-6">
       <div className="flex min-w-0 items-center gap-3">
         <IconButton
           label="Kembali ke beranda"
@@ -87,7 +87,7 @@ export function ProjectHeader({ doneSteps, right }: { doneSteps: Step[]; right?:
                   if (e.key === 'Enter') (e.target as HTMLInputElement).blur()
                   if (e.key === 'Escape') setEditing(false)
                 }}
-                className="h-8 w-[320px] rounded-lg border border-ink bg-surface px-2 font-display text-lg font-bold outline-none"
+                className="h-8 w-[320px] rounded-lg border border-edge bg-panel px-2 font-display text-lg font-bold outline-none"
               />
             ) : (
               <>
@@ -96,7 +96,7 @@ export function ProjectHeader({ doneSteps, right }: { doneSteps: Step[]; right?:
                   type="button"
                   aria-label="Ganti nama proyek"
                   onClick={() => setEditing(true)}
-                  className="flex size-7 shrink-0 items-center justify-center rounded-lg text-muted hover:bg-sand hover:text-ink"
+                  className="flex size-7 shrink-0 items-center justify-center rounded-lg text-muted hover:bg-raised hover:text-fg"
                 >
                   <Pencil className="size-[15px]" />
                 </button>
@@ -107,7 +107,7 @@ export function ProjectHeader({ doneSteps, right }: { doneSteps: Step[]; right?:
         </div>
       </div>
 
-      <nav aria-label="Langkah pembuatan" className="flex items-center gap-1 rounded-full border border-line bg-sand p-1">
+      <nav aria-label="Langkah pembuatan" className="flex items-center gap-1 rounded-full border border-line bg-raised p-1">
         {STEPS.map((s) => {
           const active = project.step === s.n
           const done = doneSteps.includes(s.n) && !active
@@ -119,13 +119,13 @@ export function ProjectHeader({ doneSteps, right }: { doneSteps: Step[]; right?:
               onClick={() => setStep(s.n)}
               className={cx(
                 'inline-flex h-9 items-center gap-2 rounded-full py-0 pl-1.5 pr-4 text-sm',
-                active ? 'bg-ink font-semibold text-paper' : 'font-medium text-ink-2 hover:text-ink'
+                active ? 'bg-select font-semibold text-fg' : 'font-medium text-fg-2 hover:text-fg'
               )}
             >
               <span
                 className={cx(
                   'inline-flex size-6 items-center justify-center rounded-full text-xs',
-                  active ? 'bg-accent text-white' : done ? 'bg-ok-soft text-ok-ink' : 'border border-line-2 bg-surface text-ink-2'
+                  active ? 'bg-sun text-sun-on' : done ? 'bg-ok-soft text-ok-ink' : 'border border-line-2 bg-panel text-fg-2'
                 )}
               >
                 {done ? <Check className="size-[13px]" strokeWidth={3} /> : s.n}

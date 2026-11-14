@@ -30,22 +30,22 @@ export function WhisperSection({ settings, onSettings }: { settings: AppSettings
   return (
     <>
       <div className="mt-5 flex items-start gap-3">
-        <span className="mt-1 text-ink">
+        <span className="mt-1 text-fg">
           <Captions className="size-5" />
         </span>
         <div className="flex flex-col gap-1">
           <h2 className="font-display text-[22px] font-bold leading-tight">Caption akurat</h2>
-          <p className="text-sm text-ink-2">Menyamakan waktu tiap kata caption dengan suara narasi, langsung di komputer ini.</p>
+          <p className="text-sm text-fg-2">Menyamakan waktu tiap kata caption dengan suara narasi, langsung di komputer ini.</p>
         </div>
       </div>
-      <section className="flex flex-col gap-4 rounded-2xl border border-line bg-surface px-5 py-[18px]">
+      <section className="flex flex-col gap-4 rounded-[14px] border border-line bg-panel px-5 py-[18px]">
         <div className="flex items-center gap-3">
-          <span className="flex size-10 shrink-0 items-center justify-center rounded-[10px] border border-ink bg-ink text-paper">
+          <span className="flex size-10 shrink-0 items-center justify-center rounded-lg border border-edge bg-select text-fg">
             <AudioLines className="size-5" />
           </span>
           <div className="flex flex-1 flex-col">
             <span className="text-base font-bold">Whisper Small</span>
-            <span className="text-[13px] text-ink-2">Pengenal suara multibahasa (termasuk Indonesia) lewat whisper.cpp · {mb(status.total)}</span>
+            <span className="text-[13px] text-fg-2">Pengenal suara multibahasa (termasuk Indonesia) lewat whisper.cpp · {mb(status.total)}</span>
           </div>
           {status.state === 'ready' ? (
             <Badge tone="ok">Siap dipakai</Badge>
@@ -56,7 +56,7 @@ export function WhisperSection({ settings, onSettings }: { settings: AppSettings
           )}
         </div>
 
-        <p className="text-[13px] leading-relaxed text-ink-2">
+        <p className="text-[13px] leading-relaxed text-fg-2">
           Dipakai untuk suara Gemini TTS, yang tidak mengirim waktu per kata. Suara ElevenLabs sudah membawa waktu kata yang presisi. Setelah diunduh,
           Whisper berjalan tanpa internet dan tanpa biaya.
         </p>
@@ -64,7 +64,7 @@ export function WhisperSection({ settings, onSettings }: { settings: AppSettings
         {busy && (
           <div className="flex flex-col gap-1.5">
             <Progress value={status.total ? status.received / status.total : 0} />
-            <span className="font-mono text-xs text-ink-2">
+            <span className="font-mono text-xs text-fg-2">
               {mb(status.received)} dari {mb(status.total)}
               {status.state === 'verifying' ? ' · memeriksa keutuhan file…' : ''}
             </span>

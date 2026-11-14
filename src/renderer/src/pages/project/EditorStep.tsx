@@ -197,7 +197,7 @@ export function EditorStep() {
   return (
     <div className="grid h-full grid-cols-[minmax(0,1fr)]" style={{ gridTemplateRows: `minmax(0,1fr) min(${timelineHeight}px, 52vh)` }}>
       <div className="grid min-h-0 grid-cols-[84px_minmax(0,1fr)_360px]">
-        <nav aria-label="Panel editor" className="flex flex-col items-center gap-1 border-r border-line bg-surface py-3">
+        <nav aria-label="Panel editor" className="flex flex-col items-center gap-1 border-r border-line bg-panel py-3">
           {INSPECTOR_TABS.map((t) => {
             const Icon = t.icon
             const on = tab === t.id
@@ -208,8 +208,8 @@ export function EditorStep() {
                 aria-pressed={on}
                 onClick={() => setTab(t.id)}
                 className={cx(
-                  'flex h-[62px] w-[68px] flex-col items-center justify-center gap-1 rounded-xl text-xs',
-                  on ? 'border-[1.5px] border-ink bg-sun-soft font-semibold text-ink' : 'font-medium text-ink-2 hover:bg-sand'
+                  'flex h-[62px] w-[68px] flex-col items-center justify-center gap-1 rounded-lg text-xs',
+                  on ? 'border border-edge bg-sun-soft font-semibold text-fg' : 'font-medium text-fg-2 hover:bg-raised'
                 )}
               >
                 <Icon className="size-5" />

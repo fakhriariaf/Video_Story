@@ -23,28 +23,28 @@ export function StylePicker({ value, onChange }: { value: string; onChange: (id:
               aria-pressed={on}
               onClick={() => onChange(s.id)}
               className={cx(
-                'group relative flex flex-col overflow-hidden rounded-[14px] bg-surface text-left transition-shadow',
-                on ? 'border-2 border-accent shadow-ink-md' : 'border border-line hover:border-line-3'
+                'group relative flex flex-col overflow-hidden rounded-[14px] bg-panel text-left transition-shadow',
+                on ? 'border-2 border-accent' : 'border border-line hover:border-line-3'
               )}
             >
-              <span className="relative block aspect-video w-full overflow-hidden border-b border-line bg-sand">
+              <span className="relative block aspect-video w-full overflow-hidden border-b border-line bg-raised">
                 <StyleSwatch
                   styleId={s.id}
                   className="size-full transition-transform duration-500 ease-out group-hover:scale-[1.06]"
                   iconSize={30}
                 />
-                <span className="absolute left-2 top-2 rounded-full bg-ink/75 px-2 py-0.5 text-[11px] font-semibold text-paper">
+                <span className="absolute left-2 top-2 rounded-full bg-strip/75 px-2 py-0.5 text-[11px] font-semibold text-fg">
                   {CATEGORY_LABEL[s.category]}
                 </span>
                 {on && (
-                  <span className="absolute right-2 top-2 flex size-6 items-center justify-center rounded-full border-[1.5px] border-ink bg-accent text-white">
+                  <span className="absolute right-2 top-2 flex size-6 items-center justify-center rounded-full bg-accent text-canvas">
                     <Check className="size-3.5" strokeWidth={3} />
                   </span>
                 )}
               </span>
               <span className="flex flex-col gap-0.5 px-3 pb-2.5 pt-2">
                 <span className="text-sm font-semibold leading-tight">{s.name}</span>
-                <span className="text-xs leading-snug text-ink-2">{s.niche}</span>
+                <span className="text-xs leading-snug text-fg-2">{s.niche}</span>
               </span>
             </button>
           )

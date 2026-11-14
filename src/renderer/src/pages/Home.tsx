@@ -39,8 +39,8 @@ function joinList(items: string[]): string {
 }
 
 const ASPECTS: SelectOption<AspectRatio>[] = [
-  { value: '16:9', label: '16:9 · YouTube', icon: <span className="block h-[10px] w-[17px] rounded-[2px] border-[1.5px] border-ink" /> },
-  { value: '9:16', label: '9:16 · Shorts', icon: <span className="mx-[3px] block h-[16px] w-[10px] rounded-[2px] border-[1.5px] border-ink" /> }
+  { value: '16:9', label: '16:9 · YouTube', icon: <span className="block h-[10px] w-[17px] rounded-[2px] border border-edge" /> },
+  { value: '9:16', label: '9:16 · Shorts', icon: <span className="mx-[3px] block h-[16px] w-[10px] rounded-[2px] border border-edge" /> }
 ]
 
 export function Home() {
@@ -155,9 +155,9 @@ export function Home() {
 
   return (
     <div className="flex h-full flex-col">
-      <header className="flex h-[68px] shrink-0 items-center gap-6 border-b border-line bg-surface px-8">
+      <header className="flex h-[68px] shrink-0 items-center gap-6 border-b border-line bg-panel px-8">
         <Logo />
-        <label className="flex h-10 w-[360px] items-center gap-2 rounded-full border border-line bg-sand px-3.5 text-muted">
+        <label className="flex h-10 w-[360px] items-center gap-2 rounded-full border border-line bg-raised px-3.5 text-muted">
           <Search className="size-[18px]" />
           <input
             type="search"
@@ -165,7 +165,7 @@ export function Home() {
             onChange={(e) => setQuery(e.target.value)}
             placeholder="Cari proyek"
             aria-label="Cari proyek"
-            className="flex-1 bg-transparent text-sm text-ink outline-none"
+            className="flex-1 bg-transparent text-sm text-fg outline-none"
           />
         </label>
         <div className="flex-1" />
@@ -178,7 +178,7 @@ export function Home() {
       <main className="scroll-thin flex-1 overflow-y-auto">
         <div className="mx-auto flex max-w-[1280px] flex-col gap-5 px-12 pt-11">
           {setupIssues.length > 0 && (
-            <div className="flex items-center gap-3 rounded-2xl border border-sun bg-sun-soft px-4 py-3 text-sm text-sun-ink">
+            <div className="flex items-center gap-3 rounded-[14px] border border-sun bg-sun-soft px-4 py-3 text-sm text-sun-ink">
               <AlertTriangle className="size-[18px] shrink-0" />
               <span className="flex-1">
                 Sebelum mulai, atur dulu {joinList(setupIssues.map((i) => i.what))} di Pengaturan. Tanpa itu,{' '}
@@ -191,12 +191,12 @@ export function Home() {
           )}
           <div>
             <h1 className="font-display text-[46px] font-bold leading-[1.08] tracking-[-0.025em]">Mau bikin video apa hari ini?</h1>
-            <p className="mt-3 text-[17px] text-ink-2">
+            <p className="mt-3 text-[17px] text-fg-2">
               Tulis idenya. AI menyusun klip, naskah, dan suaranya, lalu kamu tinggal merapikan di editor.
             </p>
           </div>
-          <div className="flex flex-col gap-3 rounded-[18px] border-[1.5px] border-ink bg-surface py-5 pl-6 pr-5 shadow-ink-lg">
-            <label htmlFor="ide" className="text-[13px] font-semibold text-ink-2">
+          <div className="flex flex-col gap-3 rounded-[18px] border border-edge bg-panel py-5 pl-6 pr-5 shadow-pop">
+            <label htmlFor="ide" className="text-[13px] font-semibold text-fg-2">
               Ide cerita atau sinopsis
             </label>
             <textarea
@@ -233,14 +233,14 @@ export function Home() {
               </Button>
             </div>
           </div>
-          <div className="flex flex-wrap items-center gap-2 text-[13px] text-ink-2">
+          <div className="flex flex-wrap items-center gap-2 text-[13px] text-fg-2">
             <span>Coba ide ini:</span>
             {SUGGESTIONS.map((s) => (
               <button
                 key={s}
                 type="button"
                 onClick={() => setSynopsis(s)}
-                className="h-9 rounded-full border border-dashed border-line-3 px-3.5 text-[13px] text-ink-2 hover:border-ink-2 hover:text-ink"
+                className="h-9 rounded-full border border-dashed border-line-3 px-3.5 text-[13px] text-fg-2 hover:border-edge hover:text-fg"
               >
                 {s}
               </button>
@@ -268,19 +268,19 @@ export function Home() {
             <button
               type="button"
               onClick={() => void start()}
-              className="flex min-h-[262px] flex-col items-center justify-center gap-2.5 rounded-2xl border-[1.5px] border-dashed border-line-3 text-ink-2 hover:border-ink-2 hover:bg-surface"
+              className="flex min-h-[262px] flex-col items-center justify-center gap-2.5 rounded-[14px] border border-dashed border-line-3 text-fg-2 hover:border-edge hover:bg-panel"
             >
-              <span className="flex size-[54px] items-center justify-center rounded-full border-[1.5px] border-ink bg-accent text-white shadow-ink">
+              <span className="flex size-[54px] items-center justify-center rounded-full bg-accent text-canvas">
                 <Plus className="size-6" strokeWidth={2.2} />
               </span>
-              <span className="text-base font-semibold text-ink">Proyek baru</span>
+              <span className="text-base font-semibold text-fg">Proyek baru</span>
               <span className="text-[13px]">Mulai dari ide atau sinopsis</span>
             </button>
 
             {visible.map((p) => {
               const st = STATUS[p.status]
               return (
-                <article key={p.id} className="flex flex-col overflow-hidden rounded-2xl border border-line bg-surface">
+                <article key={p.id} className="flex flex-col overflow-hidden rounded-[14px] border border-line bg-panel">
                   <button type="button" onClick={() => go({ name: 'project', id: p.id })} className="text-left">
                     <div className="relative aspect-video w-full overflow-hidden border-b border-line">
                       {p.coverUrl ? (
@@ -288,11 +288,11 @@ export function Home() {
                       ) : (
                         <StyleSwatch styleId={p.styleId} className="size-full" iconSize={40} />
                       )}
-                      <span className="absolute left-2.5 top-2.5 rounded-full border border-ink bg-surface px-2.5 py-[3px] text-xs font-semibold">
+                      <span className="absolute left-2.5 top-2.5 rounded-full border border-edge bg-panel px-2.5 py-[3px] text-xs font-semibold">
                         {getStyle(p.styleId).name}
                       </span>
                       {p.totalMs > 0 && (
-                        <span className="absolute bottom-2.5 right-2.5 rounded-md bg-ink px-2 py-[3px] font-mono text-xs text-paper">
+                        <span className="absolute bottom-2.5 right-2.5 rounded-md bg-select px-2 py-[3px] font-mono text-xs text-fg">
                           {mmss(p.totalMs)}
                         </span>
                       )}

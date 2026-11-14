@@ -46,7 +46,7 @@ function Section({ title, children, className }: { title: string; children: Reac
 function Slider({ label, value, min, max, unit, onChange }: { label: string; value: number; min: number; max: number; unit: string; onChange: (v: number) => void }) {
   return (
     <label className="flex items-center gap-3 text-[13px]">
-      <span className="w-20 text-ink-2">{label}</span>
+      <span className="w-20 text-fg-2">{label}</span>
       <input type="range" min={min} max={max} step={1} value={value} onChange={(e) => onChange(Number(e.target.value))} aria-label={label} className="flex-1" />
       <span className="w-12 text-right font-mono">
         {value}
@@ -59,7 +59,7 @@ function Slider({ label, value, min, max, unit, onChange }: { label: string; val
 function PositionGrid({ o, aspect }: { o: Overlay; aspect: number }) {
   return (
     <div className="flex items-center gap-3">
-      <div className="grid grid-cols-3 gap-1 rounded-xl border border-line-2 bg-paper p-1.5" role="group" aria-label="Posisi overlay">
+      <div className="grid grid-cols-3 gap-1 rounded-lg border border-line-2 bg-canvas p-1.5" role="group" aria-label="Posisi overlay">
         {ANCHOR_GRID.map((a) => {
           const on = o.anchor === a
           return (
@@ -70,7 +70,7 @@ function PositionGrid({ o, aspect }: { o: Overlay; aspect: number }) {
               aria-label={ANCHOR_NAMES[a]}
               title={ANCHOR_NAMES[a]}
               onClick={() => updateOverlay(o.id, { anchor: a, ...anchorPoint(a, aspect) })}
-              className={cx('flex size-8 items-center justify-center rounded-lg', on ? 'bg-ink' : 'hover:bg-sand')}
+              className={cx('flex size-8 items-center justify-center rounded-lg', on ? 'bg-select' : 'hover:bg-raised')}
             >
               <span className={cx('size-2 rounded-full', on ? 'bg-accent' : 'bg-line-3')} />
             </button>
@@ -107,7 +107,7 @@ function TimeRange({ o, total }: { o: Overlay; total: number }) {
           {(['start', 'end'] as const).map((k) => {
             const value = k === 'start' ? o.start : overlayEnd(o, total)
             return (
-              <label key={k} className="flex flex-col gap-1 text-xs text-ink-2">
+              <label key={k} className="flex flex-col gap-1 text-xs text-fg-2">
                 {k === 'start' ? 'Mulai (detik)' : 'Selesai (detik)'}
                 <input
                   type="number"
@@ -129,7 +129,7 @@ function TimeRange({ o, total }: { o: Overlay; total: number }) {
                     if (k === 'start') updateOverlay(o.id, { start: Math.min(now, overlayEnd(o, total) - 0.1) })
                     else updateOverlay(o.id, { end: Math.max(now, o.start + 0.1) })
                   }}
-                  className="self-start text-xs font-semibold text-accent-dark hover:underline"
+                  className="self-start text-xs font-semibold text-link hover:underline"
                 >
                   Pakai posisi playhead
                 </button>
@@ -165,15 +165,15 @@ function TextSettings({ o }: { o: TextOverlay }) {
         className={cx(inputCls, 'py-2 text-sm leading-relaxed')}
       />
       <div className="flex items-center gap-3">
-        <span className="w-14 text-[13px] text-ink-2">Ukuran</span>
+        <span className="w-14 text-[13px] text-fg-2">Ukuran</span>
         <Segmented size="sm" value={size.id} onChange={(id) => updateOverlay(o.id, { size: TEXT_SIZES.find((s) => s.id === id)!.size })} options={TEXT_SIZES} />
       </div>
       <div className="flex items-center gap-3">
-        <span className="w-14 text-[13px] text-ink-2">Gaya</span>
+        <span className="w-14 text-[13px] text-fg-2">Gaya</span>
         <Segmented size="sm" value={o.style} onChange={(v) => updateOverlay(o.id, { style: v })} options={TEXT_STYLES} />
       </div>
       <div className="flex items-center gap-3">
-        <span className="w-14 text-[13px] text-ink-2">Warna</span>
+        <span className="w-14 text-[13px] text-fg-2">Warna</span>
         <div className="flex gap-1.5">
           {TEXT_COLORS.map((c) => (
             <button
@@ -182,14 +182,14 @@ function TextSettings({ o }: { o: TextOverlay }) {
               aria-label={`Warna ${c}`}
               aria-pressed={o.color === c}
               onClick={() => updateOverlay(o.id, { color: c })}
-              className={cx('size-7 rounded-full border', o.color === c ? 'border-ink ring-2 ring-accent ring-offset-2 ring-offset-surface' : 'border-line-3')}
+              className={cx('size-7 rounded-full border', o.color === c ? 'border-edge ring-2 ring-accent ring-offset-2 ring-offset-panel' : 'border-line-3')}
               style={{ background: c }}
             />
           ))}
         </div>
       </div>
       <div className="flex items-center gap-3">
-        <span className="flex-1 text-[13px] text-ink-2">Huruf tebal</span>
+        <span className="flex-1 text-[13px] text-fg-2">Huruf tebal</span>
         <Switch on={o.bold} onChange={(v) => updateOverlay(o.id, { bold: v })} label="Huruf tebal" />
       </div>
     </Section>
@@ -245,7 +245,7 @@ export function OverlayPanel({ total }: { total: number }) {
           <button
             type="button"
             onClick={() => void addImage()}
-            className="flex flex-col items-center gap-1.5 rounded-xl border border-line-2 bg-surface px-2 py-3 text-center hover:border-ink-2"
+            className="flex flex-col items-center gap-1.5 rounded-lg border border-line-2 bg-panel px-2 py-3 text-center hover:border-edge"
           >
             <ImagePlus className="size-5" />
             <span className="text-[13px] font-semibold">Logo / gambar</span>
@@ -254,7 +254,7 @@ export function OverlayPanel({ total }: { total: number }) {
           <button
             type="button"
             onClick={addText}
-            className="flex flex-col items-center gap-1.5 rounded-xl border border-line-2 bg-surface px-2 py-3 text-center hover:border-ink-2"
+            className="flex flex-col items-center gap-1.5 rounded-lg border border-line-2 bg-panel px-2 py-3 text-center hover:border-edge"
           >
             <Type className="size-5" />
             <span className="text-[13px] font-semibold">Teks</span>
@@ -272,7 +272,7 @@ export function OverlayPanel({ total }: { total: number }) {
               return (
                 <div
                   key={o.id}
-                  className={cx('flex items-center gap-2.5 rounded-xl border px-2 py-1.5', on ? 'border-accent bg-accent-soft' : 'border-line-2 hover:border-ink-2')}
+                  className={cx('flex items-center gap-2.5 rounded-lg border px-2 py-1.5', on ? 'border-accent bg-accent-soft' : 'border-line-2 hover:border-edge')}
                 >
                   <button type="button" onClick={() => pick(o)} aria-pressed={on} className="flex min-w-0 flex-1 items-center gap-2.5 text-left">
                     <span className="flex size-9 shrink-0 items-center justify-center overflow-hidden rounded-lg border border-line bg-[repeating-conic-gradient(#EFEAE2_0_25%,#FFFFFF_0_50%)] bg-[length:10px_10px]">
@@ -293,7 +293,7 @@ export function OverlayPanel({ total }: { total: number }) {
             })}
           </div>
         ) : (
-          <p className="text-[13px] text-ink-2">Belum ada overlay. Tambahkan logo sebagai watermark, atau teks yang tampil di waktu tertentu.</p>
+          <p className="text-[13px] text-fg-2">Belum ada overlay. Tambahkan logo sebagai watermark, atau teks yang tampil di waktu tertentu.</p>
         )}
       </Section>
 

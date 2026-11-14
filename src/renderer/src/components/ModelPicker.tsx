@@ -168,8 +168,8 @@ export function ModelPicker({
         aria-expanded={open}
         onClick={() => setOpen(!open)}
         className={cx(
-          'flex h-12 w-full items-center gap-3 rounded-xl border bg-surface px-3.5 text-left transition-colors disabled:opacity-50',
-          open ? 'border-ink' : value ? 'border-line-2 hover:border-ink-2' : 'border-[1.5px] border-accent bg-accent-soft'
+          'flex h-12 w-full items-center gap-3 rounded-lg border bg-panel px-3.5 text-left transition-colors disabled:opacity-50',
+          open ? 'border-edge' : value ? 'border-line-2 hover:border-edge' : 'border border-accent bg-accent-soft'
         )}
       >
         {renderIcon && current && renderIcon(current)}
@@ -182,11 +182,11 @@ export function ModelPicker({
                 : current && current.name !== value && <span className="truncate font-mono text-xs text-muted">{value}</span>}
             </>
           ) : (
-            <span className="text-[15px] font-semibold text-accent-dark">{loading ? 'Memuat daftar model…' : placeholder}</span>
+            <span className="text-[15px] font-semibold text-link">{loading ? 'Memuat daftar model…' : placeholder}</span>
           )}
         </span>
         {current && ctxLabel(current.contextLength) && (
-          <span className="shrink-0 rounded-md bg-sand px-1.5 py-0.5 font-mono text-[11px] text-ink-2">{ctxLabel(current.contextLength)}</span>
+          <span className="shrink-0 rounded-md bg-raised px-1.5 py-0.5 font-mono text-[11px] text-fg-2">{ctxLabel(current.contextLength)}</span>
         )}
         {loading ? <Spinner className="size-4 text-muted" /> : <ChevronDown className={cx('size-4 shrink-0 transition-transform', open && 'rotate-180')} />}
       </button>
@@ -194,7 +194,7 @@ export function ModelPicker({
       {open && (
         <div
           className={cx(
-            'absolute z-40 flex min-w-full flex-col overflow-hidden rounded-2xl border-[1.5px] border-ink bg-surface shadow-ink-lg',
+            'absolute z-40 flex min-w-full flex-col overflow-hidden rounded-[14px] border border-edge bg-panel shadow-pop',
             align === 'right' ? 'right-0' : 'left-0',
             menu.up ? 'bottom-full mb-1.5' : 'top-full mt-1.5',
             menuClassName
@@ -202,7 +202,7 @@ export function ModelPicker({
           style={{ maxHeight: menu.max }}
         >
           <div className="flex flex-col gap-2 border-b border-line p-2.5">
-            <label className="flex h-10 items-center gap-2 rounded-xl border border-line-2 bg-paper px-3 focus-within:border-ink">
+            <label className="flex h-10 items-center gap-2 rounded-lg border border-line-2 bg-canvas px-3 focus-within:border-edge">
               <Search className="size-4 shrink-0 text-muted" />
               <input
                 ref={input}
@@ -217,7 +217,7 @@ export function ModelPicker({
                 className="flex-1 bg-transparent text-sm outline-none"
               />
               {query && (
-                <button type="button" aria-label="Hapus pencarian" onClick={() => setQuery('')} className="text-muted hover:text-ink">
+                <button type="button" aria-label="Hapus pencarian" onClick={() => setQuery('')} className="text-muted hover:text-fg">
                   <X className="size-4" />
                 </button>
               )}
@@ -234,7 +234,7 @@ export function ModelPicker({
                       onClick={() => setTags(on ? tags.filter((x) => x !== t) : [...tags, t])}
                       className={cx(
                         'h-7 rounded-full border px-2.5 text-xs font-medium',
-                        on ? 'border-ink bg-ink text-paper' : 'border-line-2 text-ink-2 hover:border-ink-2'
+                        on ? 'border-edge bg-select text-fg' : 'border-line-2 text-fg-2 hover:border-edge'
                       )}
                     >
                       {t}
@@ -248,7 +248,7 @@ export function ModelPicker({
                     onClick={() => setCheapFirst(!cheapFirst)}
                     className={cx(
                       'ml-auto inline-flex h-7 items-center gap-1 rounded-full border px-2.5 text-xs font-medium',
-                      cheapFirst ? 'border-ink bg-ink text-paper' : 'border-line-2 text-ink-2 hover:border-ink-2'
+                      cheapFirst ? 'border-edge bg-select text-fg' : 'border-line-2 text-fg-2 hover:border-edge'
                     )}
                   >
                     <ArrowDownNarrowWide className="size-3.5" />
@@ -260,9 +260,9 @@ export function ModelPicker({
           </div>
 
           <div ref={list} id="model-list" role="listbox" className="scroll-thin min-h-0 flex-1 overflow-y-auto p-1.5">
-            {error && <p className="m-1 rounded-xl bg-bad-soft px-3 py-2.5 text-[13px] text-bad-ink">{error}</p>}
+            {error && <p className="m-1 rounded-lg bg-bad-soft px-3 py-2.5 text-[13px] text-bad-ink">{error}</p>}
             {!error && loading && !models.length && (
-              <p className="flex items-center gap-2 px-3 py-4 text-sm text-ink-2">
+              <p className="flex items-center gap-2 px-3 py-4 text-sm text-fg-2">
                 <Spinner />
                 Mengambil daftar model dari penyedia…
               </p>
@@ -290,8 +290,8 @@ export function ModelPicker({
                   title={m.locked ?? (detail === 'description' ? m.id : undefined)}
                   // The chosen model is marked by its background, which keeps the list narrow.
                   className={cx(
-                    'flex w-full items-start gap-2.5 rounded-xl px-3 py-2 text-left',
-                    m.locked ? 'cursor-not-allowed opacity-50' : selected ? 'bg-sun-soft' : i === active ? 'bg-sand' : 'hover:bg-sand/60'
+                    'flex w-full items-start gap-2.5 rounded-lg px-3 py-2 text-left',
+                    m.locked ? 'cursor-not-allowed opacity-50' : selected ? 'bg-select' : i === active ? 'bg-raised' : 'hover:bg-raised/60'
                   )}
                 >
                   {renderIcon?.(m)}
@@ -303,20 +303,20 @@ export function ModelPicker({
                         // Description rows already say what the tags say; one keeps names readable.
                         .slice(0, detail === 'description' ? 1 : 3)
                         .map((t) => (
-                          <span key={t} className="shrink-0 rounded-full bg-draft px-1.5 py-px text-[10.5px] font-semibold text-ink-2">
+                          <span key={t} className="shrink-0 rounded-full bg-draft px-1.5 py-px text-[10.5px] font-semibold text-fg-2">
                             {t}
                           </span>
                         ))}
                     </span>
                     {m.locked ? (
-                      <span className="truncate text-[12px] text-ink-2">{m.locked}</span>
+                      <span className="truncate text-[12px] text-fg-2">{m.locked}</span>
                     ) : detail === 'description' ? (
-                      m.description && <span className="truncate text-[12px] text-ink-2">{m.description}</span>
+                      m.description && <span className="truncate text-[12px] text-fg-2">{m.description}</span>
                     ) : (
                       m.name !== m.id && <span className="truncate font-mono text-[11.5px] text-muted">{m.id}</span>
                     )}
                   </span>
-                  <span className="flex shrink-0 flex-col items-end gap-0.5 text-[11.5px] text-ink-2">
+                  <span className="flex shrink-0 flex-col items-end gap-0.5 text-[11.5px] text-fg-2">
                     {ctxLabel(m.contextLength) && <span className="font-mono">{ctxLabel(m.contextLength)} konteks</span>}
                     {price && <span className={cx('font-mono', price === 'Gratis' && 'font-semibold text-ok-ink')}>{price}</span>}
                     {m.creditUnit !== undefined &&
@@ -325,12 +325,12 @@ export function ModelPicker({
                         <Spinner className="mt-1 size-3.5 text-muted" />
                       ) : m.credits !== null ? (
                         <>
-                          <span className="font-mono text-[12.5px] font-semibold text-ink">{creditLabel(m.credits)} kr</span>
+                          <span className="font-mono text-[12.5px] font-semibold text-fg">{creditLabel(m.credits)} kr</span>
                           <span className="font-mono text-muted">{[m.creditUnit, m.usd != null && usdLabel(m.usd)].filter(Boolean).join(' · ')}</span>
                         </>
                       ) : m.usd != null ? (
                         <>
-                          <span className="font-mono text-[12.5px] font-semibold text-ink">{usdLabel(m.usd)}</span>
+                          <span className="font-mono text-[12.5px] font-semibold text-fg">{usdLabel(m.usd)}</span>
                           {m.creditUnit && <span className="font-mono text-muted">{m.creditUnit}</span>}
                         </>
                       ) : (
@@ -349,7 +349,7 @@ export function ModelPicker({
                 data-row={filtered.length}
                 onMouseEnter={() => setActive(filtered.length)}
                 onClick={() => pick(customId)}
-                className={cx('flex w-full items-center gap-2.5 rounded-xl px-3 py-2.5 text-left text-sm', active === filtered.length ? 'bg-sand' : 'hover:bg-sand/60')}
+                className={cx('flex w-full items-center gap-2.5 rounded-lg px-3 py-2.5 text-left text-sm', active === filtered.length ? 'bg-raised' : 'hover:bg-raised/60')}
               >
                 <span className="size-4" />
                 Pakai model <span className="font-mono font-semibold">{customId}</span>
@@ -360,7 +360,7 @@ export function ModelPicker({
             )}
           </div>
 
-          <div className="flex items-center gap-2 border-t border-line bg-paper px-3 py-2 text-xs text-muted">
+          <div className="flex items-center gap-2 border-t border-line bg-canvas px-3 py-2 text-xs text-muted">
             <span className="flex-1">
               {filtered.length.toLocaleString('id-ID')} dari {models.length.toLocaleString('id-ID')} model
               {models.some((m) => m.priceIn != null) && ' · harga per 1 juta token (masuk / keluar)'}
@@ -368,7 +368,7 @@ export function ModelPicker({
               {fetchedAt ? ` · diperbarui ${relativeTime(fetchedAt)}` : ''}
             </span>
             {onRefresh && (
-              <button type="button" onClick={onRefresh} disabled={loading} className="inline-flex items-center gap-1 font-semibold text-ink-2 hover:text-ink disabled:opacity-50">
+              <button type="button" onClick={onRefresh} disabled={loading} className="inline-flex items-center gap-1 font-semibold text-fg-2 hover:text-fg disabled:opacity-50">
                 <RefreshCw className={cx('size-3.5', loading && 'animate-[spin_0.8s_linear_infinite]')} />
                 Muat ulang
               </button>

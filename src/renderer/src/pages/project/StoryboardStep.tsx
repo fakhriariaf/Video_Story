@@ -93,7 +93,7 @@ function MotionPreview({ image, clip }: { image: Asset; clip: Clip }) {
         type="button"
         aria-pressed={playing}
         onClick={() => setPlaying(!playing)}
-        className="absolute right-2.5 top-2.5 inline-flex h-8 items-center gap-1.5 rounded-full bg-ink/80 px-3 text-xs font-medium text-paper hover:bg-ink"
+        className="absolute right-2.5 top-2.5 inline-flex h-8 items-center gap-1.5 rounded-full bg-strip/80 px-3 text-xs font-medium text-fg hover:bg-select"
       >
         {playing ? <Pause className="size-3.5" /> : <Play className="size-3.5" />}
         {playing ? 'Jeda pratinjau' : 'Putar pratinjau'}
@@ -150,7 +150,7 @@ function ClipPanel({ clip, index, total }: { clip: Clip; index: number; total: n
   const aspect = project.aspectRatio === '9:16' ? 'aspect-[9/16] h-[min(300px,40vh)] mx-auto' : 'aspect-video h-[min(282px,36vh)] max-w-full mx-auto'
 
   return (
-    <aside className="flex min-h-0 flex-col border-l border-line bg-surface">
+    <aside className="flex min-h-0 flex-col border-l border-line bg-panel">
       <div className="flex h-16 shrink-0 items-center gap-2.5 border-b border-line pl-5 pr-4">
         <div className="flex min-w-0 flex-1 flex-col">
           <span className="font-mono text-xs text-muted">
@@ -160,7 +160,7 @@ function ClipPanel({ clip, index, total }: { clip: Clip; index: number; total: n
             value={clip.title}
             onChange={(e) => updateClip(clip.id, { title: e.target.value })}
             aria-label="Judul klip"
-            className="-ml-1 rounded-md bg-transparent px-1 font-display text-[19px] font-bold outline-none hover:bg-sand focus:bg-sand"
+            className="-ml-1 rounded-md bg-transparent px-1 font-display text-[19px] font-bold outline-none hover:bg-raised focus:bg-raised"
           />
         </div>
         <IconButton label="Klip sebelumnya" size={38} disabled={index === 0} onClick={() => select(clips[index - 1].id)}>
@@ -186,7 +186,7 @@ function ClipPanel({ clip, index, total }: { clip: Clip; index: number; total: n
 
       {/* The preview stays put while the settings below it scroll. */}
       <div className="shrink-0 border-b border-line px-5 pb-3.5 pt-4">
-        <div className={cx('relative overflow-hidden rounded-xl border-[1.5px] border-ink bg-paper', aspect)}>
+        <div className={cx('relative overflow-hidden rounded-lg border border-edge bg-canvas', aspect)}>
           {image && !isRunning(imageJob) && clip.motionType === 'camera' ? (
             <MotionPreview image={image} clip={clip} />
           ) : (
@@ -200,7 +200,7 @@ function ClipPanel({ clip, index, total }: { clip: Clip; index: number; total: n
             </div>
           )}
           {versions.length > 1 && (
-            <div className="absolute bottom-2.5 left-2.5 flex items-center gap-1.5 rounded-[10px] border border-ink bg-surface/95 p-1.5">
+            <div className="absolute bottom-2.5 left-2.5 flex items-center gap-1.5 rounded-lg border border-edge bg-panel/95 p-1.5">
               {versions.slice(-5).map((v, i, arr) => (
                 <button
                   key={v.id}
@@ -278,10 +278,10 @@ function ClipPanel({ clip, index, total }: { clip: Clip; index: number; total: n
                     }
                     className={cx(
                       'inline-flex h-9 items-center gap-2 whitespace-nowrap rounded-full border py-0 pl-1 pr-3 text-[13px] font-medium transition-colors',
-                      on ? 'border-ink bg-ink text-paper' : 'border-line-2 bg-surface text-ink hover:border-ink-2'
+                      on ? 'border-edge bg-select text-fg' : 'border-line-2 bg-panel text-fg hover:border-edge'
                     )}
                   >
-                    <CharacterAvatar name={c.name} sheetUrl={sheet?.url} size={28} className={on ? 'border-paper/70' : undefined} />
+                    <CharacterAvatar name={c.name} sheetUrl={sheet?.url} size={28} className={on ? 'border-fg/70' : undefined} />
                     {c.name}
                   </button>
                 )
@@ -297,8 +297,8 @@ function ClipPanel({ clip, index, total }: { clip: Clip; index: number; total: n
             </label>
             <span className="text-xs text-muted">untuk TTS</span>
             <span className="flex-1" />
-            <span className="text-xs text-ink-2">{voiceName}</span>
-            <span className="rounded-md bg-sand px-1.5 py-0.5 font-mono text-xs text-ink-2">
+            <span className="text-xs text-fg-2">{voiceName}</span>
+            <span className="rounded-md bg-raised px-1.5 py-0.5 font-mono text-xs text-fg-2">
               {voice?.durationMs ? secLabel(voice.durationMs) : 'Belum ada suara'}
             </span>
           </div>
@@ -323,7 +323,7 @@ function ClipPanel({ clip, index, total }: { clip: Clip; index: number; total: n
             {narration.running ? (
               <span className="text-xs text-sun-ink">Suara narasi sedang dibuat…</span>
             ) : narrationChanged ? (
-              <span className="text-xs text-accent-dark">
+              <span className="text-xs text-link">
                 Naskah berubah.{' '}
                 <button type="button" onClick={() => void narration.start()} className="font-semibold underline">
                   Rekam ulang suara narasi
@@ -341,7 +341,7 @@ function ClipPanel({ clip, index, total }: { clip: Clip; index: number; total: n
             {(
               [
                 { id: 'camera', title: 'Gerak kamera', sub: 'Gratis · dirender di komputer', icon: <Move className="size-[22px]" />, subCls: 'text-ok-ink' },
-                { id: 'video', title: 'Video AI', sub: videoCostNote, icon: <Film className="size-[22px]" />, subCls: 'text-ink-2' }
+                { id: 'video', title: 'Video AI', sub: videoCostNote, icon: <Film className="size-[22px]" />, subCls: 'text-fg-2' }
               ] as const
             ).map((o) => {
               const on = clip.motionType === o.id
@@ -352,8 +352,8 @@ function ClipPanel({ clip, index, total }: { clip: Clip; index: number; total: n
                   aria-pressed={on}
                   onClick={() => updateClip(clip.id, { motionType: o.id })}
                   className={cx(
-                    'flex items-center gap-2.5 rounded-xl px-3 py-2 text-left',
-                    on ? 'border-2 border-accent bg-accent-soft' : 'border border-line-2 bg-surface hover:border-ink-2'
+                    'flex items-center gap-2.5 rounded-lg px-3 py-2 text-left',
+                    on ? 'border-2 border-accent bg-accent-soft' : 'border border-line-2 bg-panel hover:border-edge'
                   )}
                 >
                   {o.icon}
@@ -396,7 +396,7 @@ function ClipPanel({ clip, index, total }: { clip: Clip; index: number; total: n
                 </p>
               )}
               {project && (
-                <div className="flex items-center gap-1.5 text-xs text-ink-2">
+                <div className="flex items-center gap-1.5 text-xs text-fg-2">
                   <Film className="size-3.5 shrink-0" />
                   <span className="truncate">
                     {getVideoModel(project.videoModel).name} · video {fitDuration(getVideoModel(project.videoModel), clip.durationMs / 1000)} detik
@@ -406,7 +406,7 @@ function ClipPanel({ clip, index, total }: { clip: Clip; index: number; total: n
                   <button
                     type="button"
                     onClick={() => updateProject({ step: 1 })}
-                    className="shrink-0 font-semibold text-accent-dark hover:underline"
+                    className="shrink-0 font-semibold text-link hover:underline"
                   >
                     Ganti model
                   </button>
@@ -564,7 +564,7 @@ export function StoryboardStep() {
     return (
       <div className="flex h-full flex-col items-center justify-center gap-4 text-center">
         <h2 className="font-display text-3xl font-bold">Storyboard masih kosong</h2>
-        <p className="max-w-md text-ink-2">Tulis naskahnya dulu di langkah Naskah, lalu buat visual tiap adegan. Kamu juga bisa menambah klip sendiri.</p>
+        <p className="max-w-md text-fg-2">Tulis naskahnya dulu di langkah Naskah, lalu buat visual tiap adegan. Kamu juga bisa menambah klip sendiri.</p>
         <div className="flex gap-2.5">
           <Button onClick={() => updateProject({ step: 2 })}>Ke Naskah</Button>
           <Button variant="primary" icon={<Plus className="size-4" />} onClick={() => addClip(null)}>
@@ -576,8 +576,8 @@ export function StoryboardStep() {
 
   return (
     <div className="grid h-full grid-rows-[64px_minmax(0,1fr)_80px]">
-      <div className="flex items-center gap-2 border-b border-line bg-paper px-6">
-        <span className="mr-1 text-[13px] font-semibold text-ink-2">Pemeran</span>
+      <div className="flex items-center gap-2 border-b border-line bg-canvas px-6">
+        <span className="mr-1 text-[13px] font-semibold text-fg-2">Pemeran</span>
         <div className="scroll-thin flex min-w-0 gap-2 overflow-x-auto py-1">
           {characters.map((c) => {
             const sheet = c.sheetAssetId ? assets[c.sheetAssetId] : null
@@ -587,7 +587,7 @@ export function StoryboardStep() {
                 key={c.id}
                 type="button"
                 onClick={() => setOpenChar(c.id)}
-                className="inline-flex h-10 shrink-0 items-center gap-2 rounded-full border border-line-2 bg-surface py-0 pl-1 pr-3 text-[13px] font-medium hover:border-ink-2"
+                className="inline-flex h-10 shrink-0 items-center gap-2 rounded-full border border-line-2 bg-panel py-0 pl-1 pr-3 text-[13px] font-medium hover:border-edge"
               >
                 <CharacterAvatar name={c.name} sheetUrl={sheet?.url} size={32} busy={running} />
                 {c.name}
@@ -598,7 +598,7 @@ export function StoryboardStep() {
           <button
             type="button"
             onClick={() => setOpenChar('new')}
-            className="inline-flex h-10 shrink-0 items-center gap-1.5 rounded-full border border-dashed border-line-3 px-3.5 text-[13px] font-medium text-ink-2 hover:border-ink-2"
+            className="inline-flex h-10 shrink-0 items-center gap-1.5 rounded-full border border-dashed border-line-3 px-3.5 text-[13px] font-medium text-fg-2 hover:border-edge"
           >
             <Plus className="size-[15px]" />
             Tambah pemeran
@@ -621,17 +621,17 @@ export function StoryboardStep() {
                 : 'Rekam ulang suara narasi'}
         </Button>
         <Button
-          className="border-[1.5px] border-ink font-semibold"
+          className="border border-edge font-semibold"
           icon={<ImageIcon className="size-[17px]" />}
           disabled={!stats.needImg}
           onClick={() => void bulk(() => window.api.generate.missingImages(project.id))}
         >
           Generate {stats.needImg} gambar
-          {costLabel(imageCost) && stats.needImg > 0 && <span className="font-normal text-ink-2">≈ {costLabel(imageCost, stats.needImg)}</span>}
+          {costLabel(imageCost) && stats.needImg > 0 && <span className="font-normal text-fg-2">≈ {costLabel(imageCost, stats.needImg)}</span>}
         </Button>
         {readyForVideo && (
           <Button
-            variant="primary"
+            variant="accent"
             icon={<Clapperboard className="size-[17px]" />}
             loading={stats.videoRunning > 0}
             disabled={stats.videoRunning > 0 || stats.needVideo.length === 0}
@@ -644,7 +644,7 @@ export function StoryboardStep() {
                 ? 'Semua klip sudah video'
                 : `Jadikan ${stats.needVideo.length} video`}
             {stats.videoRunning === 0 && costLabel(videoCost) && stats.needVideo.length > 0 && (
-              <span className="font-normal text-white/80">≈ {costLabel(videoCost)}</span>
+              <span className="font-normal opacity-80">≈ {costLabel(videoCost)}</span>
             )}
           </Button>
         )}
@@ -663,7 +663,7 @@ export function StoryboardStep() {
             </Button>
           </div>
           {stale > 0 && (
-            <div className="flex items-center gap-3 rounded-2xl border border-sun bg-sun-soft px-4 py-3 text-sm text-sun-ink">
+            <div className="flex items-center gap-3 rounded-[14px] border border-sun bg-sun-soft px-4 py-3 text-sm text-sun-ink">
               <Sparkles className="size-[18px] shrink-0" />
               <span className="flex-1">
                 {stale} adegan belum punya visual dari naskah terbaru. Buat visualnya dulu supaya gambar sesuai dengan alur cerita.
@@ -686,24 +686,24 @@ export function StoryboardStep() {
                   aria-pressed={on}
                   onClick={() => select(c.id)}
                   className={cx(
-                    'flex flex-col overflow-hidden rounded-[14px] bg-surface text-left',
-                    on ? 'border-2 border-accent shadow-ink-md' : 'border border-line hover:border-line-3'
+                    'flex flex-col overflow-hidden rounded-[14px] bg-panel text-left',
+                    on ? 'border-2 border-accent' : 'border border-line hover:border-line-3'
                   )}
                 >
-                  <div className={cx('relative w-full overflow-hidden bg-paper', project.aspectRatio === '9:16' ? 'aspect-[9/16]' : 'aspect-video')}>
+                  <div className={cx('relative w-full overflow-hidden bg-canvas', project.aspectRatio === '9:16' ? 'aspect-[9/16]' : 'aspect-video')}>
                     <ClipVisual
                       clip={c}
                       image={c.imageAssetId ? assets[c.imageAssetId] : null}
                       video={c.videoAssetId ? assets[c.videoAssetId] : null}
                       job={imageJob}
                     />
-                    <span className="absolute left-2 top-2 rounded-md bg-ink px-[7px] py-0.5 font-mono text-xs text-paper">{clipNumber(i)}</span>
+                    <span className="absolute left-2 top-2 rounded-md bg-select px-[7px] py-0.5 font-mono text-xs text-fg">{clipNumber(i)}</span>
                     {c.motionType === 'video' && (
-                      <span className="absolute right-2 top-2 flex size-6 items-center justify-center rounded-md bg-ink text-paper" title="Video AI">
+                      <span className="absolute right-2 top-2 flex size-6 items-center justify-center rounded-md bg-select text-fg" title="Video AI">
                         <Film className="size-3.5" />
                       </span>
                     )}
-                    <span className="absolute bottom-2 right-2 rounded-md border border-ink bg-surface px-[7px] py-px font-mono text-xs">
+                    <span className="absolute bottom-2 right-2 rounded-md border border-edge bg-panel px-[7px] py-px font-mono text-xs">
                       {mmss(c.durationMs)}
                     </span>
                   </div>
@@ -725,7 +725,7 @@ export function StoryboardStep() {
         {sel && <ClipPanel key={sel.id} clip={sel} index={selIndex} total={clips.length} />}
       </div>
 
-      <footer className="flex items-center gap-4 border-t border-line bg-surface px-6">
+      <footer className="flex items-center gap-4 border-t border-line bg-panel px-6">
         <div className="flex w-[320px] flex-col gap-1.5">
           <div className="flex justify-between text-[13px]">
             <span className="font-semibold">

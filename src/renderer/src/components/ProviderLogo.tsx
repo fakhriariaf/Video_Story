@@ -18,7 +18,7 @@ const LOOK: Record<ProviderLogoId, { bg: string; src?: string; inset: number }> 
   elevenlabs: { bg: '#000000', src: 'elevenlabs.svg', inset: 0.28 },
   higgsfield: { bg: '#D1FE17', src: 'higgsfield.png', inset: 0 },
   fal: { bg: '#000000', src: 'fal.svg', inset: 0.12 },
-  custom: { bg: '#F3EFE8', inset: 0.24 },
+  custom: { bg: 'var(--color-raised)', inset: 0.24 },
   chatgpt: { bg: '#FFFFFF', src: 'openai.svg', inset: 0.2 }
 }
 
@@ -27,14 +27,14 @@ export function ProviderLogo({ id, size = 40, className }: { id: ProviderLogoId;
   const inner = Math.round(size * (1 - look.inset * 2))
   return (
     <span
-      className={cx('flex shrink-0 items-center justify-center overflow-hidden border border-ink', className)}
+      className={cx('flex shrink-0 items-center justify-center overflow-hidden border border-edge', className)}
       style={{ width: size, height: size, background: look.bg, borderRadius: Math.round(size * 0.26) }}
       aria-hidden="true"
     >
       {look.src ? (
         <img src={file(look.src)} alt="" draggable={false} style={{ width: inner, height: inner }} className="object-contain" />
       ) : (
-        <Server style={{ width: inner, height: inner }} strokeWidth={1.8} className="text-ink" />
+        <Server style={{ width: inner, height: inner }} strokeWidth={1.8} className="text-fg" />
       )}
     </span>
   )

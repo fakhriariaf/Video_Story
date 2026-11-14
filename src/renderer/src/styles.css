@@ -1,36 +1,44 @@
 @import 'tailwindcss';
 
 @theme {
-  --color-paper: #faf7f2;
-  --color-surface: #ffffff;
-  --color-sand: #f3efe8;
-  --color-ink: #1f1d1a;
-  --color-ink-2: #57524a;
-  --color-muted: #6b665e;
-  --color-line: #e6dfd3;
-  --color-line-2: #d4cbbb;
-  --color-line-3: #bfb5a4;
-  --color-accent: #4338ca;
-  --color-accent-dark: #3730a3;
-  --color-accent-soft: #eef0fe;
-  --color-sun: #ffc93c;
-  --color-sun-soft: #fff1c7;
-  --color-sun-ink: #6b4e00;
-  --color-ok-soft: #e1f0dd;
-  --color-ok-ink: #25572b;
-  --color-info-soft: #e3ecf8;
-  --color-info-ink: #1e4a7a;
-  --color-bad-soft: #fbe3e1;
-  --color-bad-ink: #8a1f14;
-  --color-draft: #efeae2;
+  /* Ruang Edit: a dark editing-suite look. Tokens are named for their role, not their colour. */
+  --color-canvas: #121026;
+  --color-panel: #1b1838;
+  --color-rail: #171431;
+  --color-raised: #24204a;
+  --color-strip: #0b0a1a;
+  --color-select: #3d3691;
+  --color-fg: #eceafb;
+  --color-fg-2: #c9c5ee;
+  --color-muted: #a29ec9;
+  --color-faint: #8a85bc;
+  --color-line: #2a2656;
+  --color-line-2: #322d63;
+  --color-line-3: #3a3572;
+  --color-edge: #4a4488;
+  --color-accent: #7c6cff;
+  --color-accent-press: #6657f0;
+  --color-accent-soft: #2b2566;
+  --color-link: #a99eff;
+  /* The one primary action per screen, and the marker of the active position. */
+  --color-sun: #ffb627;
+  --color-sun-on: #2a1c00;
+  --color-sun-soft: #3b2f00;
+  --color-sun-ink: #ffcf66;
+  --color-ok-soft: #0f3a2b;
+  --color-ok-ink: #6fe3b5;
+  --color-info-soft: #14305a;
+  --color-info-ink: #8fc2ff;
+  --color-bad-soft: #4a1512;
+  --color-bad-ink: #ff9a8f;
+  --color-draft: #2a2656;
 
-  --font-display: 'Bricolage Grotesque Variable', 'Segoe UI', sans-serif;
-  --font-sans: 'Plus Jakarta Sans Variable', 'Segoe UI', sans-serif;
+  --font-display: 'Barlow Condensed', 'Segoe UI', sans-serif;
+  --font-sans: 'Barlow', 'Segoe UI', sans-serif;
   --font-mono: 'JetBrains Mono Variable', Consolas, monospace;
 
-  --shadow-ink: 2px 2px 0 #1f1d1a;
-  --shadow-ink-md: 3px 3px 0 #1f1d1a;
-  --shadow-ink-lg: 4px 4px 0 #1f1d1a;
+  /* Floating menus and dialogs; flat surfaces are told apart by their fill, not by a shadow. */
+  --shadow-pop: 0 14px 36px rgb(5 4 16 / 0.6);
 }
 
 @font-face {
@@ -135,8 +143,9 @@
   }
   body {
     margin: 0;
-    background: var(--color-paper);
-    color: var(--color-ink);
+    background: var(--color-canvas);
+    color: var(--color-fg);
+    color-scheme: dark;
     font-family: var(--font-sans);
     -webkit-font-smoothing: antialiased;
     overflow: hidden;
@@ -154,6 +163,7 @@
   }
   ::selection {
     background: var(--color-sun);
+    color: var(--color-sun-on);
   }
   :focus-visible {
     outline: 2px solid var(--color-accent);
@@ -167,7 +177,7 @@
 @layer utilities {
   .scroll-thin {
     scrollbar-width: thin;
-    scrollbar-color: var(--color-line-2) transparent;
+    scrollbar-color: var(--color-line-3) transparent;
   }
 }
 

@@ -21,7 +21,7 @@ export function CharacterAvatar({
 }) {
   return (
     <span
-      className={cx('relative flex shrink-0 items-center justify-center overflow-hidden rounded-full border border-ink bg-sand font-bold text-ink', className)}
+      className={cx('relative flex shrink-0 items-center justify-center overflow-hidden rounded-full border border-edge bg-raised font-bold text-fg', className)}
       style={{ width: size, height: size, fontSize: Math.round(size * 0.42) }}
       aria-hidden="true"
     >

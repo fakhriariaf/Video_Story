@@ -31,8 +31,8 @@ export function ClipVisual({
       ) : running ? null : (
         <div
           className={cx(
-            'absolute inset-2 flex flex-col items-center justify-center gap-1.5 rounded-[10px] border-[1.5px] border-dashed text-muted',
-            failed ? 'border-bad-ink/40 bg-bad-soft text-bad-ink' : 'border-line-3 bg-paper'
+            'absolute inset-2 flex flex-col items-center justify-center gap-1.5 rounded-lg border border-dashed text-muted',
+            failed ? 'border-bad-ink/40 bg-bad-soft text-bad-ink' : 'border-line-3 bg-canvas'
           )}
         >
           {failed ? <AlertCircle className={large ? 'size-7' : 'size-5'} /> : <ImageIcon className={large ? 'size-7' : 'size-5'} strokeWidth={1.6} />}
@@ -44,14 +44,14 @@ export function ClipVisual({
         <div
           className={cx(
             'absolute inset-0 flex flex-col items-center justify-center gap-2',
-            image || showVideo ? 'bg-paper/80 backdrop-blur-[3px]' : 'bg-paper'
+            image || showVideo ? 'bg-canvas/80 backdrop-blur-[3px]' : 'bg-canvas'
           )}
         >
           <span className={cx('font-semibold text-sun-ink', large ? 'text-[15px]' : 'text-[13px]')}>
             {job!.status === 'queued' ? 'Menunggu antrean…' : `${job!.message ?? 'Memproses'}… ${Math.round(job!.progress * 100)}%`}
           </span>
           <Progress value={job!.progress} className="w-3/5" />
-          {large && <span className="text-[13px] text-ink-2">Boleh pindah klip, prosesnya tetap jalan</span>}
+          {large && <span className="text-[13px] text-fg-2">Boleh pindah klip, prosesnya tetap jalan</span>}
         </div>
       )}
     </div>

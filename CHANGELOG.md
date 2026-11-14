@@ -8,6 +8,10 @@ Cara menaikkan versi ada di [docs/pengembangan.md](docs/pengembangan.md#versi-da
 
 ## [Belum dirilis]
 
+### Diubah
+- Tampilan baru **Ruang Edit**: seluruh aplikasi memakai tema gelap dengan huruf Barlow, tombol utama kuning, dan
+  tanpa bayangan keras. Tata letak halaman belum berubah; hasil video tidak terpengaruh.
+
 ### Ditambahkan
 - Penyedia gambar dan video baru selain Higgsfield: **fal.ai** (25 model terpilih, antara lain Nano Banana,
   Flux, Seedream, GPT Image, Kling, Seedance, Wan, MiniMax) dan **Google Gemini** (Nano Banana untuk gambar, Gemini

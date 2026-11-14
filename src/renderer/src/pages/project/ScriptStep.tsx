@@ -18,7 +18,7 @@ function InsertGap({ onInsert }: { onInsert: () => void }) {
       <button
         type="button"
         onClick={onInsert}
-        className="relative inline-flex h-6 items-center gap-1 rounded-full border border-dashed border-line-3 bg-paper px-2.5 text-xs font-medium text-ink-2 opacity-0 transition-opacity hover:border-ink-2 hover:text-ink focus:opacity-100 group-hover:opacity-100"
+        className="relative inline-flex h-6 items-center gap-1 rounded-full border border-dashed border-line-3 bg-canvas px-2.5 text-xs font-medium text-fg-2 opacity-0 transition-opacity hover:border-edge hover:text-fg focus:opacity-100 group-hover:opacity-100"
       >
         <Plus className="size-3.5" />
         Sisipkan adegan
@@ -69,9 +69,9 @@ function SceneCard({ clip, index, total, onInsert }: { clip: Clip; index: number
   }
 
   return (
-    <article id={`scene-${clip.id}`} className="flex gap-4 rounded-2xl border border-line bg-surface p-4 transition-colors focus-within:border-ink-2">
+    <article id={`scene-${clip.id}`} className="flex gap-4 rounded-[14px] border border-line bg-panel p-4 transition-colors focus-within:border-edge">
       <div className="flex w-9 shrink-0 flex-col items-center gap-1 pt-1.5">
-        <span className="rounded-md bg-ink px-[7px] py-0.5 font-mono text-xs text-paper">{clipNumber(index)}</span>
+        <span className="rounded-md bg-select px-[7px] py-0.5 font-mono text-xs text-fg">{clipNumber(index)}</span>
         <IconButton label="Pindah ke atas" size={30} className="border-transparent bg-transparent" disabled={index === 0} onClick={() => moveClip(clip.id, -1)}>
           <ArrowUp className="size-4" />
         </IconButton>
@@ -93,7 +93,7 @@ function SceneCard({ clip, index, total, onInsert }: { clip: Clip; index: number
             onChange={(e) => updateClip(clip.id, { title: e.target.value })}
             aria-label={`Judul adegan ${index + 1}`}
             placeholder="Judul adegan"
-            className="-ml-1 min-w-0 flex-1 rounded-md bg-transparent px-1 font-display text-lg font-bold outline-none hover:bg-sand focus:bg-sand"
+            className="-ml-1 min-w-0 flex-1 rounded-md bg-transparent px-1 font-display text-lg font-bold outline-none hover:bg-raised focus:bg-raised"
           />
           {stale && <Badge tone="warn">Visual perlu diperbarui</Badge>}
           {voiceOld && <Badge tone="warn">Suara perlu dibuat ulang</Badge>}
@@ -111,7 +111,7 @@ function SceneCard({ clip, index, total, onInsert }: { clip: Clip; index: number
         </div>
 
         <label className="flex flex-col gap-1">
-          <span className="text-xs font-semibold text-ink-2">Alur adegan</span>
+          <span className="text-xs font-semibold text-fg-2">Alur adegan</span>
           <AutoTextarea
             id={`scene-${clip.id}-story`}
             minRows={2}
@@ -123,7 +123,7 @@ function SceneCard({ clip, index, total, onInsert }: { clip: Clip; index: number
         </label>
 
         <label className="group/narr flex flex-col gap-1">
-          <span className="flex items-center gap-2 text-xs font-semibold text-ink-2">
+          <span className="flex items-center gap-2 text-xs font-semibold text-fg-2">
             Narasi (VO)
             <span className="font-normal text-muted">
               {words} kata · ± {Math.round(estimateNarrationMs(clip.narration) / 1000)} detik
@@ -146,7 +146,7 @@ function SceneCard({ clip, index, total, onInsert }: { clip: Clip; index: number
                 type="button"
                 onMouseDown={(e) => e.preventDefault()}
                 onClick={() => insertTag(t)}
-                className="h-6 rounded-full border border-line-2 bg-paper px-2 font-mono text-[11px] text-ink-2 hover:border-ink-2 hover:text-ink"
+                className="h-6 rounded-full border border-line-2 bg-canvas px-2 font-mono text-[11px] text-fg-2 hover:border-edge hover:text-fg"
               >
                 &lt;{t}&gt;
               </button>
@@ -221,7 +221,7 @@ export function ScriptStep() {
     return (
       <div className="flex h-full flex-col items-center justify-center gap-4 text-center">
         <h2 className="font-display text-3xl font-bold">Naskah masih kosong</h2>
-        <p className="max-w-md text-ink-2">Tulis idenya di langkah Ide cerita lalu klik Susun naskah, atau tulis adegannya sendiri.</p>
+        <p className="max-w-md text-fg-2">Tulis idenya di langkah Ide cerita lalu klik Susun naskah, atau tulis adegannya sendiri.</p>
         <div className="flex gap-2.5">
           <Button onClick={() => updateProject({ step: 1 })}>Ke Ide cerita</Button>
           <Button variant="primary" icon={<Plus className="size-4" />} onClick={() => insert(null)}>
@@ -238,23 +238,23 @@ export function ScriptStep() {
           <div>
             <p className="text-[13px] font-semibold text-accent">Langkah 2 dari 4</p>
             <h1 className="mt-1.5 font-display text-[40px] font-bold leading-tight tracking-[-0.02em]">Naskah</h1>
-            <p className="mt-2 text-[15px] text-ink-2">
+            <p className="mt-2 text-[15px] text-fg-2">
               Baca alurnya dulu. Ubah, tambah, hapus, atau urutkan adegannya sesukamu, lalu AI membuat visual tiap adegan dari naskah ini.
             </p>
           </div>
 
           <div className="flex flex-wrap items-center gap-2 text-[13px]">
-            <span className="rounded-full border border-line-2 bg-surface px-3 py-1.5 font-semibold">{clips.length} adegan</span>
-            <span className="rounded-full border border-line-2 bg-surface px-3 py-1.5">± {mmss(totalMs)} narasi</span>
-            <span className="rounded-full border border-line-2 bg-surface px-3 py-1.5 text-ink-2">Target {target}</span>
+            <span className="rounded-full border border-line-2 bg-panel px-3 py-1.5 font-semibold">{clips.length} adegan</span>
+            <span className="rounded-full border border-line-2 bg-panel px-3 py-1.5">± {mmss(totalMs)} narasi</span>
+            <span className="rounded-full border border-line-2 bg-panel px-3 py-1.5 text-fg-2">Target {target}</span>
             <span className="text-muted">Durasi akhir tiap adegan mengikuti panjang suara narasinya.</span>
           </div>
 
           {project.synopsis.trim() && (
-            <div className="flex items-start gap-3 rounded-xl bg-sand px-4 py-3 text-[13px] text-ink-2">
-              <span className="shrink-0 font-semibold text-ink">Ide awal</span>
+            <div className="flex items-start gap-3 rounded-lg bg-raised px-4 py-3 text-[13px] text-fg-2">
+              <span className="shrink-0 font-semibold text-fg">Ide awal</span>
               <span className="line-clamp-2 flex-1">{project.synopsis}</span>
-              <button type="button" onClick={() => updateProject({ step: 1 })} className="shrink-0 font-semibold text-accent-dark hover:underline">
+              <button type="button" onClick={() => updateProject({ step: 1 })} className="shrink-0 font-semibold text-link hover:underline">
                 Ubah ide
               </button>
             </div>
@@ -270,7 +270,7 @@ export function ScriptStep() {
             <button
               type="button"
               onClick={() => insert(clips[clips.length - 1]?.id ?? null)}
-              className="mt-3 flex h-12 items-center justify-center gap-2 rounded-2xl border-[1.5px] border-dashed border-line-3 text-sm font-medium text-ink-2 hover:border-ink-2 hover:text-ink"
+              className="mt-3 flex h-12 items-center justify-center gap-2 rounded-[14px] border border-dashed border-line-3 text-sm font-medium text-fg-2 hover:border-edge hover:text-fg"
             >
               <Plus className="size-4" />
               Tambah adegan
@@ -279,7 +279,7 @@ export function ScriptStep() {
         </div>
       </div>
 
-      <footer className="absolute inset-x-0 bottom-0 flex h-[84px] items-center gap-3 border-t border-line bg-surface px-14">
+      <footer className="absolute inset-x-0 bottom-0 flex h-[84px] items-center gap-3 border-t border-line bg-panel px-14">
         <div className="flex flex-col gap-0.5">
           <span className="text-[15px] font-semibold">
             {clips.length} adegan · ± {mmss(totalMs)}
@@ -287,8 +287,8 @@ export function ScriptStep() {
           <span className="flex items-center gap-1.5 text-[13px] text-muted">
             <Bot className="size-3.5" />
             Visual disusun oleh {writer ? `${llmName(writer.provider)} · ` : ''}
-            <span className={cx('font-mono', writer && !writer.model && 'text-accent-dark')}>{writer ? writer.model || 'model belum dipilih' : '…'}</span>
-            <button type="button" onClick={() => void openSettings()} className="font-semibold text-accent-dark hover:underline">
+            <span className={cx('font-mono', writer && !writer.model && 'text-link')}>{writer ? writer.model || 'model belum dipilih' : '…'}</span>
+            <button type="button" onClick={() => void openSettings()} className="font-semibold text-link hover:underline">
               Ganti
             </button>
           </span>

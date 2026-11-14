@@ -73,8 +73,8 @@ function Cost({
 
 function Card({ icon, title, children }: { icon: ReactNode; title: string; children: ReactNode }) {
   return (
-    <div className="flex min-w-0 flex-col gap-2 rounded-2xl border border-line-2 bg-surface p-3">
-      <span className="flex items-center gap-2 text-[13px] font-semibold text-ink-2">
+    <div className="flex min-w-0 flex-col gap-2 rounded-[14px] border border-line-2 bg-panel p-3">
+      <span className="flex items-center gap-2 text-[13px] font-semibold text-fg-2">
         {icon}
         {title}
       </span>
@@ -145,11 +145,11 @@ export function ModelSection({
             menuClassName="w-[430px]"
             onChange={(id) => onChange({ imageModel: id })}
           />
-          <p className="text-[12.5px] leading-snug text-ink-2">
+          <p className="text-[12.5px] leading-snug text-fg-2">
             <Cost value={imageCost} model={image} hasKey={imageKey}>
               {(label, each) => (
                 <>
-                  ≈ {label} per gambar · {clipCount} gambar ≈ <b className="font-semibold text-ink">{costLabel(each, clipCount)}</b>
+                  ≈ {label} per gambar · {clipCount} gambar ≈ <b className="font-semibold text-fg">{costLabel(each, clipCount)}</b>
                 </>
               )}
             </Cost>
@@ -176,7 +176,7 @@ export function ModelSection({
           />
           {resolutions.length > 1 ? (
             <div className="flex items-center gap-2.5">
-              <span className="shrink-0 text-[12.5px] font-medium text-ink-2">Resolusi</span>
+              <span className="shrink-0 text-[12.5px] font-medium text-fg-2">Resolusi</span>
               <Segmented
                 size="sm"
                 value={resolution ?? resolutions[0]}
@@ -186,9 +186,9 @@ export function ModelSection({
               />
             </div>
           ) : (
-            resolution && <p className="text-[12.5px] text-ink-2">Resolusi {resolution} (satu-satunya pilihan model ini)</p>
+            resolution && <p className="text-[12.5px] text-fg-2">Resolusi {resolution} (satu-satunya pilihan model ini)</p>
           )}
-          <p className="text-[12.5px] leading-snug text-ink-2">
+          <p className="text-[12.5px] leading-snug text-fg-2">
             <Cost value={videoCost} model={video} hasKey={videoKey}>
               {(label) => (
                 <>

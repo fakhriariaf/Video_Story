@@ -11,7 +11,7 @@ const USAGE_URL = 'https://chatgpt.com/settings/usage'
 /** OpenAI's sign-in guidelines ask for this exact label and the white ChatGPT mark on the button. */
 function ContinueButton({ busy, onClick }: { busy: boolean; onClick: () => void }) {
   return (
-    <Button variant="ink" className="h-11 gap-2.5 px-4" loading={busy} onClick={onClick}>
+    <Button variant="secondary" className="h-11 gap-2.5 border-edge bg-black px-4 text-white hover:border-fg/60" loading={busy} onClick={onClick}>
       {!busy && <span aria-hidden="true" className="flex size-[18px] text-white [&>svg]:size-full" dangerouslySetInnerHTML={{ __html: openaiMark }} />}
       {busy ? 'Menunggu login di browser…' : 'Continue with ChatGPT'}
     </Button>
@@ -79,7 +79,7 @@ export function ChatGptAccount({
     <button
       type="button"
       onClick={() => void window.api.app.openExternal(USAGE_URL)}
-      className="inline-flex shrink-0 items-center gap-1 font-semibold text-accent-dark hover:underline"
+      className="inline-flex shrink-0 items-center gap-1 font-semibold text-link hover:underline"
     >
       Kelola pemakaian
       <ExternalLink className="size-3.5" />
@@ -94,7 +94,7 @@ export function ChatGptAccount({
             <Check className="size-4 shrink-0 text-ok-ink" strokeWidth={3} />
             <span className="truncate">{account?.label ?? 'Akun ChatGPT'}</span>
           </span>
-          <span className="text-[13px] text-ink-2">Memakai paket ChatGPT</span>
+          <span className="text-[13px] text-fg-2">Memakai paket ChatGPT</span>
           <span className="text-[13px]">{usageLink}</span>
           <span className="flex-1" />
           <Button className="h-10" loading={busy === 'logout'} onClick={() => void logout()}>
@@ -103,7 +103,7 @@ export function ChatGptAccount({
         </div>
       ) : (
         <>
-          <p className="text-[13px] text-ink-2">
+          <p className="text-[13px] text-fg-2">
             {account?.needsReauth
               ? 'Sesi ChatGPT berakhir. Login ulang untuk melanjutkan.'
               : account?.signedIn && account.planUsageAllowed === false
@@ -123,7 +123,7 @@ export function ChatGptAccount({
         </>
       )}
       <Modal open={welcome} onClose={closeWelcome} title="Kamu memakai paket ChatGPT" width={480}>
-        <p className="text-[15px] leading-relaxed text-ink-2">
+        <p className="text-[15px] leading-relaxed text-fg-2">
           Permintaan menyusun cerita memakai kuota paket ChatGPT-mu, terpisah dari biaya layanan lain. Atur batasnya di pengaturan ChatGPT.
         </p>
         <div className="flex justify-end">

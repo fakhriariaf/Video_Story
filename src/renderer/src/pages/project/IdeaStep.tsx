@@ -67,8 +67,8 @@ function VoicePicker({ provider, value, onChange }: { provider: TtsProvider; val
         onClick={() => player.toggle(id, url)}
         className={cx(
           'flex shrink-0 items-center justify-center rounded-full border transition-colors',
-          size === 'row' ? 'size-7' : 'size-12 rounded-xl',
-          on ? 'border-accent bg-accent text-white' : 'border-line-2 bg-surface text-ink hover:border-ink-2'
+          size === 'row' ? 'size-7' : 'size-12 rounded-lg',
+          on ? 'border-accent bg-accent-soft text-fg' : 'border-line-2 bg-panel text-fg hover:border-edge'
         )}
       >
         {on ? <Square className="size-3.5" fill="currentColor" /> : <Play className="ml-px size-3.5" fill="currentColor" />}
@@ -76,7 +76,7 @@ function VoicePicker({ provider, value, onChange }: { provider: TtsProvider; val
     )
   }
 
-  if (error) return <p className="flex h-12 flex-1 items-center rounded-xl bg-bad-soft px-3.5 text-[13px] text-bad-ink">{error}</p>
+  if (error) return <p className="flex h-12 flex-1 items-center rounded-lg bg-bad-soft px-3.5 text-[13px] text-bad-ink">{error}</p>
   return (
     <>
       <Select
@@ -168,13 +168,13 @@ export function IdeaStep() {
             <div>
               <p className="text-[13px] font-semibold text-accent">Langkah 1 dari 4</p>
               <h1 className="mt-1.5 font-display text-[40px] font-bold leading-tight tracking-[-0.02em]">Ceritakan idemu</h1>
-              <p className="mt-2 text-[15px] text-ink-2">
+              <p className="mt-2 text-[15px] text-fg-2">
                 Sebut tokoh, tempat, dan akhir ceritanya. Makin jelas, makin rapi susunan klip dari AI.
               </p>
             </div>
 
-            <div className="flex flex-col gap-2 rounded-2xl border-[1.5px] border-ink bg-surface px-[18px] pb-3 pt-4 shadow-ink-md">
-              <label htmlFor="sinopsis" className="text-[13px] font-semibold text-ink-2">
+            <div className="flex flex-col gap-2 rounded-[14px] border border-edge bg-panel px-[18px] pb-3 pt-4">
+              <label htmlFor="sinopsis" className="text-[13px] font-semibold text-fg-2">
                 Ide cerita atau sinopsis
               </label>
               <textarea
@@ -233,16 +233,16 @@ export function IdeaStep() {
                         aria-pressed={on}
                         onClick={() => updateProject({ aspectRatio: f.id })}
                         className={cx(
-                          'flex h-12 items-center gap-2.5 rounded-xl px-3 text-left',
-                          on ? 'border-2 border-accent bg-accent-soft' : 'border border-line-2 bg-surface hover:border-ink-2'
+                          'flex h-12 items-center gap-2.5 rounded-lg px-3 text-left',
+                          on ? 'border-2 border-accent bg-accent-soft' : 'border border-line-2 bg-panel hover:border-edge'
                         )}
                       >
                         <span className="flex w-[26px] justify-center">
-                          <span className="rounded-[3px] border-[1.8px] border-ink" style={{ width: f.w, height: f.h }} />
+                          <span className="rounded-[3px] border-[1.8px] border-edge" style={{ width: f.w, height: f.h }} />
                         </span>
                         <span className="flex flex-col leading-tight">
                           <span className="text-sm font-semibold">{f.label}</span>
-                          <span className="text-xs text-ink-2">{f.sub}</span>
+                          <span className="text-xs text-fg-2">{f.sub}</span>
                         </span>
                       </button>
                     )
@@ -271,7 +271,7 @@ export function IdeaStep() {
                   {blocked.length === 2
                     ? 'Belum ada kunci suara narator yang valid, jadi suara belum bisa dibuat.'
                     : `${ready[blocked[0]].reason}, jadi ${TTS_NAMES[blocked[0]]} belum bisa dipilih.`}{' '}
-                  <button type="button" onClick={() => void openSettings()} className="font-semibold text-accent-dark hover:underline">
+                  <button type="button" onClick={() => void openSettings()} className="font-semibold text-link hover:underline">
                     Atur di Pengaturan
                   </button>
                 </span>
@@ -290,18 +290,18 @@ export function IdeaStep() {
             />
           </div>
 
-          <aside className="flex flex-col gap-3.5 self-start rounded-[18px] border border-line bg-surface p-5">
+          <aside className="flex flex-col gap-3.5 self-start rounded-[18px] border border-line bg-panel p-5">
             <div className="flex items-baseline justify-between">
               <h2 className="font-display text-[22px] font-bold">Gaya visual</h2>
               <span className="text-[13px] text-muted">{getStyle(project.styleId).name}</span>
             </div>
-            <p className="-mt-1.5 text-[13px] text-ink-2">Dipakai untuk semua gambar di proyek ini, termasuk lembar karakter.</p>
+            <p className="-mt-1.5 text-[13px] text-fg-2">Dipakai untuk semua gambar di proyek ini, termasuk lembar karakter.</p>
             <StylePicker value={project.styleId} onChange={(id) => updateProject({ styleId: id })} />
           </aside>
         </div>
       </div>
 
-      <footer className="absolute inset-x-0 bottom-0 flex h-[84px] items-center gap-4 border-t border-line bg-surface px-14">
+      <footer className="absolute inset-x-0 bottom-0 flex h-[84px] items-center gap-4 border-t border-line bg-panel px-14">
         <div className="flex flex-col gap-0.5">
           <span className="text-[15px] font-semibold">
             ± {clipCount} adegan · gambar {model.name}
@@ -309,8 +309,8 @@ export function IdeaStep() {
           <span className="flex items-center gap-1.5 text-[13px] text-muted">
             <Bot className="size-3.5" />
             Disusun oleh {writer ? `${llmName(writer.provider)} · ` : ''}
-            <span className={cx('font-mono', writer && !writer.model && 'text-accent-dark')}>{writer ? writer.model || 'model belum dipilih' : '…'}</span>
-            <button type="button" onClick={() => void openSettings()} className="font-semibold text-accent-dark hover:underline">
+            <span className={cx('font-mono', writer && !writer.model && 'text-link')}>{writer ? writer.model || 'model belum dipilih' : '…'}</span>
+            <button type="button" onClick={() => void openSettings()} className="font-semibold text-link hover:underline">
               Ganti
             </button>
           </span>

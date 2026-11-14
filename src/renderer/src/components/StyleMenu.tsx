@@ -50,13 +50,13 @@ export function StyleMenu({ value, onChange }: { value: string; onChange: (id: s
         aria-label={`Gaya visual: ${current.name}`}
         onClick={() => setOpen(!open)}
         className={cx(
-          'inline-flex h-10 min-w-0 items-center gap-2 rounded-full border bg-paper pl-3.5 pr-3 text-sm font-medium transition-colors',
-          open ? 'border-ink' : 'border-line-2 hover:border-ink-2'
+          'inline-flex h-10 min-w-0 items-center gap-2 rounded-full border bg-canvas pl-3.5 pr-3 text-sm font-medium transition-colors',
+          open ? 'border-edge' : 'border-line-2 hover:border-edge'
         )}
       >
-        <StyleSwatch styleId={value} className="-ml-1.5 size-7 shrink-0 rounded-full border border-ink/20" iconSize={14} />
+        <StyleSwatch styleId={value} className="-ml-1.5 size-7 shrink-0 rounded-full border border-edge" iconSize={14} />
         <span className="truncate">{current.name}</span>
-        <ChevronDown className={cx('size-3.5 shrink-0 text-ink-2 transition-transform', open && 'rotate-180')} />
+        <ChevronDown className={cx('size-3.5 shrink-0 text-fg-2 transition-transform', open && 'rotate-180')} />
       </button>
 
       <Popover
@@ -73,8 +73,8 @@ export function StyleMenu({ value, onChange }: { value: string; onChange: (id: s
             <span className="text-xs text-muted">Dipakai untuk semua gambar dan lembar karakter di proyek ini.</span>
           </div>
           <div className="flex-1" />
-          <span className="truncate text-right text-[13px] text-ink-2">
-            <span className="font-semibold text-ink">{shown.name}</span> · cocok untuk {shown.niche.toLowerCase()}
+          <span className="truncate text-right text-[13px] text-fg-2">
+            <span className="font-semibold text-fg">{shown.name}</span> · cocok untuk {shown.niche.toLowerCase()}
           </span>
         </div>
         <div
@@ -98,25 +98,25 @@ export function StyleMenu({ value, onChange }: { value: string; onChange: (id: s
                 onClick={() => pick(s.id)}
                 onMouseEnter={() => setPeek(s.id)}
                 onFocus={() => setPeek(s.id)}
-                className="group flex flex-col gap-1.5 rounded-xl text-left outline-none"
+                className="group flex flex-col gap-1.5 rounded-lg text-left outline-none"
               >
                 <span
                   className={cx(
-                    'relative block aspect-square w-full overflow-hidden rounded-[11px] bg-sand transition-shadow',
-                    on ? 'border-2 border-accent shadow-ink' : 'border border-line group-hover:border-ink-2 group-focus-visible:border-ink'
+                    'relative block aspect-square w-full overflow-hidden rounded-[11px] bg-raised transition-shadow',
+                    on ? 'border-2 border-accent' : 'border border-line group-hover:border-edge group-focus-visible:ring-2 group-focus-visible:ring-accent'
                   )}
                 >
                   <StyleSwatch styleId={s.id} className="size-full transition-transform duration-500 ease-out group-hover:scale-[1.07]" iconSize={24} />
-                  <span className="absolute left-1.5 top-1.5 rounded-full bg-ink/75 px-1.5 py-px text-[10px] font-semibold text-paper">
+                  <span className="absolute left-1.5 top-1.5 rounded-full bg-strip/75 px-1.5 py-px text-[10px] font-semibold text-fg">
                     {CATEGORY_LABEL[s.category]}
                   </span>
                   {on && (
-                    <span className="absolute right-1.5 top-1.5 flex size-5 items-center justify-center rounded-full border-[1.5px] border-ink bg-accent text-white">
+                    <span className="absolute right-1.5 top-1.5 flex size-5 items-center justify-center rounded-full bg-accent text-canvas">
                       <Check className="size-3" strokeWidth={3} />
                     </span>
                   )}
                 </span>
-                <span className={cx('line-clamp-2 px-0.5 text-[12.5px] leading-tight', on ? 'font-bold text-ink' : 'font-semibold text-ink-2 group-hover:text-ink')}>
+                <span className={cx('line-clamp-2 px-0.5 text-[12.5px] leading-tight', on ? 'font-bold text-fg' : 'font-semibold text-fg-2 group-hover:text-fg')}>
                   {s.name}
                 </span>
               </button>

@@ -23,17 +23,36 @@
 
 ### Design token (`src/renderer/src/styles.css`, Tailwind v4 `@theme`)
 
+Tampilan memakai gaya **Ruang Edit**: gelap seperti ruang penyuntingan film. Token dinamai menurut **perannya**,
+bukan warnanya, supaya tema lain (misalnya mode terang) bisa ditambahkan tanpa mengganti nama kelas.
+
 | Token | Warna | Dipakai untuk |
 |---|---|---|
-| `paper` / `surface` / `sand` | `#faf7f2` / `#ffffff` / `#f3efe8` | latar halaman / kartu / isian |
-| `ink`, `ink-2`, `muted` | `#1f1d1a`, `#57524a`, `#6b665e` | teks utama, sekunder, redup |
-| `line`, `line-2`, `line-3` | krem keabuan | garis dan border |
-| `accent` (+ `-dark`, `-soft`) | `#4338ca` | tombol utama, **tanda terpilih** |
-| `sun` (+ `-soft`, `-ink`) | `#ffc93c` | sorotan, pilihan aktif di daftar |
-| `ok-*`, `info-*`, `bad-*` | hijau, biru, merah | status |
+| `canvas` / `panel` / `rail` / `raised` | `#121026` / `#1b1838` / `#171431` / `#24204a` | latar aplikasi / kartu dan kolom isian / menu sisi / chip, hover, tombol sekunder |
+| `strip` | `#0b0a1a` | pita film, area pratinjau, tirai di belakang dialog (`bg-strip/75`) |
+| `select` | `#3d3691` | isian pilihan aktif (tab, chip, baris menu terpilih) |
+| `fg`, `fg-2`, `muted`, `faint` | `#eceafb`, `#c9c5ee`, `#a29ec9`, `#8a85bc` | teks utama, kedua, redup, placeholder |
+| `line`, `line-2`, `line-3`, `edge` | indigo gelap bertingkat | garis; `edge` untuk garis tegas dan hover |
+| `accent` (+ `-press`, `-soft`), `link` | `#7c6cff`, `#a99eff` | aksen indigo, fokus, tombol tingkat kedua; `link` untuk teks tautan |
+| `sun` (+ `-on`, `-soft`, `-ink`) | `#ffb627` | **satu tindakan utama per layar** dan penanda posisi aktif; `-soft`/`-ink` untuk peringatan |
+| `ok-*`, `info-*`, `bad-*`, `draft` | hijau, biru, merah, netral | lencana dan status |
 
-Font UI: Plus Jakarta Sans (teks), Bricolage Grotesque (judul, `font-display`), JetBrains Mono (angka/waktu).
-Bayangan "tinta" (`shadow-ink`) memberi kesan kertas dan tinta. Font caption ada terpisah di `captions.ts`.
+Aturan pemakaian:
+
+- **Kuning hanya untuk satu tindakan utama per layar** (`Button variant="primary"`) dan penanda posisi (langkah
+  aktif, playhead, klip terpilih). Tindakan penting kedua memakai `variant="accent"`; sisanya `secondary`, `ghost`,
+  atau `danger`.
+- Teks di atas isian terang memakai warna gelap: `text-sun-on` di atas `sun`, `text-canvas` di atas `accent`.
+- Tanpa bayangan keras. Permukaan dibedakan lewat isiannya; hanya menu dan dialog melayang yang memakai
+  `shadow-pop`.
+- Sudut: panel besar `rounded-[14px]`, tombol/chip/kolom isian `rounded-lg`, bingkai gambar `rounded-md`.
+- Warna caption dan overlay (misalnya `TEXT_SWATCHES` di Inspector) adalah bagian dari video, bukan tema aplikasi.
+
+`npm test` menjaga dua hal (`src/main/theme.test.ts`): setiap pasangan teks dan latar di tabel mencapai kontras
+4,5:1, dan tidak ada nama kelas, font, atau warna dari desain lama yang tersisa di `src/renderer/src`.
+
+Font UI: Barlow (teks), Barlow Condensed (judul dan kode waktu, `font-display`), JetBrains Mono (kunci API dan ID
+model). Font caption ada terpisah di `captions.ts`.
 
 ### Komponen yang dipakai ulang
 
@@ -56,7 +75,7 @@ Bayangan "tinta" (`shadow-ink`) memberi kesan kertas dan tinta. Font caption ada
 4. **Pilihan yang tidak bisa dipakai dinonaktifkan**, misalnya penyedia TTS tanpa kunci valid.
 5. **Kurangi klik manual.** AI mengisi pengaturan per klip (gerak kamera, kekuatan, transisi, arahan video), dan
    pratinjau berjalan otomatis.
-6. **Pilihan terpilih ditandai warna latar** (`bg-sun-soft`), bukan kolom centang. Baris model diberi ikon
+6. **Pilihan terpilih ditandai warna latar** (`bg-select`), bukan kolom centang. Baris model diberi ikon
    keluarganya.
 7. **Pengaturan ada di tempat itemnya.** Contohnya transisi: tombol bulat di sambungan antar klip yang membuka
    panel Transisi, bukan isian di panel klip yang terkesan berlaku untuk semua.
