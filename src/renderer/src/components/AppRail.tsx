@@ -39,6 +39,7 @@ export function AppRail({
   active,
   sub,
   backToProject,
+  onSettings,
   services
 }: {
   active: 'home' | 'settings'
@@ -46,10 +47,12 @@ export function AppRail({
   sub?: RailSubItem[]
   /** Shown first when Settings was opened from a project. */
   backToProject?: () => void
+  /** On Settings itself: show the AI services tab (there is no page to navigate to). */
+  onSettings?: () => void
   services: ServiceLine[]
 }) {
   const { go } = useApp()
-  const openSettings = (): void => go({ name: 'settings', back: { name: 'home' } })
+  const openSettings = (): void => (onSettings ? onSettings() : go({ name: 'settings', back: { name: 'home' } }))
   return (
     <aside className="flex min-h-0 flex-col border-r border-line bg-rail px-4 pb-4 pt-5">
       <button type="button" onClick={() => go({ name: 'home' })} className="self-start rounded-lg px-1.5 pb-5" aria-label="Video Story, ke Beranda">
@@ -64,7 +67,7 @@ export function AppRail({
         <Item on={active === 'home'} icon={<HomeIcon className="size-[17px]" />} onClick={() => go({ name: 'home' })}>
           Beranda
         </Item>
-        <Item on={active === 'settings' && !sub?.length} icon={<SlidersHorizontal className="size-[17px]" />} onClick={() => active !== 'settings' && openSettings()}>
+        <Item on={active === 'settings' && !sub?.length} icon={<SlidersHorizontal className="size-[17px]" />} onClick={openSettings}>
           Pengaturan
         </Item>
         {sub && (
@@ -81,7 +84,7 @@ export function AppRail({
       {services.length > 0 && (
         <button
           type="button"
-          onClick={() => active !== 'settings' && openSettings()}
+          onClick={openSettings}
           title="Buka Pengaturan layanan AI"
           className="flex flex-col gap-1.5 rounded-lg border-t border-line px-2 pb-1 pt-3.5 text-left text-[13px] hover:bg-raised"
         >

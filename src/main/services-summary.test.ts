@@ -27,7 +27,7 @@ const chatgptIn: AccountStatus = { provider: 'chatgpt', signedIn: true, label: '
 
 test('lists the four services with the chosen providers', () => {
   const lines = serviceSummary({
-    settings: { ...base, llmProvider: 'chatgpt', defaultTtsProvider: 'elevenlabs', imageModel: RECOMMENDED.fal.image },
+    settings: { ...base, llmProvider: 'chatgpt', llmModels: { ...base.llmModels, chatgpt: 'gpt-6-astra' }, defaultTtsProvider: 'elevenlabs', imageModel: RECOMMENDED.fal.image },
     keys: [key('elevenlabs', true), key('fal', true)],
     accounts: [chatgptIn],
     whisperReady: false
@@ -52,15 +52,43 @@ test('a key that failed its last check is not ok', () => {
   assert.equal(lines[3].ok, true)
 })
 
-test('a missing key is not ok', () => {
-  const lines = serviceSummary({ settings: base, keys: [key('gemini', true)], accounts: [], whisperReady: false })
-  assert.equal(lines[0].ok, true)
-  assert.equal(lines[2].provider, 'Higgsfield')
-  assert.equal(lines[2].ok, false)
+test('with no usable key the chosen providers are shown as not ready', () => {
+  const lines = serviceSummary({ settings: base, keys: [], accounts: [], whisperReady: false })
+  assert.deepEqual(
+    lines.map((l) => [l.provider, l.ok]),
+    [
+      ['Google Gemini', false],
+      ['Gemini TTS', false],
+      ['Higgsfield', false],
+      ['Belum diunduh', false]
+    ]
+  )
+})
+
+test('images show the provider a new project will really use', () => {
+  // Default model is Higgsfield's, but only fal.ai has a key: new projects start on fal.ai.
+  const lines = serviceSummary({ settings: base, keys: [key('fal', true)], accounts: [], whisperReady: false })
+  assert.equal(lines[2].provider, 'fal.ai')
+  assert.equal(lines[2].ok, true)
+})
+
+test('voice shows the narrator service that has a working key', () => {
+  // Default voice is Gemini, but only ElevenLabs has a key: Home starts new projects on ElevenLabs.
+  const lines = serviceSummary({ settings: base, keys: [key('elevenlabs', true)], accounts: [], whisperReady: false })
+  assert.equal(lines[1].provider, 'ElevenLabs')
+  assert.equal(lines[1].ok, true)
+})
+
+test('a story provider without a chosen model is not ready', () => {
+  const settings: AppSettings = { ...base, llmProvider: 'openrouter' }
+  const lines = serviceSummary({ settings, keys: [key('openrouter', true)], accounts: [], whisperReady: false })
+  assert.equal(lines[0].ok, false)
+  const withModel = { ...settings, llmModels: { ...settings.llmModels, openrouter: 'some/model' } }
+  assert.equal(serviceSummary({ settings: withModel, keys: [key('openrouter', true)], accounts: [], whisperReady: false })[0].ok, true)
 })
 
 test('ChatGPT without plan usage, or needing a new sign-in, is not ok', () => {
-  const settings: AppSettings = { ...base, llmProvider: 'chatgpt' }
+  const settings: AppSettings = { ...base, llmProvider: 'chatgpt', llmModels: { ...base.llmModels, chatgpt: 'gpt-6-astra' } }
   const story = (a: AccountStatus[]): boolean => serviceSummary({ settings, keys: [], accounts: a, whisperReady: false })[0].ok
   assert.equal(story([{ ...chatgptIn, planUsageAllowed: false }]), false)
   assert.equal(story([{ ...chatgptIn, needsReauth: true }]), false)

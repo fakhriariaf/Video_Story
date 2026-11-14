@@ -719,6 +719,7 @@ export function Settings() {
         active="settings"
         services={services}
         backToProject={back.name === 'project' ? () => go(back) : undefined}
+        onSettings={() => setTab('services')}
         sub={NAV.map((n) => ({ id: n.id, label: n.label, on: tab === n.id, onPick: () => setTab(n.id) }))}
       />
         <main className="scroll-thin overflow-y-auto">
