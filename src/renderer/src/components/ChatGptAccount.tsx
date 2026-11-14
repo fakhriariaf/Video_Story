@@ -11,8 +11,8 @@ const USAGE_URL = 'https://chatgpt.com/settings/usage'
 /** OpenAI's sign-in guidelines ask for this exact label and the white ChatGPT mark on the button. */
 function ContinueButton({ busy, onClick }: { busy: boolean; onClick: () => void }) {
   return (
-    <Button variant="accent" className="h-11 gap-2.5 px-4" loading={busy} onClick={onClick}>
-      {!busy && <span aria-hidden="true" className="flex size-[18px] text-canvas [&>svg]:size-full" dangerouslySetInnerHTML={{ __html: openaiMark }} />}
+    <Button variant="secondary" className="h-11 gap-2.5 border-edge bg-black px-4 text-white hover:border-fg/60" loading={busy} onClick={onClick}>
+      {!busy && <span aria-hidden="true" className="flex size-[18px] text-white [&>svg]:size-full" dangerouslySetInnerHTML={{ __html: openaiMark }} />}
       {busy ? 'Menunggu login di browser…' : 'Continue with ChatGPT'}
     </Button>
   )

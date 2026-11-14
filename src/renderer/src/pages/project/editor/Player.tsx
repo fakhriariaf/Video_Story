@@ -186,7 +186,7 @@ function OverlayItem({ o, asset, box, editable }: { o: Overlay; asset: Asset | n
     top: `${o.y * 100}%`,
     transform: `translate(calc(${-ax * 100}% + ${pad * (2 * ax - 1)}px), calc(${-ay * 100}% + ${pad * (2 * ay - 1)}px))`
   }
-  const ring = editable ? (selected ? 'cursor-move outline outline-2 outline-offset-2 outline-accent' : 'cursor-move hover:outline hover:outline-1 hover:outline-offset-2 hover:outline-canvas') : 'pointer-events-none'
+  const ring = editable ? (selected ? 'cursor-move outline outline-2 outline-offset-2 outline-accent' : 'cursor-move hover:outline hover:outline-1 hover:outline-offset-2 hover:outline-fg/70') : 'pointer-events-none'
 
   if (o.kind === 'image') {
     if (!asset) return null
@@ -303,7 +303,7 @@ export function Player({
   return (
     <section ref={stage} className="flex min-h-0 flex-col items-center justify-center gap-3 bg-strip p-5">
       <div
-        className="relative overflow-hidden rounded-lg border border-edge bg-select"
+        className="relative overflow-hidden rounded-lg border border-line-2 bg-black"
         style={{ width: box.w, height: box.h }}
         onClick={audition ? stopAudition : toggle}
       >
@@ -337,7 +337,7 @@ export function Player({
           .map((o) => (
             <OverlayItem key={o.id} o={o} asset={null} box={box} editable={editOverlays} />
           ))}
-        {!items.length && <div className="flex size-full items-center justify-center text-canvas">Belum ada klip</div>}
+        {!items.length && <div className="flex size-full items-center justify-center text-muted">Belum ada klip</div>}
         {audition && win && (
           <span className="pointer-events-none absolute left-2.5 top-2.5 z-10 flex items-center gap-1.5 rounded-full bg-strip/80 px-2.5 py-1 text-xs font-medium text-fg">
             <span className="size-1.5 animate-pulse rounded-full bg-accent" />

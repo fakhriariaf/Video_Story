@@ -68,7 +68,7 @@ export function TransitionPanel({ clip, next, index }: { clip: Clip; next: Clip;
                   on ? 'border-accent bg-select' : trying === t.id ? 'border-edge bg-canvas' : 'border-line-2 hover:border-edge'
                 )}
               >
-                <span className={cx('flex size-8 items-center justify-center rounded-full border', on ? 'border-edge bg-sun' : 'border-line-2 bg-panel')}>
+                <span className={cx('flex size-8 items-center justify-center rounded-full border', on ? 'border-sun bg-sun text-sun-on' : 'border-line-2 bg-panel')}>
                   <Icon className="size-4" />
                 </span>
                 <span className={cx('text-sm', on && 'font-semibold')}>{t.label}</span>

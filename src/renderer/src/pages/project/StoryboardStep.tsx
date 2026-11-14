@@ -281,7 +281,7 @@ function ClipPanel({ clip, index, total }: { clip: Clip; index: number; total: n
                       on ? 'border-edge bg-select text-fg' : 'border-line-2 bg-panel text-fg hover:border-edge'
                     )}
                   >
-                    <CharacterAvatar name={c.name} sheetUrl={sheet?.url} size={28} className={on ? 'border-canvas/70' : undefined} />
+                    <CharacterAvatar name={c.name} sheetUrl={sheet?.url} size={28} className={on ? 'border-fg/70' : undefined} />
                     {c.name}
                   </button>
                 )

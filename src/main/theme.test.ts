@@ -94,3 +94,41 @@ test('no legacy class, font or colour names remain in the renderer', () => {
   )
   assert.deepEqual(hits, [])
 })
+
+function rendererLines(): { text: string; at: string }[] {
+  return rendererFiles().flatMap((file) =>
+    readFileSync(file, 'utf8')
+      .split(/\r?\n/)
+      .map((text, i) => ({ text, at: `${relative(RENDERER, file)}:${i + 1}` }))
+  )
+}
+
+test('dark text is only used on the bright accent and sun fills', () => {
+  // text-canvas is the dark colour for text on a bright fill; anywhere else it is dark on dark.
+  const hits = rendererLines()
+    .filter((l) => /\btext-canvas\b/.test(l.text) && !/\bbg-(accent|sun|fg)\b/.test(l.text))
+    .map((l) => l.at)
+  assert.deepEqual(hits, [])
+})
+
+test('light fills carry dark text', () => {
+  // A bright yellow fill with the default light text is unreadable. The playhead line and its handle carry no text.
+  const TEXTLESS = /w-0.5 bg-sun|size-3.5 rounded-.3px. bg-sun/
+  const hits = rendererLines()
+    .filter((l) => !TEXTLESS.test(l.text))
+    .filter((l) => /\bbg-sun\b(?![-/])/.test(l.text) && !/\btext-sun-on\b/.test(l.text) && /className|cx\(|'/.test(l.text))
+    .map((l) => l.at)
+  assert.deepEqual(hits, [])
+})
+
+test('outlines and borders never use the canvas colour', () => {
+  const hits = rendererLines()
+    .filter((l) => /\b(border|outline)-canvas\b/.test(l.text))
+    .map((l) => l.at)
+  assert.deepEqual(hits, [])
+})
+
+test('the window opens on the canvas colour, not on the old cream', () => {
+  const main = readFileSync(join(process.cwd(), 'src', 'main', 'index.ts'), 'utf8')
+  assert.match(main, new RegExp(`backgroundColor: '${color('canvas')}'`, 'i'))
+})

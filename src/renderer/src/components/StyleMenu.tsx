@@ -103,7 +103,7 @@ export function StyleMenu({ value, onChange }: { value: string; onChange: (id: s
                 <span
                   className={cx(
                     'relative block aspect-square w-full overflow-hidden rounded-[11px] bg-raised transition-shadow',
-                    on ? 'border-2 border-accent' : 'border border-line group-hover:border-edge group-focus-visible:border-edge'
+                    on ? 'border-2 border-accent' : 'border border-line group-hover:border-edge group-focus-visible:ring-2 group-focus-visible:ring-accent'
                   )}
                 >
                   <StyleSwatch styleId={s.id} className="size-full transition-transform duration-500 ease-out group-hover:scale-[1.07]" iconSize={24} />

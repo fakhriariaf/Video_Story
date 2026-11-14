@@ -19,7 +19,7 @@ const ORIGIN = LABEL_W + PAD
 const ROW_GAP = 8
 const TICK_STEPS = [1, 2, 5, 10, 15, 30, 60, 120]
 /** The one look for "this is what the panel is editing", on every track. */
-const SELECTED = 'z-[1] ring-2 ring-accent ring-offset-1 ring-offset-panel'
+const SELECTED = 'z-[1] ring-2 ring-sun ring-offset-1 ring-offset-panel'
 /** How close (in pixels) a dragged edge has to come to the playhead or a clip joint to snap to it. */
 const SNAP_PX = 8
 const MAX_IMAGE_MS = 120_000
@@ -84,8 +84,8 @@ function retimedWords(all: WordTiming[], c: CaptionChunk, start: number, end: nu
 function Playhead({ pps }: { pps: number }) {
   const t = usePlayback((s) => s.t)
   return (
-    <div className="pointer-events-none absolute bottom-0 top-0 z-10 w-0.5 bg-accent" style={{ left: ORIGIN + t * pps }}>
-      <span className="absolute -left-[6px] -top-0.5 size-3.5 rounded-[3px] border border-edge bg-accent" />
+    <div className="pointer-events-none absolute bottom-0 top-0 z-10 w-0.5 bg-sun" style={{ left: ORIGIN + t * pps }}>
+      <span className="absolute -left-[6px] -top-0.5 size-3.5 rounded-[3px] bg-sun" />
     </div>
   )
 }
@@ -246,11 +246,11 @@ export function Timeline({
         {...on(spec, side)}
         title={`Tarik untuk mengatur ${side === 'left' ? 'awal' : 'akhir'} ${label}`}
         className={cx(
-          'group/edge absolute inset-y-0 z-[4] flex w-2.5 cursor-ew-resize items-center justify-center hover:bg-strip/20',
+          'group/edge absolute inset-y-0 z-[4] flex w-2.5 cursor-ew-resize items-center justify-center hover:bg-fg/10',
           side === 'left' ? 'left-0 rounded-l-[inherit]' : 'right-0 rounded-r-[inherit]'
         )}
       >
-        <span className={cx('h-1/2 max-h-6 w-[3px] rounded-full bg-strip/70 transition-opacity', selected ? 'opacity-100' : 'opacity-0 group-hover/edge:opacity-100')} />
+        <span className={cx('h-1/2 max-h-6 w-[3px] rounded-full bg-fg/80 ring-1 ring-strip/60 transition-opacity', selected ? 'opacity-100' : 'opacity-0 group-hover/edge:opacity-100')} />
       </span>
     ))
 

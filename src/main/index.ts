@@ -28,7 +28,7 @@ function createWindow(): void {
     minWidth: 1180,
     minHeight: 720,
     show: false,
-    backgroundColor: '#FAF7F2',
+    backgroundColor: '#121026',
     autoHideMenuBar: true,
     title: 'Video Story',
     webPreferences: {
