@@ -186,7 +186,7 @@ function ClipPanel({ clip, index, total }: { clip: Clip; index: number; total: n
 
       {/* The preview stays put while the settings below it scroll. */}
       <div className="shrink-0 border-b border-line px-5 pb-3.5 pt-4">
-        <div className={cx('relative overflow-hidden rounded-xl border-[1.5px] border-edge bg-canvas', aspect)}>
+        <div className={cx('relative overflow-hidden rounded-lg border border-edge bg-canvas', aspect)}>
           {image && !isRunning(imageJob) && clip.motionType === 'camera' ? (
             <MotionPreview image={image} clip={clip} />
           ) : (
@@ -200,7 +200,7 @@ function ClipPanel({ clip, index, total }: { clip: Clip; index: number; total: n
             </div>
           )}
           {versions.length > 1 && (
-            <div className="absolute bottom-2.5 left-2.5 flex items-center gap-1.5 rounded-[10px] border border-edge bg-panel/95 p-1.5">
+            <div className="absolute bottom-2.5 left-2.5 flex items-center gap-1.5 rounded-lg border border-edge bg-panel/95 p-1.5">
               {versions.slice(-5).map((v, i, arr) => (
                 <button
                   key={v.id}
@@ -352,7 +352,7 @@ function ClipPanel({ clip, index, total }: { clip: Clip; index: number; total: n
                   aria-pressed={on}
                   onClick={() => updateClip(clip.id, { motionType: o.id })}
                   className={cx(
-                    'flex items-center gap-2.5 rounded-xl px-3 py-2 text-left',
+                    'flex items-center gap-2.5 rounded-lg px-3 py-2 text-left',
                     on ? 'border-2 border-accent bg-accent-soft' : 'border border-line-2 bg-panel hover:border-edge'
                   )}
                 >
@@ -621,7 +621,7 @@ export function StoryboardStep() {
                 : 'Rekam ulang suara narasi'}
         </Button>
         <Button
-          className="border-[1.5px] border-edge font-semibold"
+          className="border border-edge font-semibold"
           icon={<ImageIcon className="size-[17px]" />}
           disabled={!stats.needImg}
           onClick={() => void bulk(() => window.api.generate.missingImages(project.id))}
@@ -644,7 +644,7 @@ export function StoryboardStep() {
                 ? 'Semua klip sudah video'
                 : `Jadikan ${stats.needVideo.length} video`}
             {stats.videoRunning === 0 && costLabel(videoCost) && stats.needVideo.length > 0 && (
-              <span className="font-normal text-white/80">≈ {costLabel(videoCost)}</span>
+              <span className="font-normal opacity-80">≈ {costLabel(videoCost)}</span>
             )}
           </Button>
         )}
@@ -663,7 +663,7 @@ export function StoryboardStep() {
             </Button>
           </div>
           {stale > 0 && (
-            <div className="flex items-center gap-3 rounded-2xl border border-sun bg-sun-soft px-4 py-3 text-sm text-sun-ink">
+            <div className="flex items-center gap-3 rounded-[14px] border border-sun bg-sun-soft px-4 py-3 text-sm text-sun-ink">
               <Sparkles className="size-[18px] shrink-0" />
               <span className="flex-1">
                 {stale} adegan belum punya visual dari naskah terbaru. Buat visualnya dulu supaya gambar sesuai dengan alur cerita.

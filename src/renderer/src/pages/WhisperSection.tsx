@@ -38,9 +38,9 @@ export function WhisperSection({ settings, onSettings }: { settings: AppSettings
           <p className="text-sm text-fg-2">Menyamakan waktu tiap kata caption dengan suara narasi, langsung di komputer ini.</p>
         </div>
       </div>
-      <section className="flex flex-col gap-4 rounded-2xl border border-line bg-panel px-5 py-[18px]">
+      <section className="flex flex-col gap-4 rounded-[14px] border border-line bg-panel px-5 py-[18px]">
         <div className="flex items-center gap-3">
-          <span className="flex size-10 shrink-0 items-center justify-center rounded-[10px] border border-edge bg-select text-fg">
+          <span className="flex size-10 shrink-0 items-center justify-center rounded-lg border border-edge bg-select text-fg">
             <AudioLines className="size-5" />
           </span>
           <div className="flex flex-1 flex-col">

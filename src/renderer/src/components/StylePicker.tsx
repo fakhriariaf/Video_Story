@@ -37,7 +37,7 @@ export function StylePicker({ value, onChange }: { value: string; onChange: (id:
                   {CATEGORY_LABEL[s.category]}
                 </span>
                 {on && (
-                  <span className="absolute right-2 top-2 flex size-6 items-center justify-center rounded-full border-[1.5px] border-edge bg-accent text-white">
+                  <span className="absolute right-2 top-2 flex size-6 items-center justify-center rounded-full bg-accent text-canvas">
                     <Check className="size-3.5" strokeWidth={3} />
                   </span>
                 )}

@@ -168,8 +168,8 @@ export function ModelPicker({
         aria-expanded={open}
         onClick={() => setOpen(!open)}
         className={cx(
-          'flex h-12 w-full items-center gap-3 rounded-xl border bg-panel px-3.5 text-left transition-colors disabled:opacity-50',
-          open ? 'border-edge' : value ? 'border-line-2 hover:border-edge' : 'border-[1.5px] border-accent bg-accent-soft'
+          'flex h-12 w-full items-center gap-3 rounded-lg border bg-panel px-3.5 text-left transition-colors disabled:opacity-50',
+          open ? 'border-edge' : value ? 'border-line-2 hover:border-edge' : 'border border-accent bg-accent-soft'
         )}
       >
         {renderIcon && current && renderIcon(current)}
@@ -194,7 +194,7 @@ export function ModelPicker({
       {open && (
         <div
           className={cx(
-            'absolute z-40 flex min-w-full flex-col overflow-hidden rounded-2xl border-[1.5px] border-edge bg-panel shadow-pop',
+            'absolute z-40 flex min-w-full flex-col overflow-hidden rounded-[14px] border border-edge bg-panel shadow-pop',
             align === 'right' ? 'right-0' : 'left-0',
             menu.up ? 'bottom-full mb-1.5' : 'top-full mt-1.5',
             menuClassName
@@ -202,7 +202,7 @@ export function ModelPicker({
           style={{ maxHeight: menu.max }}
         >
           <div className="flex flex-col gap-2 border-b border-line p-2.5">
-            <label className="flex h-10 items-center gap-2 rounded-xl border border-line-2 bg-canvas px-3 focus-within:border-edge">
+            <label className="flex h-10 items-center gap-2 rounded-lg border border-line-2 bg-canvas px-3 focus-within:border-edge">
               <Search className="size-4 shrink-0 text-muted" />
               <input
                 ref={input}
@@ -260,7 +260,7 @@ export function ModelPicker({
           </div>
 
           <div ref={list} id="model-list" role="listbox" className="scroll-thin min-h-0 flex-1 overflow-y-auto p-1.5">
-            {error && <p className="m-1 rounded-xl bg-bad-soft px-3 py-2.5 text-[13px] text-bad-ink">{error}</p>}
+            {error && <p className="m-1 rounded-lg bg-bad-soft px-3 py-2.5 text-[13px] text-bad-ink">{error}</p>}
             {!error && loading && !models.length && (
               <p className="flex items-center gap-2 px-3 py-4 text-sm text-fg-2">
                 <Spinner />
@@ -290,7 +290,7 @@ export function ModelPicker({
                   title={m.locked ?? (detail === 'description' ? m.id : undefined)}
                   // The chosen model is marked by its background, which keeps the list narrow.
                   className={cx(
-                    'flex w-full items-start gap-2.5 rounded-xl px-3 py-2 text-left',
+                    'flex w-full items-start gap-2.5 rounded-lg px-3 py-2 text-left',
                     m.locked ? 'cursor-not-allowed opacity-50' : selected ? 'bg-sun-soft' : i === active ? 'bg-raised' : 'hover:bg-raised/60'
                   )}
                 >
@@ -349,7 +349,7 @@ export function ModelPicker({
                 data-row={filtered.length}
                 onMouseEnter={() => setActive(filtered.length)}
                 onClick={() => pick(customId)}
-                className={cx('flex w-full items-center gap-2.5 rounded-xl px-3 py-2.5 text-left text-sm', active === filtered.length ? 'bg-raised' : 'hover:bg-raised/60')}
+                className={cx('flex w-full items-center gap-2.5 rounded-lg px-3 py-2.5 text-left text-sm', active === filtered.length ? 'bg-raised' : 'hover:bg-raised/60')}
               >
                 <span className="size-4" />
                 Pakai model <span className="font-mono font-semibold">{customId}</span>

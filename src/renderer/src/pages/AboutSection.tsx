@@ -8,7 +8,7 @@ export function AboutSection() {
   }, [])
 
   return (
-    <section className="flex flex-col gap-5 rounded-2xl border border-line bg-panel p-6 text-[15px] leading-relaxed text-fg-2">
+    <section className="flex flex-col gap-5 rounded-[14px] border border-line bg-panel p-6 text-[15px] leading-relaxed text-fg-2">
       <div className="flex items-end justify-between gap-4">
         <div className="flex flex-col">
           <h1 className="font-display text-[34px] font-bold tracking-[-0.015em] text-fg">Video Story</h1>

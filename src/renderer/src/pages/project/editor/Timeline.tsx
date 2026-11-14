@@ -85,7 +85,7 @@ function Playhead({ pps }: { pps: number }) {
   const t = usePlayback((s) => s.t)
   return (
     <div className="pointer-events-none absolute bottom-0 top-0 z-10 w-0.5 bg-accent" style={{ left: ORIGIN + t * pps }}>
-      <span className="absolute -left-[6px] -top-0.5 size-3.5 rounded-[3px] border-[1.5px] border-edge bg-accent" />
+      <span className="absolute -left-[6px] -top-0.5 size-3.5 rounded-[3px] border border-edge bg-accent" />
     </div>
   )
 }
@@ -520,7 +520,7 @@ export function Timeline({
                   title={`${text} (klik untuk edit teks)`}
                   aria-pressed={selected}
                   className={cx(
-                    'absolute top-0 flex h-[30px] cursor-pointer select-none items-center overflow-hidden whitespace-nowrap rounded-md border border-[#E3C46A] bg-sun-soft px-1.5 text-xs text-sun-ink hover:border-sun-ink',
+                    'absolute top-0 flex h-[30px] cursor-pointer select-none items-center overflow-hidden whitespace-nowrap rounded-md border border-sun-ink/40 bg-sun-soft px-1.5 text-xs text-sun-ink hover:border-sun-ink',
                     selected && SELECTED
                   )}
                   style={{ left: start * pps + 1, width: Math.max(4, (end - start) * pps - 2) }}
@@ -577,7 +577,7 @@ export function Timeline({
                 aria-pressed={is('music')}
                 aria-label="Musik latar"
                 className={cx(
-                  'absolute top-0 flex h-[30px] cursor-pointer select-none items-center gap-2 overflow-hidden whitespace-nowrap rounded-md border border-[#9CC596] bg-ok-soft px-2.5 text-xs text-ok-ink hover:border-ok-ink',
+                  'absolute top-0 flex h-[30px] cursor-pointer select-none items-center gap-2 overflow-hidden whitespace-nowrap rounded-md border border-ok-ink/40 bg-ok-soft px-2.5 text-xs text-ok-ink hover:border-ok-ink',
                   is('music') && SELECTED
                 )}
                 style={{ left: ms.startSec * pps + 1, width: Math.max(10, (ms.endSec - ms.startSec) * pps - 2) }}
@@ -605,7 +605,7 @@ export function Timeline({
                     title={label}
                     className={cx(
                       'absolute top-0 flex h-[30px] cursor-pointer select-none items-center gap-1.5 overflow-hidden whitespace-nowrap rounded-md border px-2 text-xs font-medium',
-                      o.kind === 'image' ? 'border-[#A9C3E3] bg-info-soft text-info-ink' : 'border-[#CFC3EA] bg-[#EFEAFA] text-[#4A3B78]',
+                      o.kind === 'image' ? 'border-info-ink/40 bg-info-soft text-info-ink' : 'border-accent/40 bg-accent-soft text-link',
                       is('overlay', o.id) && SELECTED
                     )}
                     style={{ left: start * pps + 1, width: Math.max(10, (end - start) * pps - 2) }}

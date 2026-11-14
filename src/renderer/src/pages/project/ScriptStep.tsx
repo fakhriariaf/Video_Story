@@ -69,7 +69,7 @@ function SceneCard({ clip, index, total, onInsert }: { clip: Clip; index: number
   }
 
   return (
-    <article id={`scene-${clip.id}`} className="flex gap-4 rounded-2xl border border-line bg-panel p-4 transition-colors focus-within:border-edge">
+    <article id={`scene-${clip.id}`} className="flex gap-4 rounded-[14px] border border-line bg-panel p-4 transition-colors focus-within:border-edge">
       <div className="flex w-9 shrink-0 flex-col items-center gap-1 pt-1.5">
         <span className="rounded-md bg-select px-[7px] py-0.5 font-mono text-xs text-fg">{clipNumber(index)}</span>
         <IconButton label="Pindah ke atas" size={30} className="border-transparent bg-transparent" disabled={index === 0} onClick={() => moveClip(clip.id, -1)}>
@@ -251,7 +251,7 @@ export function ScriptStep() {
           </div>
 
           {project.synopsis.trim() && (
-            <div className="flex items-start gap-3 rounded-xl bg-raised px-4 py-3 text-[13px] text-fg-2">
+            <div className="flex items-start gap-3 rounded-lg bg-raised px-4 py-3 text-[13px] text-fg-2">
               <span className="shrink-0 font-semibold text-fg">Ide awal</span>
               <span className="line-clamp-2 flex-1">{project.synopsis}</span>
               <button type="button" onClick={() => updateProject({ step: 1 })} className="shrink-0 font-semibold text-link hover:underline">
@@ -270,7 +270,7 @@ export function ScriptStep() {
             <button
               type="button"
               onClick={() => insert(clips[clips.length - 1]?.id ?? null)}
-              className="mt-3 flex h-12 items-center justify-center gap-2 rounded-2xl border-[1.5px] border-dashed border-line-3 text-sm font-medium text-fg-2 hover:border-edge hover:text-fg"
+              className="mt-3 flex h-12 items-center justify-center gap-2 rounded-[14px] border border-dashed border-line-3 text-sm font-medium text-fg-2 hover:border-edge hover:text-fg"
             >
               <Plus className="size-4" />
               Tambah adegan

@@ -598,7 +598,7 @@ function CaptionTab() {
             return (
               <button key={s.id} type="button" aria-pressed={on} onClick={() => updateEditor({ captionStyle: s.id, captionColor: undefined, captionHighlight: undefined, captionBg: undefined })} className="flex flex-col gap-1 text-left">
                 <span
-                  className={cx('flex h-[52px] w-full items-center justify-center rounded-[10px] bg-[#E99A5B]', on ? 'border-2 border-accent' : 'border border-edge')}
+                  className={cx('flex h-[52px] w-full items-center justify-center rounded-lg bg-[#E99A5B]', on ? 'border-2 border-accent' : 'border border-edge')}
                 >
                   <span
                     className="whitespace-nowrap rounded-md px-1.5 py-0.5 text-[12px]"
@@ -624,7 +624,7 @@ function CaptionTab() {
           aria-pressed={e.captionStyle === 'none'}
           onClick={() => updateEditor({ captionStyle: 'none' })}
           className={cx(
-            'flex h-9 items-center justify-center gap-1.5 rounded-[10px] text-[13px] font-medium',
+            'flex h-9 items-center justify-center gap-1.5 rounded-lg text-[13px] font-medium',
             e.captionStyle === 'none' ? 'border-2 border-accent bg-accent-soft' : 'border border-line-2 hover:border-edge'
           )}
         >
@@ -781,7 +781,7 @@ function MusicTab() {
       <MusicPromptSection />
       <Section title="Musik latar">
         {music ? (
-          <div className="flex items-center gap-2.5 rounded-xl border border-[#9CC596] bg-ok-soft px-3 py-2.5 text-[13px] text-ok-ink">
+          <div className="flex items-center gap-2.5 rounded-lg border border-ok-ink/40 bg-ok-soft px-3 py-2.5 text-[13px] text-ok-ink">
             <Music className="size-4 shrink-0" />
             <span className="flex-1 truncate">{music.prompt}</span>
             <button type="button" aria-label="Lepas musik" onClick={() => updateEditor({ musicAssetId: null })} className="hover:text-fg">

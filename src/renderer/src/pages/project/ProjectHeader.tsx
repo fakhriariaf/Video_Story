@@ -125,7 +125,7 @@ export function ProjectHeader({ doneSteps, right }: { doneSteps: Step[]; right?:
               <span
                 className={cx(
                   'inline-flex size-6 items-center justify-center rounded-full text-xs',
-                  active ? 'bg-accent text-white' : done ? 'bg-ok-soft text-ok-ink' : 'border border-line-2 bg-panel text-fg-2'
+                  active ? 'bg-sun text-sun-on' : done ? 'bg-ok-soft text-ok-ink' : 'border border-line-2 bg-panel text-fg-2'
                 )}
               >
                 {done ? <Check className="size-[13px]" strokeWidth={3} /> : s.n}

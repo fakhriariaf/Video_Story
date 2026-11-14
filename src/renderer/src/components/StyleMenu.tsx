@@ -98,7 +98,7 @@ export function StyleMenu({ value, onChange }: { value: string; onChange: (id: s
                 onClick={() => pick(s.id)}
                 onMouseEnter={() => setPeek(s.id)}
                 onFocus={() => setPeek(s.id)}
-                className="group flex flex-col gap-1.5 rounded-xl text-left outline-none"
+                className="group flex flex-col gap-1.5 rounded-lg text-left outline-none"
               >
                 <span
                   className={cx(
@@ -111,7 +111,7 @@ export function StyleMenu({ value, onChange }: { value: string; onChange: (id: s
                     {CATEGORY_LABEL[s.category]}
                   </span>
                   {on && (
-                    <span className="absolute right-1.5 top-1.5 flex size-5 items-center justify-center rounded-full border-[1.5px] border-edge bg-accent text-white">
+                    <span className="absolute right-1.5 top-1.5 flex size-5 items-center justify-center rounded-full bg-accent text-canvas">
                       <Check className="size-3" strokeWidth={3} />
                     </span>
                   )}

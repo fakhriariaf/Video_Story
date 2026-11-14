@@ -59,7 +59,7 @@ function Slider({ label, value, min, max, unit, onChange }: { label: string; val
 function PositionGrid({ o, aspect }: { o: Overlay; aspect: number }) {
   return (
     <div className="flex items-center gap-3">
-      <div className="grid grid-cols-3 gap-1 rounded-xl border border-line-2 bg-canvas p-1.5" role="group" aria-label="Posisi overlay">
+      <div className="grid grid-cols-3 gap-1 rounded-lg border border-line-2 bg-canvas p-1.5" role="group" aria-label="Posisi overlay">
         {ANCHOR_GRID.map((a) => {
           const on = o.anchor === a
           return (
@@ -245,7 +245,7 @@ export function OverlayPanel({ total }: { total: number }) {
           <button
             type="button"
             onClick={() => void addImage()}
-            className="flex flex-col items-center gap-1.5 rounded-xl border border-line-2 bg-panel px-2 py-3 text-center hover:border-edge"
+            className="flex flex-col items-center gap-1.5 rounded-lg border border-line-2 bg-panel px-2 py-3 text-center hover:border-edge"
           >
             <ImagePlus className="size-5" />
             <span className="text-[13px] font-semibold">Logo / gambar</span>
@@ -254,7 +254,7 @@ export function OverlayPanel({ total }: { total: number }) {
           <button
             type="button"
             onClick={addText}
-            className="flex flex-col items-center gap-1.5 rounded-xl border border-line-2 bg-panel px-2 py-3 text-center hover:border-edge"
+            className="flex flex-col items-center gap-1.5 rounded-lg border border-line-2 bg-panel px-2 py-3 text-center hover:border-edge"
           >
             <Type className="size-5" />
             <span className="text-[13px] font-semibold">Teks</span>
@@ -272,7 +272,7 @@ export function OverlayPanel({ total }: { total: number }) {
               return (
                 <div
                   key={o.id}
-                  className={cx('flex items-center gap-2.5 rounded-xl border px-2 py-1.5', on ? 'border-accent bg-accent-soft' : 'border-line-2 hover:border-edge')}
+                  className={cx('flex items-center gap-2.5 rounded-lg border px-2 py-1.5', on ? 'border-accent bg-accent-soft' : 'border-line-2 hover:border-edge')}
                 >
                   <button type="button" onClick={() => pick(o)} aria-pressed={on} className="flex min-w-0 flex-1 items-center gap-2.5 text-left">
                     <span className="flex size-9 shrink-0 items-center justify-center overflow-hidden rounded-lg border border-line bg-[repeating-conic-gradient(#EFEAE2_0_25%,#FFFFFF_0_50%)] bg-[length:10px_10px]">

@@ -151,7 +151,7 @@ export function Select<T extends string | number>({
           'flex min-w-0 items-center text-left transition-colors disabled:cursor-not-allowed disabled:opacity-50',
           variant === 'pill'
             ? 'inline-flex h-10 gap-2 rounded-full border bg-canvas pl-3.5 pr-3 text-sm font-medium'
-            : cx('w-full gap-2.5 rounded-xl border bg-panel px-3.5 text-fg', SIZES[size]),
+            : cx('w-full gap-2.5 rounded-lg border bg-panel px-3.5 text-fg', SIZES[size]),
           open ? 'border-edge' : 'border-line-2 hover:border-edge',
           className
         )}
@@ -167,7 +167,7 @@ export function Select<T extends string | number>({
       <Popover anchor={trigger} open={open} onClose={(why) => hide(why === 'escape')} width={menuWidth} align={align} maxHeight={search ? 420 : 360}>
         {search && (
           <div className="border-b border-line p-2">
-            <label className="flex h-9 items-center gap-2 rounded-xl border border-line-2 bg-canvas px-3 focus-within:border-edge">
+            <label className="flex h-9 items-center gap-2 rounded-lg border border-line-2 bg-canvas px-3 focus-within:border-edge">
               <Search className="size-4 shrink-0 text-muted" />
               <input
                 autoFocus
@@ -202,7 +202,7 @@ export function Select<T extends string | number>({
                   onMouseEnter={() => !o.disabled && setActive(i)}
                   onClick={() => choose(o)}
                   className={cx(
-                    'flex items-center gap-2.5 rounded-xl px-3 py-2 text-sm',
+                    'flex items-center gap-2.5 rounded-lg px-3 py-2 text-sm',
                     o.disabled ? 'cursor-not-allowed text-muted' : cx('cursor-pointer', selected ? 'bg-sun-soft' : i === active && 'bg-raised')
                   )}
                 >

@@ -53,7 +53,7 @@ function NewCharacter({ onClose, onCreated }: { onClose: () => void; onCreated?:
 
   return (
     <Modal open onClose={() => void close()} title="Pemeran baru" subtitle="Isi nama dan penampilannya, lalu simpan. Lembar karakter bisa dibuat setelah itu." width={760}>
-      <div className="flex h-[150px] flex-col items-center justify-center gap-2 rounded-xl border-[1.5px] border-dashed border-line-3 bg-canvas text-sm text-fg-2">
+      <div className="flex h-[150px] flex-col items-center justify-center gap-2 rounded-lg border border-dashed border-line-3 bg-canvas text-sm text-fg-2">
         <UserPlus className="size-6 text-muted" />
         Lembar karakter dibuat setelah pemeran disimpan.
       </div>
@@ -113,7 +113,7 @@ function EditCharacter({ characterId, onClose }: { characterId: string | null; o
 
   return (
     <Modal open onClose={onClose} title="Lembar karakter" subtitle={`Dipakai di ${usedIn} klip sebagai referensi supaya tampilannya konsisten.`} width={760}>
-      <div className="relative aspect-video overflow-hidden rounded-xl border-[1.5px] border-edge bg-canvas">
+      <div className="relative aspect-video overflow-hidden rounded-lg border border-edge bg-canvas">
         {sheet ? (
           <img src={sheet.url} alt={`Lembar karakter ${c.name}`} className="size-full object-contain" />
         ) : running ? null : (
@@ -161,7 +161,7 @@ function EditCharacter({ characterId, onClose }: { characterId: string | null; o
             Buat ulang lembar
           </Button>
         )}
-        <Button variant="ink" onClick={onClose}>
+        <Button variant="accent" onClick={onClose}>
           Selesai
         </Button>
       </div>

@@ -39,8 +39,8 @@ function joinList(items: string[]): string {
 }
 
 const ASPECTS: SelectOption<AspectRatio>[] = [
-  { value: '16:9', label: '16:9 · YouTube', icon: <span className="block h-[10px] w-[17px] rounded-[2px] border-[1.5px] border-edge" /> },
-  { value: '9:16', label: '9:16 · Shorts', icon: <span className="mx-[3px] block h-[16px] w-[10px] rounded-[2px] border-[1.5px] border-edge" /> }
+  { value: '16:9', label: '16:9 · YouTube', icon: <span className="block h-[10px] w-[17px] rounded-[2px] border border-edge" /> },
+  { value: '9:16', label: '9:16 · Shorts', icon: <span className="mx-[3px] block h-[16px] w-[10px] rounded-[2px] border border-edge" /> }
 ]
 
 export function Home() {
@@ -178,7 +178,7 @@ export function Home() {
       <main className="scroll-thin flex-1 overflow-y-auto">
         <div className="mx-auto flex max-w-[1280px] flex-col gap-5 px-12 pt-11">
           {setupIssues.length > 0 && (
-            <div className="flex items-center gap-3 rounded-2xl border border-sun bg-sun-soft px-4 py-3 text-sm text-sun-ink">
+            <div className="flex items-center gap-3 rounded-[14px] border border-sun bg-sun-soft px-4 py-3 text-sm text-sun-ink">
               <AlertTriangle className="size-[18px] shrink-0" />
               <span className="flex-1">
                 Sebelum mulai, atur dulu {joinList(setupIssues.map((i) => i.what))} di Pengaturan. Tanpa itu,{' '}
@@ -195,7 +195,7 @@ export function Home() {
               Tulis idenya. AI menyusun klip, naskah, dan suaranya, lalu kamu tinggal merapikan di editor.
             </p>
           </div>
-          <div className="flex flex-col gap-3 rounded-[18px] border-[1.5px] border-edge bg-panel py-5 pl-6 pr-5 shadow-pop">
+          <div className="flex flex-col gap-3 rounded-[18px] border border-edge bg-panel py-5 pl-6 pr-5 shadow-pop">
             <label htmlFor="ide" className="text-[13px] font-semibold text-fg-2">
               Ide cerita atau sinopsis
             </label>
@@ -268,9 +268,9 @@ export function Home() {
             <button
               type="button"
               onClick={() => void start()}
-              className="flex min-h-[262px] flex-col items-center justify-center gap-2.5 rounded-2xl border-[1.5px] border-dashed border-line-3 text-fg-2 hover:border-edge hover:bg-panel"
+              className="flex min-h-[262px] flex-col items-center justify-center gap-2.5 rounded-[14px] border border-dashed border-line-3 text-fg-2 hover:border-edge hover:bg-panel"
             >
-              <span className="flex size-[54px] items-center justify-center rounded-full border-[1.5px] border-edge bg-accent text-white">
+              <span className="flex size-[54px] items-center justify-center rounded-full bg-accent text-canvas">
                 <Plus className="size-6" strokeWidth={2.2} />
               </span>
               <span className="text-base font-semibold text-fg">Proyek baru</span>
@@ -280,7 +280,7 @@ export function Home() {
             {visible.map((p) => {
               const st = STATUS[p.status]
               return (
-                <article key={p.id} className="flex flex-col overflow-hidden rounded-2xl border border-line bg-panel">
+                <article key={p.id} className="flex flex-col overflow-hidden rounded-[14px] border border-line bg-panel">
                   <button type="button" onClick={() => go({ name: 'project', id: p.id })} className="text-left">
                     <div className="relative aspect-video w-full overflow-hidden border-b border-line">
                       {p.coverUrl ? (

@@ -100,7 +100,7 @@ export function Popover({
       onPointerDown={(e) => e.stopPropagation()}
       onMouseDown={(e) => e.stopPropagation()}
       onClick={(e) => e.stopPropagation()}
-      className={cx('fixed z-50 flex flex-col overflow-hidden rounded-2xl border-[1.5px] border-edge bg-panel shadow-pop', className)}
+      className={cx('fixed z-50 flex flex-col overflow-hidden rounded-[14px] border border-edge bg-panel shadow-pop', className)}
     >
       {children}
     </div>,

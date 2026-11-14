@@ -30,7 +30,7 @@ export function TransitionButton({ clip, next, x, selected, onPick }: { clip: Cl
       title={`Transisi: ${current.label}${seconds ? ` · ${secondsLabel(seconds)}` : ''}`}
       className={cx(
         // Small and on top, so the clip edges above and below it can still be dragged.
-        'absolute top-1/2 z-[5] flex size-5 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full border-[1.5px] border-edge shadow-[0_1px_0_rgba(0,0,0,0.25)] transition-colors',
+        'absolute top-1/2 z-[5] flex size-5 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full border border-edge shadow-[0_1px_0_rgba(0,0,0,0.25)] transition-colors',
         current.id === 'cut' ? 'bg-panel text-fg-2 hover:bg-sun-soft' : 'bg-sun text-fg hover:bg-sun-soft',
         selected && 'ring-2 ring-accent ring-offset-2 ring-offset-panel'
       )}

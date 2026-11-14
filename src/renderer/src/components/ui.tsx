@@ -7,23 +7,22 @@ import { Popover } from './Popover'
 
 export { cx }
 
-type Variant = 'primary' | 'secondary' | 'accent' | 'ghost' | 'danger' | 'ink'
+type Variant = 'primary' | 'secondary' | 'accent' | 'ghost' | 'danger'
 type Size = 'sm' | 'md' | 'lg'
 
 const VARIANTS: Record<Variant, string> = {
-  primary:
-    'bg-accent text-white border-[1.5px] border-edge hover:bg-accent-press font-semibold',
-  secondary: 'bg-panel text-fg border border-line-2 hover:border-edge hover:bg-canvas font-medium',
-  accent: 'bg-panel text-link border-[1.5px] border-accent hover:bg-accent-soft font-semibold',
+  // Yellow is the one action that moves the flow forward; a screen shows at most one of these.
+  primary: 'bg-sun text-sun-on hover:brightness-105 font-semibold',
+  secondary: 'bg-raised text-fg border border-line-2 hover:border-edge font-medium',
+  accent: 'bg-accent text-canvas hover:bg-accent-press font-semibold',
   ghost: 'bg-transparent text-fg-2 border border-transparent hover:bg-raised hover:text-fg font-medium',
-  danger: 'bg-panel text-bad-ink border border-line-2 hover:border-bad-ink hover:bg-bad-soft font-medium',
-  ink: 'bg-select text-fg border border-edge hover:bg-select font-semibold'
+  danger: 'bg-bad-soft text-bad-ink hover:brightness-110 font-medium'
 }
 
 const SIZES: Record<Size, string> = {
-  sm: 'h-9 px-3 text-[13px] gap-1.5 rounded-[10px]',
-  md: 'h-10 px-4 text-sm gap-2 rounded-xl',
-  lg: 'h-12 px-6 text-[15px] gap-2.5 rounded-xl'
+  sm: 'h-9 px-3 text-[13px] gap-1.5 rounded-lg',
+  md: 'h-10 px-4 text-sm gap-2 rounded-lg',
+  lg: 'h-12 px-6 text-[15px] gap-2.5 rounded-lg'
 }
 
 export function Button({
@@ -68,7 +67,7 @@ export function IconButton({
       title={label}
       style={{ width: size, height: size }}
       className={cx(
-        'inline-flex shrink-0 items-center justify-center rounded-xl border border-line-2 bg-panel text-fg transition-colors hover:border-edge hover:bg-canvas disabled:opacity-40',
+        'inline-flex shrink-0 items-center justify-center rounded-lg border border-line-2 bg-raised text-fg transition-colors hover:border-edge disabled:opacity-40',
         className
       )}
       {...rest}
@@ -89,8 +88,8 @@ export function Chip({
       type="button"
       aria-pressed={on}
       className={cx(
-        'inline-flex h-9 items-center gap-1.5 whitespace-nowrap rounded-full border px-3.5 text-sm font-medium transition-colors',
-        on ? 'border-edge bg-select text-fg' : 'border-line-2 bg-panel text-fg hover:border-edge',
+        'inline-flex h-9 items-center gap-1.5 whitespace-nowrap rounded-lg border px-3.5 text-sm font-medium transition-colors',
+        on ? 'border-select bg-select text-fg' : 'border-line-2 bg-raised text-fg-2 hover:border-edge hover:text-fg',
         className
       )}
       {...rest}
@@ -114,7 +113,7 @@ export function Segmented<T extends string>({
   size?: 'sm' | 'md'
 }) {
   return (
-    <div className={cx('inline-flex gap-0.5 rounded-xl border border-line bg-raised p-[3px]', className)}>
+    <div className={cx('inline-flex gap-0.5 rounded-lg border border-line-2 bg-canvas p-[3px]', className)}>
       {options.map((o) => (
         <button
           key={o.id}
@@ -124,9 +123,9 @@ export function Segmented<T extends string>({
           title={o.title}
           onClick={() => onChange(o.id)}
           className={cx(
-            'flex-1 whitespace-nowrap rounded-[9px] px-3 font-medium transition-colors disabled:cursor-not-allowed disabled:text-muted/70',
+            'flex-1 whitespace-nowrap rounded-md px-3 font-medium transition-colors disabled:cursor-not-allowed disabled:text-muted/70',
             size === 'sm' ? 'h-8 text-[13px]' : 'h-9 text-sm',
-            o.id === value ? 'bg-panel text-fg shadow-[0_0_0_1px_var(--color-line)]' : 'text-fg-2 enabled:hover:text-fg'
+            o.id === value ? 'bg-select text-fg' : 'text-fg-2 enabled:hover:text-fg'
           )}
         >
           {o.label}
@@ -136,19 +135,18 @@ export function Segmented<T extends string>({
   )
 }
 
-type Tone = 'draft' | 'info' | 'warn' | 'ok' | 'bad' | 'ink'
+type Tone = 'draft' | 'info' | 'warn' | 'ok' | 'bad'
 const TONES: Record<Tone, string> = {
   draft: 'bg-draft text-fg-2',
   info: 'bg-info-soft text-info-ink',
   warn: 'bg-sun-soft text-sun-ink',
   ok: 'bg-ok-soft text-ok-ink',
-  bad: 'bg-bad-soft text-bad-ink',
-  ink: 'bg-select text-fg'
+  bad: 'bg-bad-soft text-bad-ink'
 }
 
 export function Badge({ tone = 'draft', children, className }: { tone?: Tone; children: ReactNode; className?: string }) {
   return (
-    <span className={cx('inline-flex items-center gap-1 whitespace-nowrap rounded-full px-2.5 py-[3px] text-xs font-semibold', TONES[tone], className)}>
+    <span className={cx('inline-flex items-center gap-1 whitespace-nowrap rounded-md px-2 py-[3px] text-xs font-semibold', TONES[tone], className)}>
       {children}
     </span>
   )
@@ -163,17 +161,17 @@ export function Switch({ on, onChange, label }: { on: boolean; onChange: (v: boo
       aria-label={label}
       onClick={() => onChange(!on)}
       className={cx(
-        'flex h-7 w-[46px] shrink-0 items-center rounded-full border-[1.5px] border-edge p-[3px] transition-colors',
-        on ? 'justify-end bg-accent' : 'justify-start bg-line'
+        'flex h-7 w-[46px] shrink-0 items-center rounded-full p-[3px] transition-colors',
+        on ? 'justify-end bg-accent' : 'justify-start bg-line-3'
       )}
     >
-      <span className="block size-[19px] rounded-full border-[1.5px] border-edge bg-white" />
+      <span className="block size-[21px] rounded-full bg-fg" />
     </button>
   )
 }
 
 export const inputCls =
-  'w-full rounded-xl border border-line-2 bg-panel px-3.5 text-[15px] text-fg outline-none transition-colors placeholder:text-muted/80 focus:border-edge'
+  'w-full rounded-lg border border-line-2 bg-panel px-3.5 text-[15px] text-fg outline-none transition-colors placeholder:text-faint focus:border-accent'
 
 export function Field({ label, hint, children, className }: { label: ReactNode; hint?: ReactNode; children: ReactNode; className?: string }) {
   return (
@@ -187,7 +185,7 @@ export function Field({ label, hint, children, className }: { label: ReactNode; 
 
 export function Progress({ value, className }: { value: number; className?: string }) {
   return (
-    <span className={cx('block h-2 overflow-hidden rounded-full bg-[#EFE9DF]', className)}>
+    <span className={cx('block h-2 overflow-hidden rounded-full bg-raised', className)}>
       <span className="block h-full rounded-full bg-accent transition-[width] duration-300" style={{ width: `${Math.round(value * 100)}%` }} />
     </span>
   )
@@ -228,11 +226,11 @@ export function Modal({
   }, [open, onClose])
   if (!open) return null
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-strip/50 p-6" onMouseDown={(e) => e.target === e.currentTarget && onClose()}>
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-strip/75 p-6" onMouseDown={(e) => e.target === e.currentTarget && onClose()}>
       <div
         role="dialog"
         aria-modal="true"
-        className="scroll-thin flex max-h-full flex-col gap-5 overflow-y-auto rounded-[20px] border-[1.5px] border-edge bg-panel p-7 shadow-pop"
+        className="scroll-thin flex max-h-full flex-col gap-5 overflow-y-auto rounded-[14px] border border-line-2 bg-panel p-7 shadow-pop"
         style={{ width }}
       >
         <div className="flex items-start gap-3">
@@ -282,7 +280,7 @@ export function ConfirmHost() {
       <p className="text-[15px] leading-relaxed text-fg-2">{req?.body}</p>
       <div className="flex justify-end gap-2.5">
         <Button onClick={() => close(false)}>{req?.cancel ?? 'Batal'}</Button>
-        <Button variant={req?.danger ? 'ink' : 'primary'} onClick={() => close(true)} autoFocus>
+        <Button variant={req?.danger ? 'danger' : 'primary'} onClick={() => close(true)} autoFocus>
           {req?.confirm}
         </Button>
       </div>
@@ -309,7 +307,7 @@ export function Menu({ trigger, items }: { trigger: (open: () => void) => ReactN
               it.run()
             }}
             className={cx(
-              'flex h-10 w-full shrink-0 items-center gap-2.5 rounded-xl px-3 text-left text-sm font-medium hover:bg-raised',
+              'flex h-10 w-full shrink-0 items-center gap-2.5 rounded-lg px-3 text-left text-sm font-medium hover:bg-raised',
               it.danger ? 'text-bad-ink' : 'text-fg'
             )}
           >

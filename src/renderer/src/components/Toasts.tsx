@@ -11,7 +11,7 @@ export function Toasts() {
           key={t.id}
           role={t.kind === 'error' ? 'alert' : 'status'}
           className={cx(
-            'pointer-events-auto flex items-start gap-3 rounded-2xl border-[1.5px] border-edge bg-panel px-4 py-3',
+            'pointer-events-auto flex items-start gap-3 rounded-[14px] border border-edge bg-panel px-4 py-3',
             t.kind === 'error' && 'bg-bad-soft'
           )}
         >

@@ -67,8 +67,8 @@ function VoicePicker({ provider, value, onChange }: { provider: TtsProvider; val
         onClick={() => player.toggle(id, url)}
         className={cx(
           'flex shrink-0 items-center justify-center rounded-full border transition-colors',
-          size === 'row' ? 'size-7' : 'size-12 rounded-xl',
-          on ? 'border-accent bg-accent text-white' : 'border-line-2 bg-panel text-fg hover:border-edge'
+          size === 'row' ? 'size-7' : 'size-12 rounded-lg',
+          on ? 'border-accent bg-accent-soft text-fg' : 'border-line-2 bg-panel text-fg hover:border-edge'
         )}
       >
         {on ? <Square className="size-3.5" fill="currentColor" /> : <Play className="ml-px size-3.5" fill="currentColor" />}
@@ -76,7 +76,7 @@ function VoicePicker({ provider, value, onChange }: { provider: TtsProvider; val
     )
   }
 
-  if (error) return <p className="flex h-12 flex-1 items-center rounded-xl bg-bad-soft px-3.5 text-[13px] text-bad-ink">{error}</p>
+  if (error) return <p className="flex h-12 flex-1 items-center rounded-lg bg-bad-soft px-3.5 text-[13px] text-bad-ink">{error}</p>
   return (
     <>
       <Select
@@ -173,7 +173,7 @@ export function IdeaStep() {
               </p>
             </div>
 
-            <div className="flex flex-col gap-2 rounded-2xl border-[1.5px] border-edge bg-panel px-[18px] pb-3 pt-4">
+            <div className="flex flex-col gap-2 rounded-[14px] border border-edge bg-panel px-[18px] pb-3 pt-4">
               <label htmlFor="sinopsis" className="text-[13px] font-semibold text-fg-2">
                 Ide cerita atau sinopsis
               </label>
@@ -233,7 +233,7 @@ export function IdeaStep() {
                         aria-pressed={on}
                         onClick={() => updateProject({ aspectRatio: f.id })}
                         className={cx(
-                          'flex h-12 items-center gap-2.5 rounded-xl px-3 text-left',
+                          'flex h-12 items-center gap-2.5 rounded-lg px-3 text-left',
                           on ? 'border-2 border-accent bg-accent-soft' : 'border border-line-2 bg-panel hover:border-edge'
                         )}
                       >

@@ -31,7 +31,7 @@ export function ClipVisual({
       ) : running ? null : (
         <div
           className={cx(
-            'absolute inset-2 flex flex-col items-center justify-center gap-1.5 rounded-[10px] border-[1.5px] border-dashed text-muted',
+            'absolute inset-2 flex flex-col items-center justify-center gap-1.5 rounded-lg border border-dashed text-muted',
             failed ? 'border-bad-ink/40 bg-bad-soft text-bad-ink' : 'border-line-3 bg-canvas'
           )}
         >

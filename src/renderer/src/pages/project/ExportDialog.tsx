@@ -107,7 +107,7 @@ export function ExportDialog({ open, onClose }: { open: boolean; onClose: () => 
             <Button icon={<RotateCcw className="size-4" />} onClick={() => setJobId(null)}>
               Ekspor lagi
             </Button>
-            <Button variant="ink" onClick={onClose}>
+            <Button variant="accent" onClick={onClose}>
               Selesai
             </Button>
           </div>
@@ -115,7 +115,7 @@ export function ExportDialog({ open, onClose }: { open: boolean; onClose: () => 
       ) : (
         <>
           {missing.length > 0 && (
-            <div className="flex items-start gap-2.5 rounded-xl border border-sun bg-sun-soft px-3.5 py-2.5 text-[13px] text-sun-ink">
+            <div className="flex items-start gap-2.5 rounded-lg border border-sun bg-sun-soft px-3.5 py-2.5 text-[13px] text-sun-ink">
               <AlertTriangle className="mt-0.5 size-4 shrink-0" />
               <span>
                 Klip {missing.map(({ i }) => clipNumber(i)).join(', ')} belum punya gambar. Buat gambarnya dulu di Storyboard sebelum ekspor.
@@ -123,14 +123,14 @@ export function ExportDialog({ open, onClose }: { open: boolean; onClose: () => 
             </div>
           )}
           {missing.length === 0 && noVoice > 0 && (
-            <div className="flex items-start gap-2.5 rounded-xl border border-line bg-raised px-3.5 py-2.5 text-[13px] text-fg-2">
+            <div className="flex items-start gap-2.5 rounded-lg border border-line bg-raised px-3.5 py-2.5 text-[13px] text-fg-2">
               <AlertTriangle className="mt-0.5 size-4 shrink-0" />
               <span>{noVoice} klip belum punya suara narasi. Klip itu akan tampil tanpa suara dan tanpa caption.</span>
             </div>
           )}
           <label className="flex flex-col gap-1.5">
             <span className="text-sm font-semibold">Nama file</span>
-            <div className="flex h-[46px] overflow-hidden rounded-xl border border-line-2">
+            <div className="flex h-[46px] overflow-hidden rounded-lg border border-line-2">
               <input value={opts.fileName} onChange={(e) => set({ fileName: e.target.value })} className="flex-1 px-3.5 text-[15px] outline-none" />
               <span className="flex items-center border-l border-line-2 bg-raised px-3.5 font-mono text-sm text-fg-2">.mp4</span>
             </div>
@@ -147,7 +147,7 @@ export function ExportDialog({ open, onClose }: { open: boolean; onClose: () => 
                       type="button"
                       aria-pressed={on}
                       onClick={() => set({ resolution: r.id })}
-                      className={cx('flex h-14 flex-col items-center justify-center rounded-xl', on ? 'border-2 border-accent bg-accent-soft' : 'border border-line-2 hover:border-edge')}
+                      className={cx('flex h-14 flex-col items-center justify-center rounded-lg', on ? 'border-2 border-accent bg-accent-soft' : 'border border-line-2 hover:border-edge')}
                     >
                       <span className="text-[15px] font-semibold">{r.label}</span>
                       <span className="text-xs text-fg-2">{r.sub}</span>
@@ -166,7 +166,7 @@ export function ExportDialog({ open, onClose }: { open: boolean; onClose: () => 
                     aria-pressed={opts.fps === f}
                     onClick={() => set({ fps: f })}
                     className={cx(
-                      'h-14 rounded-xl text-[15px] font-semibold',
+                      'h-14 rounded-lg text-[15px] font-semibold',
                       opts.fps === f ? 'border-2 border-accent bg-accent-soft' : 'border border-line-2 hover:border-edge'
                     )}
                   >

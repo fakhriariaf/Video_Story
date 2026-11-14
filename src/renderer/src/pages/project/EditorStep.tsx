@@ -208,8 +208,8 @@ export function EditorStep() {
                 aria-pressed={on}
                 onClick={() => setTab(t.id)}
                 className={cx(
-                  'flex h-[62px] w-[68px] flex-col items-center justify-center gap-1 rounded-xl text-xs',
-                  on ? 'border-[1.5px] border-edge bg-sun-soft font-semibold text-fg' : 'font-medium text-fg-2 hover:bg-raised'
+                  'flex h-[62px] w-[68px] flex-col items-center justify-center gap-1 rounded-lg text-xs',
+                  on ? 'border border-edge bg-sun-soft font-semibold text-fg' : 'font-medium text-fg-2 hover:bg-raised'
                 )}
               >
                 <Icon className="size-5" />

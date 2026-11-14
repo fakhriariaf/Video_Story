@@ -95,7 +95,7 @@ function ProviderSelect<T extends string>({ value, options, onChange }: { value:
         aria-expanded={open}
         onClick={() => setOpen(!open)}
         className={cx(
-          'flex w-full items-center gap-3 rounded-2xl border-[1.5px] border-edge bg-panel px-4 py-3 text-left transition-shadow',
+          'flex w-full items-center gap-3 rounded-[14px] border border-edge bg-panel px-4 py-3 text-left transition-shadow',
           open ? 'shadow-none' : ''
         )}
       >
@@ -108,7 +108,7 @@ function ProviderSelect<T extends string>({ value, options, onChange }: { value:
         <ChevronDown className={cx('size-5 shrink-0 transition-transform', open && 'rotate-180')} />
       </button>
       {open && (
-        <div role="listbox" className="absolute inset-x-0 top-full z-40 mt-1.5 flex flex-col gap-0.5 rounded-2xl border-[1.5px] border-edge bg-panel p-1.5 shadow-pop">
+        <div role="listbox" className="absolute inset-x-0 top-full z-40 mt-1.5 flex flex-col gap-0.5 rounded-[14px] border border-edge bg-panel p-1.5 shadow-pop">
           {options.map((o) => {
             const on = o.id === value
             return (
@@ -121,7 +121,7 @@ function ProviderSelect<T extends string>({ value, options, onChange }: { value:
                   setOpen(false)
                   if (!on) onChange(o.id)
                 }}
-                className={cx('flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left', on ? 'bg-accent-soft' : 'hover:bg-raised')}
+                className={cx('flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-left', on ? 'bg-accent-soft' : 'hover:bg-raised')}
               >
                 <ProviderLogo id={o.logo} size={36} />
                 <span className="flex min-w-0 flex-1 flex-col">
@@ -389,7 +389,7 @@ function KeyForm({
 }
 
 function Card({ children }: { children: ReactNode }) {
-  return <section className="flex flex-col gap-4 rounded-2xl border border-line bg-panel px-5 py-[18px]">{children}</section>
+  return <section className="flex flex-col gap-4 rounded-[14px] border border-line bg-panel px-5 py-[18px]">{children}</section>
 }
 
 function SectionTitle({ icon, title, sub }: { icon: ReactNode; title: string; sub: ReactNode }) {
@@ -737,7 +737,7 @@ export function Settings() {
               aria-current={tab === n.id ? 'page' : undefined}
               onClick={() => setTab(n.id)}
               className={cx(
-                'flex h-11 items-center gap-3 rounded-xl px-3.5 text-left text-[15px]',
+                'flex h-11 items-center gap-3 rounded-lg px-3.5 text-left text-[15px]',
                 tab === n.id ? 'bg-select font-semibold text-fg' : 'font-medium text-fg hover:bg-raised'
               )}
             >
@@ -776,7 +776,7 @@ export function Settings() {
                   <h1 className="font-display text-[34px] font-bold tracking-[-0.015em]">Umum</h1>
                   <p className="mt-2 text-[15px] text-fg-2">Pilihan bawaan untuk proyek baru.</p>
                 </div>
-                <section className="flex flex-col gap-5 rounded-2xl border border-line bg-panel p-6">
+                <section className="flex flex-col gap-5 rounded-[14px] border border-line bg-panel p-6">
                   <Field label="Bahasa default naskah dan suara">
                     <Select
                       label="Bahasa default naskah dan suara"
@@ -788,7 +788,7 @@ export function Settings() {
                   </Field>
                   <Field label="Folder ekspor">
                     <div className="flex gap-2">
-                      <div className="flex h-11 min-w-0 flex-1 items-center gap-2.5 rounded-xl border border-line bg-raised px-3.5 font-mono text-[13px]">
+                      <div className="flex h-11 min-w-0 flex-1 items-center gap-2.5 rounded-lg border border-line bg-raised px-3.5 font-mono text-[13px]">
                         <FolderOpen className="size-[17px] shrink-0 text-fg-2" />
                         <span className="truncate">{folder}</span>
                       </div>

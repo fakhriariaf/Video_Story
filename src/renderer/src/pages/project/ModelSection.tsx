@@ -73,7 +73,7 @@ function Cost({
 
 function Card({ icon, title, children }: { icon: ReactNode; title: string; children: ReactNode }) {
   return (
-    <div className="flex min-w-0 flex-col gap-2 rounded-2xl border border-line-2 bg-panel p-3">
+    <div className="flex min-w-0 flex-col gap-2 rounded-[14px] border border-line-2 bg-panel p-3">
       <span className="flex items-center gap-2 text-[13px] font-semibold text-fg-2">
         {icon}
         {title}
