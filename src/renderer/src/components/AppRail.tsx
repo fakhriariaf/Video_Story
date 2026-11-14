@@ -12,7 +12,22 @@ export interface RailSubItem {
   onPick: () => void
 }
 
-function Item({ on, icon, children, onClick, small }: { on?: boolean; icon?: ReactNode; children: ReactNode; onClick: () => void; small?: boolean }) {
+function Item({
+  on,
+  icon,
+  children,
+  onClick,
+  small,
+  attention
+}: {
+  on?: boolean
+  icon?: ReactNode
+  children: ReactNode
+  onClick: () => void
+  small?: boolean
+  /** A small dot after the label: something behind this item needs the user. */
+  attention?: string
+}) {
   return (
     <button
       type="button"
@@ -27,6 +42,7 @@ function Item({ on, icon, children, onClick, small }: { on?: boolean; icon?: Rea
     >
       {icon}
       <span className="truncate">{children}</span>
+      {attention && <span className="ml-auto size-2 shrink-0 rounded-full bg-sun" role="img" aria-label={attention} title={attention} />}
     </button>
   )
 }
@@ -53,6 +69,8 @@ export function AppRail({
 }) {
   const { go } = useApp()
   const openSettings = (): void => (onSettings ? onSettings() : go({ name: 'settings', back: { name: 'home' } }))
+  // Captions work without Whisper (with estimated timing), so only the three required services raise the dot.
+  const needsSetup = services.some((s) => s.id !== 'caption' && !s.ok)
   return (
     <aside className="flex min-h-0 flex-col border-r border-line bg-rail px-4 pb-4 pt-5">
       <button type="button" onClick={() => go({ name: 'home' })} className="self-start rounded-lg px-1.5 pb-5" aria-label="Video Story, ke Beranda">
@@ -67,7 +85,10 @@ export function AppRail({
         <Item on={active === 'home'} icon={<HomeIcon className="size-[17px]" />} onClick={() => go({ name: 'home' })}>
           Beranda
         </Item>
-        <Item on={active === 'settings' && !sub?.length} icon={<SlidersHorizontal className="size-[17px]" />} onClick={openSettings}>
+        <Item on={active === 'settings' && !sub?.length} icon={<SlidersHorizontal className="size-[17px]" />}
+          onClick={openSettings}
+          attention={needsSetup && active !== 'settings' ? 'Ada layanan AI yang belum siap' : undefined}
+        >
           Pengaturan
         </Item>
         {sub && (
@@ -82,22 +103,28 @@ export function AppRail({
       </nav>
       <div className="flex-1" />
       {services.length > 0 && (
-        <button
-          type="button"
-          onClick={openSettings}
-          title="Buka Pengaturan layanan AI"
-          className="flex flex-col gap-1.5 rounded-lg border-t border-line px-2 pb-1 pt-3.5 text-left text-[13px] hover:bg-raised"
-        >
-          <span className="pb-0.5 font-semibold text-fg">Layanan AI</span>
-          {services.map((s) => (
-            <span key={s.id} className="flex items-center gap-2 text-muted">
-              <span className={cx('size-[7px] shrink-0 rounded-full', s.ok ? 'bg-ok-ink' : 'bg-line-3')} aria-hidden="true" />
-              <span>{s.label}</span>
-              <span className={cx('ml-auto truncate pl-2 text-right', s.ok ? 'text-fg-2' : 'text-muted')}>{s.provider}</span>
-              <span className="sr-only">{s.ok ? 'siap' : 'belum siap'}</span>
-            </span>
-          ))}
-        </button>
+        // The separator sits on the wrapper so the button's rounded hover fill does not bend or cover it.
+        <div className="border-t border-line pt-2">
+          <button
+            type="button"
+            onClick={openSettings}
+            title="Buka Pengaturan layanan AI"
+            className="flex w-full flex-col gap-1.5 rounded-lg px-2 py-1.5 text-left text-[13px] hover:bg-raised"
+          >
+            <span className="pb-0.5 font-semibold text-fg">Layanan AI</span>
+            {services.map((s) => (
+              <span key={s.id} className="flex items-center gap-2 text-muted">
+                {/* Ready is a filled dot, not ready a hollow one: the difference does not rest on colour alone. */}
+                <span className={cx('size-[7px] shrink-0 rounded-full', s.ok ? 'bg-ok-ink' : 'border border-muted')} aria-hidden="true" />
+                <span>{s.label}</span>
+                <span className={cx('ml-auto truncate pl-2 text-right', s.ok ? 'text-fg-2' : 'text-muted')} title={s.provider}>
+                  {s.provider}
+                </span>
+                <span className="sr-only">{s.ok ? 'siap' : 'belum siap'}</span>
+              </span>
+            ))}
+          </button>
+        </div>
       )}
     </aside>
   )

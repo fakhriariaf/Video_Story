@@ -114,8 +114,9 @@ test('dark text is only used on the bright accent and sun fills', () => {
 })
 
 test('light fills carry dark text', () => {
-  // A bright yellow fill with the default light text is unreadable. The playhead line and its handle carry no text.
-  const TEXTLESS = /w-0.5 bg-sun|size-3.5 rounded-.3px. bg-sun/
+  // A bright yellow fill with the default light text is unreadable. The playhead line, its handle and the rail's
+  // attention dot carry no text.
+  const TEXTLESS = /w-0.5 bg-sun|size-3.5 rounded-.3px. bg-sun|size-2 shrink-0 rounded-full bg-sun/
   const hits = rendererLines()
     .filter((l) => !TEXTLESS.test(l.text))
     .filter((l) => /\bbg-sun\b(?![-/])/.test(l.text) && !/\btext-sun-on\b/.test(l.text) && /className|cx\(|'/.test(l.text))

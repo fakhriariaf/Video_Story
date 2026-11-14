@@ -93,7 +93,7 @@ function SceneCard({ clip, index, total, onInsert }: { clip: Clip; index: number
             onChange={(e) => updateClip(clip.id, { title: e.target.value })}
             aria-label={`Judul adegan ${index + 1}`}
             placeholder="Judul adegan"
-            className="-ml-1 min-w-0 flex-1 rounded-md bg-transparent px-1 font-display text-lg font-bold outline-none hover:bg-raised focus:bg-raised"
+            className="-ml-1 min-w-0 flex-1 rounded-md bg-transparent px-1 font-display text-lg font-semibold outline-none hover:bg-raised focus:bg-raised"
           />
           {stale && <Badge tone="warn">Visual perlu diperbarui</Badge>}
           {voiceOld && <Badge tone="warn">Suara perlu dibuat ulang</Badge>}
@@ -220,7 +220,7 @@ export function ScriptStep() {
   if (!clips.length)
     return (
       <div className="flex h-full flex-col items-center justify-center gap-4 text-center">
-        <h2 className="font-display text-3xl font-bold">Naskah masih kosong</h2>
+        <h2 className="font-display text-3xl font-semibold">Naskah masih kosong</h2>
         <p className="max-w-md text-fg-2">Tulis idenya di langkah Ide cerita lalu klik Susun naskah, atau tulis adegannya sendiri.</p>
         <div className="flex gap-2.5">
           <Button onClick={() => updateProject({ step: 1 })}>Ke Ide cerita</Button>
@@ -236,9 +236,8 @@ export function ScriptStep() {
       <div className="scroll-thin h-full overflow-y-auto pb-32">
         <div className="mx-auto flex max-w-[940px] flex-col gap-5 px-10 pt-8">
           <div>
-            <p className="text-[13px] font-semibold text-accent">Langkah 2 dari 4</p>
-            <h1 className="mt-1.5 font-display text-[40px] font-bold leading-tight tracking-[-0.02em]">Naskah</h1>
-            <p className="mt-2 text-[15px] text-fg-2">
+            <h1 className="font-display text-[44px] font-semibold leading-none">Naskah</h1>
+            <p className="mt-2 text-[15px] text-muted">
               Baca alurnya dulu. Ubah, tambah, hapus, atau urutkan adegannya sesukamu, lalu AI membuat visual tiap adegan dari naskah ini.
             </p>
           </div>

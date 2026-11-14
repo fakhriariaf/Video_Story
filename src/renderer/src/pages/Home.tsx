@@ -126,6 +126,8 @@ export function Home() {
   }, [projects, filter, query])
 
   const start = async (): Promise<void> => {
+    // A second click while the first project is being created would make two.
+    if (creating) return
     setCreating(true)
     try {
       const b = await window.api.projects.create({ synopsis, durationSec, language, aspectRatio, styleId, ttsProvider: tts })
@@ -179,7 +181,7 @@ export function Home() {
           <h1 className="font-display text-[52px] font-semibold leading-none">Mau bikin video apa hari ini?</h1>
           <p className="mt-2.5 text-base text-muted">Tulis idenya. AI menyusun adegan, naskah, dan suaranya, lalu kamu merapikannya di editor.</p>
 
-          <div className="mt-6 flex flex-col gap-3 rounded-[14px] border border-line-2 bg-panel px-5 pb-4 pt-[18px]">
+          <div className="mt-6 flex flex-col gap-3 rounded-[14px] border border-line-2 bg-panel px-5 pb-4 pt-[18px] focus-within:border-accent">
             <label htmlFor="ide" className="sr-only">
               Ide cerita atau sinopsis
             </label>
@@ -251,7 +253,7 @@ export function Home() {
               })}
             </div>
             <div className="flex-1" />
-            <label className="flex h-9 w-[240px] items-center gap-2 rounded-lg border border-line-2 bg-panel px-3 text-muted">
+            <label className="flex h-9 w-[240px] items-center gap-2 rounded-lg border border-line-2 bg-panel px-3 text-muted focus-within:border-accent">
               <Search className="size-4" />
               <input
                 type="search"
@@ -279,8 +281,12 @@ export function Home() {
             {visible.map((p) => {
               const st = STATUS[p.status]
               return (
-                <article key={p.id} className="flex flex-col overflow-hidden rounded-md bg-panel">
-                  <button type="button" onClick={() => go({ name: 'project', id: p.id })} className="text-left">
+                <article
+                  key={p.id}
+                  // The picture would paint over an outline on the button, so keyboard focus is shown around the whole card.
+                  className="flex flex-col overflow-hidden rounded-md bg-panel has-[>button:focus-visible]:outline-2 has-[>button:focus-visible]:outline-offset-2 has-[>button:focus-visible]:outline-accent"
+                >
+                  <button type="button" onClick={() => go({ name: 'project', id: p.id })} className="text-left focus-visible:outline-none">
                     <div className="relative aspect-video w-full overflow-hidden">
                       {p.coverUrl ? (
                         <img src={p.coverUrl} alt="" className="size-full object-cover" />
@@ -294,7 +300,9 @@ export function Home() {
                         </span>
                       )}
                     </div>
-                    <div className="truncate px-3 pt-2.5 text-[15.5px] font-semibold">{p.title}</div>
+                    <div className="truncate px-3 pt-2.5 text-[15.5px] font-semibold" title={p.title}>
+                      {p.title}
+                    </div>
                   </button>
                   <div className="flex items-center gap-2 pb-1.5 pl-3 pr-1.5 pt-0.5">
                     <Badge tone={st.tone}>{st.label}</Badge>

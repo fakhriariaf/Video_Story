@@ -87,11 +87,11 @@ export function ProjectHeader({ doneSteps, right }: { doneSteps: Step[]; right?:
                   if (e.key === 'Enter') (e.target as HTMLInputElement).blur()
                   if (e.key === 'Escape') setEditing(false)
                 }}
-                className="h-8 w-[320px] rounded-lg border border-edge bg-panel px-2 font-display text-lg font-bold outline-none"
+                className="h-8 w-[320px] rounded-lg border border-edge bg-panel px-2 font-display text-lg font-semibold outline-none"
               />
             ) : (
               <>
-                <span className="truncate font-display text-lg font-bold">{project.title}</span>
+                <span className="truncate font-display text-lg font-semibold">{project.title}</span>
                 <button
                   type="button"
                   aria-label="Ganti nama proyek"

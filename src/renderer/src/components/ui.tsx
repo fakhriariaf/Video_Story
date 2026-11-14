@@ -12,11 +12,12 @@ type Size = 'sm' | 'md' | 'lg'
 
 const VARIANTS: Record<Variant, string> = {
   // Yellow is the one action that moves the flow forward; a screen shows at most one of these.
-  primary: 'bg-sun text-sun-on hover:brightness-105 font-semibold',
-  secondary: 'bg-raised text-fg border border-line-2 hover:border-edge font-medium',
-  accent: 'bg-accent text-canvas hover:bg-accent-press font-semibold',
-  ghost: 'bg-transparent text-fg-2 border border-transparent hover:bg-raised hover:text-fg font-medium',
-  danger: 'bg-bad-soft text-bad-ink hover:brightness-110 font-medium'
+  // Disabled buttons become a grey plate with readable text instead of a faded copy of their colour.
+  primary: 'bg-sun text-sun-on hover:brightness-105 font-semibold disabled:bg-raised disabled:text-muted disabled:brightness-100',
+  secondary: 'bg-raised text-fg border border-line-2 hover:border-edge font-medium disabled:text-muted disabled:hover:border-line-2',
+  accent: 'bg-accent text-canvas hover:brightness-110 font-semibold disabled:bg-raised disabled:text-muted disabled:brightness-100',
+  ghost: 'bg-transparent text-fg-2 border border-transparent hover:bg-raised hover:text-fg font-medium disabled:opacity-50',
+  danger: 'bg-bad-soft text-bad-ink hover:brightness-110 font-medium disabled:bg-raised disabled:text-muted disabled:brightness-100'
 }
 
 const SIZES: Record<Size, string> = {
@@ -40,7 +41,7 @@ export function Button({
       type="button"
       disabled={disabled || loading}
       className={cx(
-        'inline-flex shrink-0 items-center justify-center whitespace-nowrap transition-colors disabled:cursor-not-allowed disabled:opacity-50',
+        'inline-flex shrink-0 items-center justify-center whitespace-nowrap transition-colors disabled:cursor-not-allowed',
         VARIANTS[variant],
         SIZES[size],
         className
@@ -235,7 +236,7 @@ export function Modal({
       >
         <div className="flex items-start gap-3">
           <div className="flex-1">
-            <h2 className="font-display text-[26px] font-bold leading-tight">{title}</h2>
+            <h2 className="font-display text-[26px] font-semibold leading-tight">{title}</h2>
             {subtitle && <p className="mt-1 text-sm text-fg-2">{subtitle}</p>}
           </div>
           <IconButton label="Tutup" onClick={onClose}>
