@@ -43,6 +43,8 @@ const PAIRS: [string, string][] = [
   ['sun-on', 'sun'],
   ['canvas', 'accent'],
   ['ok-ink', 'ok-soft'],
+  ['fg', 'ok-soft'],
+  ['fg', 'bad-soft'],
   ['info-ink', 'info-soft'],
   ['sun-ink', 'sun-soft'],
   ['bad-ink', 'bad-soft']

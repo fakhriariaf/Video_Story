@@ -6,6 +6,7 @@ import { VOICE_TAGS } from '@shared/speech'
 import type { Clip, LlmProvider } from '@shared/types'
 import { AutoTextarea } from '../../components/AutoTextarea'
 import { Badge, Button, IconButton, Menu, confirmDialog, cx, inputCls } from '../../components/ui'
+import { WorkNote } from '../../components/WorkNote'
 import { clipNumber, errorText, mmss } from '../../lib/format'
 import { useApp } from '../../store/app'
 import { useProject } from '../../store/project'
@@ -279,7 +280,8 @@ export function ScriptStep() {
       </div>
 
       <footer className="absolute inset-x-0 bottom-0 flex h-[84px] items-center gap-3 border-t border-line bg-panel px-14">
-        <div className="flex flex-col gap-0.5">
+        {busy && <WorkNote title={`AI sedang menyusun visual ${busy === 'all' ? clips.length : stale || clips.length} adegan…`} typicalSec={120} />}
+        <div className={cx('flex-col gap-0.5', busy ? 'hidden' : 'flex')}>
           <span className="text-[15px] font-semibold">
             {clips.length} adegan · ± {mmss(totalMs)}
           </span>

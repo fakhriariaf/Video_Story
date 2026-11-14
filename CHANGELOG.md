@@ -37,6 +37,12 @@ Cara menaikkan versi ada di [docs/pengembangan.md](docs/pengembangan.md#versi-da
 ### Diperbaiki
 - Klik ganda pada "Mulai" tidak lagi membuat dua proyek.
 - Perkiraan biaya tidak lagi sempat menampilkan harga model sebelumnya saat model diganti.
+- Harga model fal.ai diambil dalam satu permintaan untuk semua model, bukan satu per model, sehingga tidak lagi
+  ditolak fal.ai karena terlalu banyak permintaan (harga sebelumnya sering kosong).
+- Menyusun naskah dan visual sekarang menampilkan keterangan "AI sedang menyusun…" dengan waktu berjalan dan garis
+  bergerak di bilah bawah.
+- Notifikasi (berhasil atau gagal) tampil di atas bilah bawah dengan warna dan bayangan, tidak lagi menutupi tombol
+  utama dan menyatu dengan latarnya.
 
 ## [1.0.0] - 2026-10-02
 

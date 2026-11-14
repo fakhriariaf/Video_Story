@@ -3,6 +3,7 @@ import { basename, extname } from 'node:path'
 import type { KeyTestResult } from '@shared/types'
 import { getSecret, requireSecret } from '../secrets'
 import { falError, falUsd } from './fal-format'
+import { createBatcher, FAL_PRICE_BATCH, falPricingUrl, loadFalPrices, type FalPrice } from './fal-prices'
 import { ApiError, sleep } from './http'
 
 const QUEUE = 'https://queue.fal.run'
@@ -107,21 +108,17 @@ export async function uploadFile(absPath: string, signal?: AbortSignal): Promise
   return slot.file_url
 }
 
-interface FalPrice {
-  endpoint_id: string
-  unit_price: number
-  unit: string
+async function pricePage(endpoints: string[], key?: string): Promise<FalPrice[]> {
+  return (await fal<{ prices?: FalPrice[] }>(falPricingUrl(endpoints), { method: 'GET', key })).prices ?? []
 }
 
-async function prices(endpoint: string, key?: string): Promise<FalPrice | null> {
-  const out = await fal<{ prices?: FalPrice[] }>(`https://api.fal.ai/v1/models/pricing?endpoint_id=${encodeURIComponent(endpoint)}`, { method: 'GET', key })
-  return out.prices?.find((p) => p.endpoint_id === endpoint) ?? out.prices?.[0] ?? null
-}
+// Pickers ask for every model's price in the same moment; the batcher turns that burst into one request.
+const priceOf = createBatcher<FalPrice>((endpoints) => loadFalPrices(endpoints, (ids) => pricePage(ids), sleep), { max: FAL_PRICE_BATCH, waitMs: 40 })
 
 /** Dollars for one image, or one video of `seconds`; null when fal prices it by a unit we cannot predict. */
 export async function priceUsd(endpoint: string, kind: 'image' | 'video', seconds: number): Promise<number | null> {
   try {
-    return falUsd(await prices(endpoint), kind, seconds)
+    return falUsd((await priceOf(endpoint)) ?? null, kind, seconds)
   } catch (e) {
     console.warn(`[fal] price ${endpoint}: ${(e as Error).message}`)
     return null
@@ -133,7 +130,7 @@ export async function testKey(key?: string): Promise<KeyTestResult> {
   const k = key ?? getSecret('fal')
   if (!k) return { ok: false, message: 'Kunci belum diatur' }
   try {
-    const p = await prices('google/nano-banana-2.1', k)
+    const [p = null] = await pricePage(['google/nano-banana-2.1'], k)
     const usd = falUsd(p, 'image', 0)
     return { ok: true, message: usd != null ? `Terhubung · 1 gambar Nano Banana 2.1 ≈ US$${usd.toLocaleString('id-ID', { maximumFractionDigits: 3 })}` : 'Terhubung' }
   } catch (e) {

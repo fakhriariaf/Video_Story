@@ -5,14 +5,15 @@ import { cx } from './ui'
 export function Toasts() {
   const { toasts, dismiss } = useApp()
   return (
-    <div className="pointer-events-none fixed bottom-6 right-6 z-[60] flex w-[380px] flex-col gap-2.5">
+    // Above the steps' footers: at the very bottom a toast covered the main button and blended into the footer.
+    <div className="pointer-events-none fixed bottom-[100px] right-6 z-[60] flex w-[380px] flex-col gap-2.5">
       {toasts.map((t) => (
         <div
           key={t.id}
           role={t.kind === 'error' ? 'alert' : 'status'}
           className={cx(
-            'pointer-events-auto flex items-start gap-3 rounded-[14px] border border-edge bg-panel px-4 py-3',
-            t.kind === 'error' && 'bg-bad-soft'
+            'pointer-events-auto flex items-start gap-3 rounded-[14px] border px-4 py-3 shadow-pop motion-safe:animate-[toast-in_0.22s_ease-out]',
+            t.kind === 'error' ? 'border-bad-ink/50 bg-bad-soft' : t.kind === 'success' ? 'border-ok-ink/50 bg-ok-soft' : 'border-edge bg-raised'
           )}
         >
           {t.kind === 'error' ? (
@@ -37,7 +38,7 @@ export function Toasts() {
               </button>
             )}
           </div>
-          <button type="button" aria-label="Tutup" onClick={() => dismiss(t.id)} className="text-muted hover:text-fg">
+          <button type="button" aria-label="Tutup" onClick={() => dismiss(t.id)} className="text-fg-2 hover:text-fg">
             <X className="size-4" />
           </button>
         </div>

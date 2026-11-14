@@ -121,6 +121,9 @@ Model dipilih per proyek (`Project.imageModel`, `Project.videoModel`). Semua mod
 - Harga: `GET https://api.fal.ai/v1/models/pricing?endpoint_id=…`. Satuan per gambar, per detik, atau per video
   dihitung (`falUsd`); satuan lain (misalnya megapiksel) tidak diperkirakan. Tes kunci memakai panggilan ini juga,
   jadi tidak memakai saldo.
+  Harga yang diminta bersamaan (pemilih model meminta semua model sekaligus) dikirim dalam satu permintaan,
+  maksimal 50 endpoint per permintaan (`services/fal-prices.ts`); satu permintaan per model membuat akun dibatasi
+  (HTTP 429).
 - **Memperbarui daftar model:** ubah daftar kurasi di `scripts/fal-catalog.mjs`, lalu jalankan
   `node scripts/fal-catalog.mjs`. Skrip mengambil skema OpenAPI tiap endpoint, menyimpan varian `/edit` sebagai
   `withRefs` (dipakai kalau ada lembar karakter), dan melewati model yang isian wajibnya tidak bisa diisi aplikasi.
