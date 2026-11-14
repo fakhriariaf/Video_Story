@@ -1,0 +1,253 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Video Story: dua tata letak Ide cerita</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=Barlow:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: #e9e9ef; color: #1a1838; font-family: 'Barlow', 'Segoe UI', sans-serif; padding: 28px 20px 60px; }
+  .page { max-width: 1280px; margin: 0 auto; }
+  .intro h1 { font-size: 26px; font-weight: 600; }
+  .intro p { margin-top: 6px; color: #55546e; font-size: 15px; max-width: 76ch; line-height: 1.5; }
+  .jump { display: flex; gap: 8px; margin: 16px 0 6px; flex-wrap: wrap; }
+  .jump a { text-decoration: none; color: #1a1838; background: #fff; border: 1px solid #cfcedd; padding: 8px 14px; border-radius: 999px; font-size: 14px; font-weight: 600; }
+  .dir { margin-top: 34px; }
+  .dir > h2 { font-size: 21px; font-weight: 600; }
+  .dir > .sum { color: #55546e; font-size: 14.5px; margin: 4px 0 12px; max-width: 84ch; line-height: 1.5; }
+  .fit { width: 100%; overflow: hidden; border-radius: 14px; box-shadow: 0 10px 40px rgba(26, 24, 56, .18); }
+  .notes { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 14px; margin-top: 14px; font-size: 14px; line-height: 1.5; }
+  .notes b { display: block; font-size: 13px; color: #55546e; font-weight: 600; margin-bottom: 3px; }
+  button { font: inherit; cursor: default; }
+
+  /* ---------- Ruang Edit, shared by both layouts ---------- */
+  .app { width: 1280px; transform-origin: 0 0; background: #121026; color: #eceafb; font-family: 'Barlow', 'Segoe UI', sans-serif; font-size: 15px; }
+  .top { height: 64px; display: flex; align-items: center; gap: 14px; padding: 0 22px; background: #1b1838; border-bottom: 1px solid #2a2656; }
+  .back { width: 38px; height: 38px; border-radius: 8px; background: #24204a; border: 1px solid #322d63; display: grid; place-items: center; color: #c9c5ee; }
+  .top .ttl strong { font-family: 'Barlow Condensed', sans-serif; font-size: 21px; font-weight: 600; display: block; line-height: 1.05; }
+  .top .ttl small { color: #6fe3b5; font-size: 12.5px; }
+  .steps { margin: 0 auto; display: flex; gap: 4px; background: #121026; border: 1px solid #2a2656; border-radius: 999px; padding: 4px; }
+  .steps span { padding: 6px 14px 6px 8px; border-radius: 999px; font-size: 14.5px; color: #a29ec9; display: flex; align-items: center; gap: 8px; font-weight: 500; }
+  .steps i { width: 22px; height: 22px; border-radius: 50%; border: 1px solid #3a3572; display: grid; place-items: center; font-style: normal; font-size: 12px; }
+  .steps .on { background: #24204a; color: #fff; font-weight: 600; }
+  .steps .on i { background: #ffb627; color: #2a1c00; border: 0; font-weight: 700; }
+  .btn { background: #24204a; border: 1px solid #322d63; color: #eceafb; padding: 0 16px; height: 40px; border-radius: 8px; font-weight: 500; font-size: 14.5px; }
+  .btn.go { background: #ffb627; color: #2a1c00; border: 0; font-weight: 600; height: 48px; padding: 0 26px; font-size: 16px; }
+  .body { display: grid; gap: 28px; padding: 30px 44px 34px; align-items: start; }
+  h1.h { font-family: 'Barlow Condensed', sans-serif; font-weight: 600; font-size: 44px; line-height: 1; }
+  .lede { color: #a29ec9; margin-top: 8px; }
+  .panel { background: #1b1838; border: 1px solid #322d63; border-radius: 14px; }
+  .idea { margin-top: 20px; padding: 16px 18px 12px; }
+  .idea p { font-size: 17px; line-height: 1.55; min-height: 104px; }
+  .idea .foot { display: flex; justify-content: space-between; color: #a29ec9; font-size: 13px; border-top: 1px solid #2a2656; padding-top: 10px; }
+  .lbl { font-size: 14px; font-weight: 600; margin-bottom: 8px; display: block; }
+  .hint { color: #a29ec9; font-size: 13px; margin-top: 8px; line-height: 1.4; }
+  .chips { display: flex; gap: 6px; flex-wrap: wrap; }
+  .chip { background: #24204a; border: 1px solid #322d63; color: #c9c5ee; padding: 7px 10px; white-space: nowrap; border-radius: 8px; font-size: 14px; font-weight: 500; }
+  .chip.on { background: #3d3691; border-color: #3d3691; color: #fff; }
+  .field { background: #121026; border: 1px solid #322d63; border-radius: 8px; height: 40px; display: flex; align-items: center; justify-content: space-between; padding: 0 12px; font-size: 14.5px; }
+  .field::after { content: ''; width: 7px; height: 7px; border-right: 1.5px solid #a29ec9; border-bottom: 1.5px solid #a29ec9; transform: rotate(45deg) translateY(-2px); }
+  .fmt { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+  .fmt div { border: 1px solid #322d63; border-radius: 8px; padding: 8px 10px; display: flex; gap: 9px; align-items: center; font-size: 14px; font-weight: 600; background: #121026; }
+  .fmt div small { display: block; font-weight: 400; color: #a29ec9; font-size: 12.5px; }
+  .fmt div.on { border-color: #7c6cff; background: #2b2566; }
+  .fmt i { border: 1.5px solid #c9c5ee; border-radius: 3px; display: block; }
+  .fmt .w { width: 22px; height: 13px; } .fmt .t { width: 11px; height: 19px; }
+  .seg { display: inline-flex; background: #121026; border: 1px solid #322d63; border-radius: 8px; padding: 3px; font-size: 14px; }
+  .seg span { padding: 6px 11px; border-radius: 6px; color: #c9c5ee; font-weight: 500; } .seg .on { background: #3d3691; color: #fff; }
+  .model { padding: 14px; }
+  .model .who { display: flex; align-items: center; gap: 10px; background: #121026; border: 1px solid #322d63; border-radius: 8px; padding: 8px 10px; }
+  .logo { width: 30px; height: 30px; border-radius: 8px; background: #fff; display: grid; place-items: center; color: #1a1838; font-weight: 700; font-size: 13px; flex: none; }
+  .model strong { font-size: 15px; font-weight: 600; display: block; } .model small { color: #a29ec9; font-size: 12.5px; }
+  .model .tag { margin-left: auto; font-size: 12px; background: #24204a; padding: 2px 8px; border-radius: 6px; color: #c9c5ee; }
+  .cost { margin-top: 10px; font-size: 13.5px; color: #c9c5ee; } .cost b { color: #fff; font-weight: 600; }
+  .tabs { display: flex; gap: 16px; font-size: 14px; color: #a29ec9; }
+  .tabs b { color: #fff; font-weight: 600; border-bottom: 2px solid #ffb627; padding-bottom: 3px; }
+  .th { background-size: cover; background-position: center; border-radius: 6px; position: relative; }
+  .th.sel { outline: 2px solid #7c6cff; outline-offset: 2px; }
+  .th .dim { position: absolute; left: 6px; top: 6px; background: rgba(11,10,26,.8); font-size: 11px; font-weight: 600; padding: 1px 6px; border-radius: 4px; }
+  .bar { height: 78px; border-top: 1px solid #2a2656; background: #1b1838; display: flex; align-items: center; gap: 12px; padding: 0 44px; }
+  .bar strong { font-size: 15px; font-weight: 600; display: block; } .bar small { color: #a29ec9; font-size: 13px; } .bar small a { color: #a99eff; font-weight: 600; }
+
+  /* ---------- A: Meja kerja ---------- */
+  .A .body { grid-template-columns: 1fr 440px; }
+  .A .set { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 16px; }
+  .A .set > div { padding: 14px; }
+  .A .models { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 12px; }
+  .A .style { padding: 16px; }
+  .A .style h3 { font-family: 'Barlow Condensed', sans-serif; font-size: 24px; font-weight: 600; }
+  .A .big { height: 214px; margin: 12px 0 14px; border-radius: 8px; }
+  .A .big .cap { position: absolute; inset: auto 0 0 0; padding: 26px 12px 10px; background: linear-gradient(transparent, rgba(11,10,26,.92)); border-radius: 0 0 8px 8px; }
+  .A .big .cap strong { font-size: 17px; font-weight: 600; display: block; } .A .big .cap small { color: #c9c5ee; font-size: 13px; }
+  .A .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 12px; }
+  .A .grid .th { aspect-ratio: 1; } .A .grid small { display: block; font-size: 12.5px; color: #c9c5ee; margin-top: 5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+  /* ---------- B: Papan clapper ---------- */
+  .B .body { grid-template-columns: 1fr 372px; }
+  .B .row4 { display: grid; grid-template-columns: 2.1fr 1.55fr .9fr 1.35fr; gap: 14px; padding: 14px 16px; margin-top: 16px; }
+  .B .secttl { display: flex; align-items: baseline; gap: 16px; margin: 24px 0 10px; }
+  .B .secttl h3 { font-family: 'Barlow Condensed', sans-serif; font-size: 24px; font-weight: 600; }
+  .B .secttl a { margin-left: auto; color: #a99eff; font-size: 14px; font-weight: 600; }
+  /* styles sit on a strip of film, the same motif as the project list on Home */
+  .B .strip { background: #0b0a1a; border-radius: 10px; padding: 20px 14px; display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; position: relative; }
+  .B .strip::before, .B .strip::after { content: ''; position: absolute; left: 12px; right: 12px; height: 7px; background: repeating-linear-gradient(90deg, #2a2656 0 14px, transparent 14px 28px); border-radius: 2px; }
+  .B .strip::before { top: 6px; } .B .strip::after { bottom: 6px; }
+  .B .strip .th { aspect-ratio: 4/3; } .B .strip small { display: block; font-size: 12.5px; color: #c9c5ee; margin-top: 5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .B .strip .on small { color: #fff; font-weight: 600; }
+  .B .models { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  /* the slate: what this project will be, like the board held up before a take */
+  .B .slate { overflow: hidden; }
+  .B .clap { height: 26px; background: repeating-linear-gradient(-55deg, #eceafb 0 22px, #0b0a1a 22px 44px); }
+  .B .slate .in { padding: 14px 16px 16px; }
+  .B .slate h3 { font-family: 'Barlow Condensed', sans-serif; font-size: 22px; font-weight: 600; line-height: 1.1; }
+  .B .frame { margin: 12px 0 4px; border-radius: 6px; aspect-ratio: 16/9; }
+  .B .frame .tc { position: absolute; right: 8px; bottom: 8px; background: rgba(11,10,26,.85); font-family: 'Barlow Condensed', sans-serif; font-weight: 600; font-size: 15px; padding: 1px 7px; border-radius: 4px; letter-spacing: .04em; }
+  .B dl { display: grid; grid-template-columns: auto 1fr; font-size: 14px; }
+  .B dt, .B dd { padding: 7px 0; border-bottom: 1px solid #2a2656; } .B dt { color: #a29ec9; } .B dd { text-align: right; font-weight: 500; }
+  .B .total { margin-top: 12px; background: #121026; border-radius: 8px; padding: 10px 12px; font-size: 13.5px; color: #c9c5ee; line-height: 1.55; }
+  .B .total b { color: #fff; font-weight: 600; }
+</style>
+</head>
+<body>
+<div class="page">
+  <div class="intro">
+    <h1>Dua tata letak untuk langkah Ide cerita</h1>
+    <p>Keduanya memakai gaya Ruang Edit dan berisi hal yang sama dengan halaman sekarang: ide, durasi, format, bahasa, suara narator, gaya visual, model gambar dan video beserta perkiraan harga, dan tombol susun naskah. Yang berbeda adalah cara menyusunnya. Ini gambar rancangan, belum kode aplikasi.</p>
+    <div class="jump"><a href="#a">A. Meja kerja</a><a href="#b">B. Papan clapper</a></div>
+  </div>
+
+  <!-- ================= A ================= -->
+  <section class="dir" id="a">
+    <h2>A. Meja kerja</h2>
+    <p class="sum">Susunan dua kolom seperti sekarang, tapi lebih rapat. Pengaturan video dikelompokkan dalam empat kotak kecil, Model AI langsung terlihat tanpa menggulir jauh, dan di kanan ada pratinjau besar gaya yang dipilih di atas daftar gaya.</p>
+    <div class="fit"><div class="app A">
+      <div class="top">
+        <div class="back">&#8592;</div>
+        <div class="ttl"><strong>Si Kucing Penjaga Warung</strong><small>Tersimpan, baru saja</small></div>
+        <div class="steps"><span class="on"><i>1</i>Ide cerita</span><span><i>2</i>Naskah</span><span><i>3</i>Storyboard</span><span><i>4</i>Editor</span></div>
+        <button class="btn">Simpan</button>
+      </div>
+      <div class="body">
+        <div>
+          <h1 class="h">Ceritakan idemu</h1>
+          <p class="lede">Sebut tokoh, tempat, dan akhir ceritanya. Makin jelas, makin rapi susunan adegan dari AI.</p>
+          <div class="panel idea">
+            <p>Seekor kucing oranye gemuk bernama Mochi menjaga warung kopi milik nenek di gang kecil Jakarta. Suatu hari seekor tikus mencoba mencuri roti, dan Mochi harus memilih antara mengejarnya atau melanjutkan tidur siangnya.</p>
+            <div class="foot"><span>Tulis juga suasana yang kamu mau, misalnya tegang, lucu, atau haru.</span><span>214 / 4.000</span></div>
+          </div>
+          <div class="set">
+            <div class="panel"><span class="lbl">Durasi video</span><div class="chips"><span class="chip on">30 detik</span><span class="chip">1 menit</span><span class="chip">3 menit</span><span class="chip">5 menit</span><span class="chip">10 menit</span></div><p class="hint">Sekitar 5 adegan, masing-masing kurang lebih 6 detik.</p></div>
+            <div class="panel"><span class="lbl">Format</span><div class="fmt"><div class="on"><i class="w"></i><span>16:9<small>YouTube</small></span></div><div><i class="t"></i><span>9:16<small>Shorts, Reels, TikTok</small></span></div></div></div>
+            <div class="panel"><span class="lbl">Bahasa naskah dan suara</span><div class="field">Indonesia</div></div>
+            <div class="panel"><span class="lbl">Suara narator</span><div style="display:flex;gap:8px"><div class="seg"><span>Gemini TTS</span><span class="on">ElevenLabs</span></div><div class="field" style="flex:1">Rachel</div></div></div>
+          </div>
+          <div class="models">
+            <div class="panel model"><span class="lbl">Gambar klip</span><div class="who"><span class="logo">G</span><span><strong>Nano Banana 2.1</strong><small>pakai lembar karakter, hasil 2K</small></span><span class="tag">fal.ai</span></div><p class="cost">≈ US$0,05 per gambar, 5 gambar ≈ <b>US$0,25</b></p></div>
+            <div class="panel model"><span class="lbl">Video AI</span><div class="who"><span class="logo">K</span><span><strong>Kling 3.0 Standard</strong><small>3–15 detik, mulai dari gambar klip</small></span><span class="tag">fal.ai</span></div><p class="cost">≈ <b>US$0,42</b> per video 6 detik. Hanya untuk klip yang kamu jadikan Video AI.</p></div>
+          </div>
+        </div>
+        <div class="panel style">
+          <div style="display:flex;align-items:baseline;gap:14px"><h3>Gaya visual</h3><div class="tabs"><b>Semua</b><span>2D</span><span>3D</span><span>Realistis</span></div></div>
+          <div class="th big" style="background-image:url('../../../../src/renderer/src/assets/styles/watercolor.webp')"><div class="cap"><strong>Buku cerita cat air</strong><small>Dongeng anak, religi. Dipakai untuk semua gambar, termasuk lembar karakter.</small></div></div>
+          <div class="grid">
+            <div><div class="th" style="background-image:url('../../../../src/renderer/src/assets/styles/stickman.webp')"><span class="dim">2D</span></div><small>Stickman berwarna</small></div>
+            <div><div class="th" style="background-image:url('../../../../src/renderer/src/assets/styles/flat.webp')"><span class="dim">2D</span></div><small>Kartun flat</small></div>
+            <div><div class="th sel" style="background-image:url('../../../../src/renderer/src/assets/styles/watercolor.webp')"><span class="dim">2D</span></div><small>Buku cerita cat air</small></div>
+            <div><div class="th" style="background-image:url('../../../../src/renderer/src/assets/styles/anime.webp')"><span class="dim">2D</span></div><small>Anime</small></div>
+            <div><div class="th" style="background-image:url('../../../../src/renderer/src/assets/styles/animation3d.webp')"><span class="dim">3D</span></div><small>Animasi 3D</small></div>
+            <div><div class="th" style="background-image:url('../../../../src/renderer/src/assets/styles/clay.webp')"><span class="dim">3D</span></div><small>Claymation</small></div>
+          </div>
+        </div>
+      </div>
+      <div class="bar"><div><strong>± 5 adegan, 30 detik, 16:9</strong><small>Disusun oleh ChatGPT (langganan), gpt-6-astra. <a>Ganti</a></small></div><div style="flex:1"></div><button class="btn go">Susun naskah</button></div>
+    </div></div>
+    <div class="notes">
+      <div><b>Kelebihan</b>Paling dekat dengan yang sekarang, jadi mudah dikenali. Daftar gaya tetap terlihat banyak sekaligus, dan gaya terpilih tampil besar.</div>
+      <div><b>Yang perlu ditimbang</b>Ringkasan proyek hanya ada di bilah bawah, jadi biaya gambar dan video tetap harus dibaca di dua kartu terpisah.</div>
+    </div>
+  </section>
+
+  <!-- ================= B ================= -->
+  <section class="dir" id="b">
+    <h2>B. Papan clapper</h2>
+    <p class="sum">Di kanan ada papan ringkasan seperti papan clapper sebelum syuting: bingkai pratinjau dalam format yang dipilih, semua pilihan dalam satu daftar, dan perkiraan biaya dijumlahkan. Gaya visual dipilih dari pita film, sama seperti daftar proyek di Beranda.</p>
+    <div class="fit"><div class="app B">
+      <div class="top">
+        <div class="back">&#8592;</div>
+        <div class="ttl"><strong>Si Kucing Penjaga Warung</strong><small>Tersimpan, baru saja</small></div>
+        <div class="steps"><span class="on"><i>1</i>Ide cerita</span><span><i>2</i>Naskah</span><span><i>3</i>Storyboard</span><span><i>4</i>Editor</span></div>
+        <button class="btn">Simpan</button>
+      </div>
+      <div class="body">
+        <div>
+          <h1 class="h">Ceritakan idemu</h1>
+          <p class="lede">Sebut tokoh, tempat, dan akhir ceritanya. Makin jelas, makin rapi susunan adegan dari AI.</p>
+          <div class="panel idea">
+            <p>Seekor kucing oranye gemuk bernama Mochi menjaga warung kopi milik nenek di gang kecil Jakarta. Suatu hari seekor tikus mencoba mencuri roti, dan Mochi harus memilih antara mengejarnya atau melanjutkan tidur siangnya.</p>
+            <div class="foot"><span>Tulis juga suasana yang kamu mau, misalnya tegang, lucu, atau haru.</span><span>214 / 4.000</span></div>
+          </div>
+          <div class="panel row4">
+            <div><span class="lbl">Durasi</span><div class="chips"><span class="chip on">30 dtk</span><span class="chip">1 mnt</span><span class="chip">3 mnt</span><span class="chip">5 mnt</span><span class="chip">10 mnt</span></div></div>
+            <div><span class="lbl">Format</span><div class="chips"><span class="chip on">16:9 YouTube</span><span class="chip">9:16 Shorts</span></div></div>
+            <div><span class="lbl">Bahasa</span><div class="field">Indonesia</div></div>
+            <div><span class="lbl">Suara narator</span><div class="field">ElevenLabs, Rachel</div></div>
+          </div>
+          <div class="secttl"><h3>Gaya visual</h3><div class="tabs"><b>Semua</b><span>2D</span><span>3D</span><span>Realistis</span></div><a>Lihat semua 16 gaya</a></div>
+          <div class="strip">
+            <div><div class="th" style="background-image:url('../../../../src/renderer/src/assets/styles/stickman.webp')"></div><small>Stickman berwarna</small></div>
+            <div><div class="th" style="background-image:url('../../../../src/renderer/src/assets/styles/flat.webp')"></div><small>Kartun flat</small></div>
+            <div class="on"><div class="th sel" style="background-image:url('../../../../src/renderer/src/assets/styles/watercolor.webp')"></div><small>Buku cerita cat air</small></div>
+            <div><div class="th" style="background-image:url('../../../../src/renderer/src/assets/styles/anime.webp')"></div><small>Anime</small></div>
+            <div><div class="th" style="background-image:url('../../../../src/renderer/src/assets/styles/animation3d.webp')"></div><small>Animasi 3D</small></div>
+          </div>
+          <div class="secttl"><h3>Model AI</h3></div>
+          <div class="models">
+            <div class="panel model"><span class="lbl">Gambar klip</span><div class="who"><span class="logo">G</span><span><strong>Nano Banana 2.1</strong><small>pakai lembar karakter, hasil 2K</small></span><span class="tag">fal.ai</span></div></div>
+            <div class="panel model"><span class="lbl">Video AI</span><div class="who"><span class="logo">K</span><span><strong>Kling 3.0 Standard</strong><small>3–15 detik, mulai dari gambar klip</small></span><span class="tag">fal.ai</span></div></div>
+          </div>
+        </div>
+        <div class="panel slate">
+          <div class="clap"></div>
+          <div class="in">
+            <h3>Si Kucing Penjaga Warung</h3>
+            <div class="th frame" style="background-image:url('../../../../src/renderer/src/assets/styles/watercolor.webp')"><span class="tc">00:30</span></div>
+            <dl>
+              <dt>Adegan</dt><dd>± 5, masing-masing 6 detik</dd>
+              <dt>Format</dt><dd>16:9 YouTube</dd>
+              <dt>Bahasa</dt><dd>Indonesia</dd>
+              <dt>Narator</dt><dd>ElevenLabs, Rachel</dd>
+              <dt>Gaya</dt><dd>Buku cerita cat air</dd>
+              <dt>Gambar</dt><dd>Nano Banana 2.1 (fal.ai)</dd>
+              <dt>Video</dt><dd>Kling 3.0 Standard (fal.ai)</dd>
+            </dl>
+            <div class="total">5 gambar ≈ <b>US$0,25</b><br>Video AI ≈ <b>US$0,42</b> per klip 6 detik, hanya untuk klip yang kamu jadikan video.</div>
+          </div>
+        </div>
+      </div>
+      <div class="bar"><div><strong>Naskah disusun oleh ChatGPT (langganan)</strong><small>Model gpt-6-astra. <a>Ganti</a></small></div><div style="flex:1"></div><button class="btn go">Susun naskah</button></div>
+    </div></div>
+    <div class="notes">
+      <div><b>Kelebihan</b>Semua pilihan dan perkiraan biaya terbaca di satu tempat sebelum menekan tombol. Bingkai pratinjau ikut berubah bentuk saat format diganti ke 9:16. Halaman jadi lebih pendek.</div>
+      <div><b>Yang perlu ditimbang</b>Pita film hanya menampilkan lima gaya sekaligus. Sisanya dibuka lewat "Lihat semua 16 gaya" (kisi yang sama dengan pemilih gaya di Beranda) atau digeser. Pekerjaannya lebih banyak daripada tata letak A.</div>
+    </div>
+  </section>
+</div>
+<script>
+  // Each mockup is drawn 1280 px wide and scaled to the width it is given.
+  function fit() {
+    document.querySelectorAll('.fit').forEach(function (box) {
+      var c = box.querySelector('.app');
+      var s = Math.min(1, box.clientWidth / 1280);
+      c.style.transform = 'scale(' + s + ')';
+      box.style.height = c.offsetHeight * s + 'px';
+    });
+  }
+  window.addEventListener('resize', fit);
+  window.addEventListener('load', fit);
+  fit();
+</script>
+</body>
+</html>

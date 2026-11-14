@@ -152,10 +152,24 @@ Sesuai mockup:
 
 ### 6. Ide cerita
 
-Tata letak baru dirancang di tahap 3. Sebelum kodenya dibuat, pembangun membuat **mockup Ide cerita** berbentuk
-halaman HTML (seperti `assets/arah-tampilan-beranda.html`) dan pemilik menyetujuinya dulu. Rencana implementasi
-tahap 3 baru ditulis rinci setelah mockup itu disetujui; sebelum itu cukup garis besar. Isi yang harus tetap ada: teks ide, durasi, bahasa, format, suara narator, gaya visual, Model AI
-(gambar dan video, dengan perkiraan harga), dan bilah bawah berisi ringkasan dan tombol susun naskah.
+Pemilik memilih tata letak **B, "Papan clapper"** (2026-11-14) dari dua mockup di
+`assets/ruang-edit-ide.html`. Semua isi halaman lama tetap ada; yang berubah susunannya.
+
+- **Kiri (form):** judul "Ceritakan idemu", kotak ide, lalu satu panel pengaturan berisi Durasi, Format, Bahasa, dan
+  Suara narator (empat kolom; dua kali dua kalau ruangnya sempit). Di bawahnya **Gaya visual** sebagai pita film:
+  tab kategori (Semua, 2D, 3D, Realistis), lima gaya dalam satu baris, dan tautan "Lihat semua N gaya" yang
+  membentangkan pita menjadi semua gaya (klik lagi untuk meringkas). Gaya terpilih selalu ikut tampil di baris
+  ringkas. Terakhir **Model AI**: dua kartu pemilih model (gambar dan video, dengan resolusi video).
+- **Kanan (papan clapper), menempel saat digulir:** garis-garis clapper, judul proyek, bingkai pratinjau berbentuk
+  format yang dipilih (16:9 atau 9:16) berisi contoh gaya terpilih dan kode waktu durasi, lalu daftar Adegan, Format,
+  Bahasa, Narator, Gaya, Gambar, Video. Di bawahnya perkiraan biaya: jumlah gambar kali harga per gambar, dan harga
+  satu video AI. Perkiraan biaya **pindah dari kartu Model AI ke papan ini**; harga per model di dalam pemilih model
+  tetap ada.
+- **Bilah bawah:** siapa yang menyusun naskah (penyedia dan model, tautan Ganti), tombol "Lihat naskah" kalau naskah
+  sudah ada, dan tombol utama "Susun naskah" / "Susun ulang naskah". Perilakunya tidak berubah.
+- *(Keputusan pembangun:)* tulisan kecil "Langkah 1 dari 4" di atas judul dihapus karena bilah langkah di atas sudah
+  menunjukkannya; "Lihat semua gaya" membentangkan pita di tempat, bukan membuka jendela terpisah; kalimat "Sekitar N
+  adegan…" pindah ke baris Adegan di papan.
 
 ### 7. Halaman lain (tahap 4)
 
