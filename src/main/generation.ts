@@ -3,12 +3,14 @@ import { mkdirSync, writeFileSync } from 'node:fs'
 import { dirname } from 'node:path'
 import { estimateWordTimings } from '@shared/captions'
 import { stripVoiceTags } from '@shared/speech'
-import { getImageModel, getVideoModel, imageBody, maxRefs, promptLimit, videoBody, type HfModel } from '@shared/higgsfield'
+import { getImageModel, getVideoModel, imageRequest, maxRefs, promptLimit, videoPlan, videoRequest, type MediaModel, type MediaProvider } from '@shared/media'
 import { getStyle } from '@shared/styles'
-import type { AspectRatio, Asset, Character, Clip, CreditEstimate, Job, Project, WordTiming } from '@shared/types'
+import type { AspectRatio, Character, Clip, CreditEstimate, Job, Project, WordTiming } from '@shared/types'
 import { getDb } from './db'
 import { emit } from './events'
 import { runJob, type TaskCtx } from './jobs'
+import { BACKENDS, type MediaResult, type Submitted, type Tick } from './media/backends'
+import { resumePlan, type MediaPayload } from './media/payload'
 import { assetAbsPath } from './paths'
 import {
   activeJobFor,
@@ -25,14 +27,12 @@ import {
   setCharacterSheet,
   touchProject,
   unfinishedJobs,
-  updateAssetMeta,
   updateJob
 } from './repo'
 import { dropCache, getSettings, readCache, writeCache } from './settings'
 import { probeDurationMs, probeSize } from './services/audio'
 import * as eleven from './services/elevenlabs'
 import * as gemini from './services/gemini'
-import * as hf from './services/higgsfield'
 import { downloadTo, sleep } from './services/http'
 
 const DAY = 24 * 60 * 60 * 1000
@@ -54,20 +54,9 @@ function saveFile(projectId: string, folder: string, ext: string, bytes: Buffer)
   return rel
 }
 
-/** A URL Higgsfield can fetch for a stored asset: its own recent result URL, or a fresh upload. */
-async function publicUrlFor(asset: Asset, signal: AbortSignal): Promise<string> {
-  if (asset.remoteUrl && asset.provider === 'higgsfield' && Date.now() - asset.createdAt < 6 * DAY) return asset.remoteUrl
-  const up = asset.meta.uploadedUrl as string | undefined
-  const at = asset.meta.uploadedAt as number | undefined
-  if (up && at && Date.now() - at < 0.5 * DAY) return up
-  const url = await hf.uploadFile(assetAbsPath(asset.projectId, asset.localPath), signal)
-  updateAssetMeta(asset.id, { ...asset.meta, uploadedUrl: url, uploadedAt: Date.now() })
-  return url
-}
-
-function imageProgress(ctx: TaskCtx, what: string) {
-  return (status: hf.HfStatus, elapsed: number): void => {
-    if (status === 'queued') ctx.progress(0.12, 'Mengantre di Higgsfield')
+function mediaProgress(ctx: TaskCtx, label: string, what: string): Tick {
+  return (state, elapsed) => {
+    if (state === 'queued') ctx.progress(0.12, `Mengantre di ${label}`)
     else ctx.progress(0.15 + 0.75 * (1 - Math.exp(-elapsed / 45_000)), what)
   }
 }
@@ -141,7 +130,7 @@ async function waitForSheets(characterIds: string[], signal: AbortSignal): Promi
   }
 }
 
-async function referenceUrls(model: HfModel, chars: Character[], signal: AbortSignal): Promise<{ urls: string[]; names: string[] }> {
+async function referenceUrls(model: MediaModel, chars: Character[], signal: AbortSignal): Promise<{ urls: string[]; names: string[] }> {
   const limit = maxRefs(model)
   if (limit === 0) return { urls: [], names: [] }
   await waitForSheets(
@@ -154,33 +143,27 @@ async function referenceUrls(model: HfModel, chars: Character[], signal: AbortSi
     const fresh = getCharacter(c.id)
     const sheet = getAsset(fresh.sheetAssetId)
     if (!sheet || urls.length >= limit) continue
-    urls.push(await publicUrlFor(sheet, signal))
+    urls.push(await BACKENDS[model.provider].prepareRef(sheet, signal))
     names.push(fresh.name)
   }
   return { urls, names }
 }
 
-// ---------- finishing a Higgsfield request (also used to resume after a restart) ----------
+// ---------- finishing an image/video request (also used to resume after a restart) ----------
 
-interface HfPayload {
-  target: 'clip-image' | 'sheet' | 'clip-video'
-  model: string
-  prompt: string
-}
-
-async function finishHiggsfield(ctx: TaskCtx, job: Job, requestId: string, payload: HfPayload): Promise<string> {
+/** Waits for a submitted request (unless the provider answered at once), stores the file and puts it on the clip. */
+async function finishMedia(ctx: TaskCtx, job: Job, payload: MediaPayload, sent: Submitted | { done: MediaResult }): Promise<string> {
+  const provider = payload.provider ?? 'higgsfield'
+  const backend = BACKENDS[provider]
   const isVideo = payload.target === 'clip-video'
-  const result = await hf.waitForResult(
-    requestId,
-    imageProgress(ctx, isVideo ? 'Membuat video' : payload.target === 'sheet' ? 'Membuat lembar karakter' : 'Membuat gambar'),
-    ctx.signal,
-    isVideo ? 30 * 60 * 1000 : 15 * 60 * 1000
-  )
-  const url = isVideo ? result.video?.url : result.images?.[0]?.url
-  if (!url) throw new Error('Higgsfield selesai tanpa file hasil')
+  const what = isVideo ? 'Membuat video' : payload.target === 'sheet' ? 'Membuat lembar karakter' : 'Membuat gambar'
+  const result =
+    'done' in sent
+      ? sent.done
+      : await backend.wait(sent.remoteId, sent.resume, mediaProgress(ctx, backend.label, what), ctx.signal, isVideo ? 30 * 60 * 1000 : 15 * 60 * 1000)
   ctx.progress(0.93, 'Mengunduh hasil')
-  const { bytes, contentType } = await downloadTo(url, ctx.signal)
-  const rel = saveFile(job.projectId, isVideo ? 'videos' : 'images', extFromType(contentType, url, isVideo ? '.mp4' : '.png'), bytes)
+  const file = result.bytes ? { bytes: result.bytes, contentType: result.contentType ?? '' } : await downloadTo(result.url!, ctx.signal)
+  const rel = saveFile(job.projectId, isVideo ? 'videos' : 'images', extFromType(file.contentType, result.url ?? '', isVideo ? '.mp4' : '.png'), file.bytes)
   const abs = assetAbsPath(job.projectId, rel)
   const size = await probeSize(abs)
   const durationMs = isVideo ? await probeDurationMs(abs).catch(() => null) : null
@@ -189,11 +172,11 @@ async function finishHiggsfield(ctx: TaskCtx, job: Job, requestId: string, paylo
     clipId: job.clipId,
     characterId: job.characterId,
     kind: isVideo ? 'video' : 'image',
-    provider: 'higgsfield',
+    provider,
     model: payload.model,
     prompt: payload.prompt,
-    remoteId: requestId,
-    remoteUrl: url,
+    remoteId: 'done' in sent ? null : sent.remoteId,
+    remoteUrl: result.url ?? null,
     localPath: rel,
     durationMs,
     width: size?.width ?? null,
@@ -218,20 +201,26 @@ async function finishHiggsfield(ctx: TaskCtx, job: Job, requestId: string, paylo
   return asset.id
 }
 
-function startHiggsfield(job: Job, build: (ctx: TaskCtx) => Promise<{ endpoint: string; body: Record<string, unknown>; payload: HfPayload }>): Job {
+type MediaBuild = (ctx: TaskCtx) => Promise<{ endpoint: string; body: Record<string, unknown>; payload: MediaPayload }>
+
+function startMedia(job: Job, provider: MediaProvider, build: MediaBuild): Job {
   emit.job(job)
-  return runJob(job, 'higgsfield', async (ctx) => {
+  const backend = BACKENDS[provider]
+  return runJob(job, backend.queue, async (ctx) => {
     ctx.progress(0.04, 'Menyiapkan prompt')
     const { endpoint, body, payload } = await build(ctx)
-    ctx.progress(0.08, 'Mengirim ke Higgsfield')
-    const requestId = await hf.submit(endpoint, body, ctx.signal)
-    ctx.setRemote(requestId)
-    updateJobPayload(job.id, payload)
-    return finishHiggsfield(ctx, job, requestId, payload)
+    ctx.progress(0.08, `Mengirim ke ${backend.label}`)
+    const sent = await backend.submit(endpoint, body, payload.target === 'clip-video' ? 'video' : 'image', ctx.signal)
+    if ('done' in sent) updateJobPayload(job.id, payload)
+    else {
+      ctx.setRemote(sent.remoteId)
+      updateJobPayload(job.id, { ...payload, resume: sent.resume })
+    }
+    return finishMedia(ctx, job, payload, sent)
   })
 }
 
-function updateJobPayload(jobId: string, payload: HfPayload): void {
+function updateJobPayload(jobId: string, payload: MediaPayload): void {
   getDb().prepare('UPDATE jobs SET payload_json = ? WHERE id = ?').run(JSON.stringify(payload), jobId)
 }
 
@@ -241,19 +230,16 @@ export function generateClipImage(clipId: string): Job {
   const existing = activeJobFor({ clipId }, 'image')
   if (existing) return existing
   const clip = getClip(clipId)
-  const job = insertJob({ projectId: clip.projectId, clipId, kind: 'image', provider: 'higgsfield' })
-  return startHiggsfield(job, async (ctx) => {
+  // Fixed at queue time: switching the project's model while jobs wait must not send this one to another provider.
+  const model = getImageModel(getProject(clip.projectId).imageModel)
+  const job = insertJob({ projectId: clip.projectId, clipId, kind: 'image', provider: model.provider })
+  return startMedia(job, model.provider, async (ctx) => {
     const fresh = getClip(clipId)
     const project = getProject(fresh.projectId)
-    const model = getImageModel(project.imageModel)
     const chars = charactersOf(project.id).filter((c) => fresh.characterIds.includes(c.id))
     const refs = await referenceUrls(model, chars, ctx.signal)
     const prompt = clipPrompt(project, fresh, chars, refs.names, promptLimit(model))
-    return {
-      endpoint: model.id,
-      body: imageBody(model, prompt, project.aspectRatio, refs.urls),
-      payload: { target: 'clip-image', model: model.id, prompt }
-    }
+    return { ...imageRequest(model, prompt, project.aspectRatio, refs.urls), payload: { target: 'clip-image', model: model.id, prompt, provider: model.provider } }
   })
 }
 
@@ -261,16 +247,12 @@ export function generateCharacterSheet(characterId: string): Job {
   const existing = activeJobFor({ characterId }, 'sheet')
   if (existing) return existing
   const c = getCharacter(characterId)
-  const job = insertJob({ projectId: c.projectId, characterId, kind: 'sheet', provider: 'higgsfield' })
-  return startHiggsfield(job, async () => {
+  const model = getImageModel(getProject(c.projectId).imageModel)
+  const job = insertJob({ projectId: c.projectId, characterId, kind: 'sheet', provider: model.provider })
+  return startMedia(job, model.provider, async () => {
     const project = getProject(c.projectId)
-    const model = getImageModel(project.imageModel)
     const prompt = sheetPrompt(project, getCharacter(characterId))
-    return {
-      endpoint: model.id,
-      body: imageBody(model, prompt, '16:9', []),
-      payload: { target: 'sheet', model: model.id, prompt }
-    }
+    return { ...imageRequest(model, prompt, '16:9', []), payload: { target: 'sheet', model: model.id, prompt, provider: model.provider } }
   })
 }
 
@@ -279,24 +261,23 @@ export function generateClipVideo(clipId: string): Job {
   if (existing) return existing
   const clip = getClip(clipId)
   if (!clip.imageAssetId) throw new Error('Buat gambar klip ini dulu sebelum membuat video AI.')
-  const job = insertJob({ projectId: clip.projectId, clipId, kind: 'video', provider: 'higgsfield' })
-  return startHiggsfield(job, async (ctx) => {
+  const model = getVideoModel(getProject(clip.projectId).videoModel)
+  const job = insertJob({ projectId: clip.projectId, clipId, kind: 'video', provider: model.provider })
+  return startMedia(job, model.provider, async (ctx) => {
     const fresh = getClip(clipId)
     const image = getAsset(fresh.imageAssetId)
     if (!image) throw new Error('Gambar klip tidak ditemukan')
     const project = getProject(fresh.projectId)
-    const model = getVideoModel(project.videoModel)
     ctx.progress(0.05, 'Menyiapkan gambar awal')
-    const url = await publicUrlFor(image, ctx.signal)
+    const url = await BACKENDS[model.provider].prepareRef(image, ctx.signal)
     let prompt =
       fresh.videoPrompt.trim() ||
       `${splitAvoid(fresh.visualPrompt).scene.replace(/\.$/, '')}. Subtle natural motion of the characters and environment, the camera slowly pushes in. Keep the art style of the first frame.`
     if (model.input.mode === 'reference')
       prompt = `Open on the exact scene of the reference image and keep its art style, characters and composition. ${prompt}`
     return {
-      endpoint: model.id,
-      body: videoBody(model, prompt, url, fresh.durationMs / 1000, project.aspectRatio, project.videoResolution),
-      payload: { target: 'clip-video', model: model.id, prompt }
+      ...videoRequest(model, prompt, url, fresh.durationMs / 1000, project.aspectRatio, project.videoResolution),
+      payload: { target: 'clip-video', model: model.id, prompt, provider: model.provider }
     }
   })
 }
@@ -383,13 +364,14 @@ export function generateMissingTts(projectId: string): Job[] {
     .map((c) => generateClipTts(c.id))
 }
 
-/** After a restart, keep polling Higgsfield requests that were already submitted; fail the rest. */
+/** After a restart, keep polling requests that already reached a provider; fail the rest. */
 export function resumeJobs(): void {
   for (const row of unfinishedJobs()) {
-    const payload = JSON.parse(row.payload_json || '{}') as Partial<HfPayload>
-    if (row.provider === 'higgsfield' && row.remote_id && payload.target) {
+    const plan = resumePlan(row)
+    if (plan && row.remote_id) {
       const job = getJob(row.id)!
-      runJob(job, 'higgsfield', (ctx) => finishHiggsfield(ctx, job, row.remote_id, payload as HfPayload))
+      const sent: Submitted = { remoteId: row.remote_id, resume: plan.payload.resume }
+      runJob(job, BACKENDS[plan.provider].queue, (ctx) => finishMedia(ctx, job, { ...plan.payload, provider: plan.provider }, sent))
     } else {
       emit.job(updateJob(row.id, { status: 'failed', error: 'Terhenti karena aplikasi ditutup. Coba lagi.', message: null }))
     }
@@ -415,10 +397,11 @@ export async function setActiveAsset(clipId: string, assetId: string): Promise<v
 const failedEstimates = new Map<string, number>()
 
 /**
- * Credits for one image, or one clip video of about `seconds`. The model pickers ask for every model,
- * so answers are kept for a day and failures for ten minutes.
+ * The price of one image, or one clip video of about `seconds`: Higgsfield credits (with dollars when known), or
+ * dollars for fal.ai and Gemini. The model pickers ask for every model, so answers are kept for a day and failures
+ * for ten minutes.
  */
-export async function estimateCredits(
+export async function estimateCost(
   kind: 'image' | 'video',
   modelId: string,
   aspect: AspectRatio,
@@ -426,23 +409,24 @@ export async function estimateCredits(
   resolution?: string | null
 ): Promise<CreditEstimate | null> {
   const model = kind === 'image' ? getImageModel(modelId) : getVideoModel(modelId)
-  const body =
-    kind === 'image'
-      ? imageBody(model, 'estimate', aspect, [])
-      : videoBody(model, 'estimate', 'https://example.com/frame.png', seconds, aspect, resolution)
-  const key = `estimate:${model.id}:${JSON.stringify(body)}`
+  // Gemini takes the frame inline, the others by URL; the estimate never sends it anywhere.
+  const frame = model.provider === 'gemini' ? 'data:image/png;base64,AA==' : 'https://example.com/frame.png'
+  const request =
+    kind === 'image' ? imageRequest(model, 'estimate', aspect, []) : videoRequest(model, 'estimate', frame, seconds, aspect, resolution)
+  const key = `estimate:${model.provider}:${model.id}:${JSON.stringify(request.body)}`
   const hit = readCache<CreditEstimate>(key)
   if (hit && Date.now() - hit.updatedAt < DAY) return hit.value
   const failedAt = failedEstimates.get(key)
   if (failedAt && Date.now() - failedAt < 10 * 60 * 1000) return null
-  const value = await hf.estimate(model.id, body)
+  const plan = videoPlan(model, seconds, resolution)
+  const value = await BACKENDS[model.provider].estimate(model, request, kind, plan.duration ?? seconds, plan.resolution).catch(() => null)
   if (value) writeCache(key, value)
   else failedEstimates.set(key, Date.now())
   return value
 }
 
-/** Prices can differ per account, so a new Higgsfield key starts from fresh estimates. */
-export function forgetEstimates(): void {
-  failedEstimates.clear()
-  dropCache('estimate:')
+/** Prices can differ per account, so a new key starts from fresh estimates for its provider. */
+export function forgetEstimates(provider: MediaProvider): void {
+  for (const k of failedEstimates.keys()) if (k.startsWith(`estimate:${provider}:`)) failedEstimates.delete(k)
+  dropCache(`estimate:${provider}:`)
 }

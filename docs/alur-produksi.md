@@ -2,12 +2,15 @@
 
 Satu proyek melewati empat langkah (`Project.step`): **1 Ide → 2 Naskah → 3 Storyboard → 4 Editor**, lalu ekspor.
 
+Gambar dan video dibuat oleh penyedia yang dipilih per proyek: Higgsfield, fal.ai, atau Google Gemini (lihat
+[layanan-ai.md](layanan-ai.md#gambar-dan-video-tiga-penyedia)).
+
 ```
 Ide cerita ──LLM──► Naskah (adegan + narasi) ──LLM──► Rencana visual per adegan
                                                      │
             ┌────────────────────────────────────────┼─────────────────────────┐
             ▼                                         ▼                         ▼
-   Lembar karakter (Higgsfield)          Gambar klip (Higgsfield)       Narasi satu rekaman (TTS)
+   Lembar karakter (penyedia gambar)     Gambar klip (penyedia gambar)  Narasi satu rekaman (TTS)
             └────────── referensi ──────────────────►│                         │
                                                      ▼                         ▼
                                           Video AI (opsional)        Potong per adegan + Whisper

@@ -2,7 +2,7 @@ export type ProjectStatus = 'draft' | 'script' | 'storyboard' | 'editing' | 'exp
 export type AspectRatio = '16:9' | '9:16'
 export type TtsProvider = 'gemini' | 'elevenlabs'
 export type LlmProvider = 'gemini' | 'openrouter' | 'groq' | 'custom' | 'chatgpt'
-export type ApiProvider = 'higgsfield' | 'gemini' | 'elevenlabs' | 'openrouter' | 'groq' | 'custom'
+export type ApiProvider = 'higgsfield' | 'fal' | 'gemini' | 'elevenlabs' | 'openrouter' | 'groq' | 'custom'
 /** Where a live model list comes from: an LLM provider, or a TTS catalog. */
 export type ModelSource = LlmProvider | 'gemini-tts' | 'elevenlabs'
 export type MotionType = 'camera' | 'video'
@@ -311,8 +311,9 @@ export interface AppSettings {
 }
 
 /** What one Higgsfield request would cost, from the API's estimate endpoint. */
+/** Higgsfield prices in credits (with dollars when known); fal.ai and Gemini in dollars only. */
 export interface CreditEstimate {
-  credits: number
+  credits: number | null
   usd: number | null
 }
 
@@ -334,12 +335,19 @@ export interface ModelOption {
   priceOut?: number | null
   /** Short labels the picker can filter on, e.g. "JSON", "Gratis", "Gambar". */
   tags: string[]
+  /** Provider heading the picker groups this row under, e.g. "fal.ai". */
+  group?: string
+  /** Why the row cannot be picked yet, e.g. "Isi kunci fal.ai di Pengaturan". */
+  locked?: string
   /** Model family, e.g. "Kling", for a brand mark next to the name. */
   family?: string
-  /** Higgsfield credits (and dollars) for one request; undefined while unknown, null when it cannot be estimated. */
+  /**
+   * Price of one request: Higgsfield credits (and dollars), or dollars alone for fal.ai and Gemini. credits is
+   * undefined while loading; null credits with null usd means it cannot be estimated.
+   */
   credits?: number | null
   usd?: number | null
-  /** What the credits pay for, e.g. "10 dtk". */
+  /** What the price pays for, e.g. "10 dtk". */
   creditUnit?: string
 }
 

@@ -13,7 +13,7 @@
 | Sinkron Whisper menimpa edit caption manual | `syncCaptions` menulis ulang `meta.words` dari naskah, jadi teks caption yang diedit tangan kembali ke naskah. Ini terjadi pada mode "semua klip", dan pada klip yang memang perlu disinkronkan. | Lewati klip dengan `meta.editedWords`, atau tanya pengguna dulu. |
 | Riwayat versi aset setelah split | Bagian kedua memakai gambar/video milik klip asal; riwayat versinya ada di klip asal. | Salin baris aset untuk klip baru kalau riwayat per bagian diperlukan. |
 | Caption sulit digeser utuh | Potongan caption berdempetan, jadi menyeret badannya sering tidak punya ruang. | Tarik tepinya; atau izinkan geser yang ikut mendorong potongan tetangga. |
-| Tidak semua model sudah diuji langsung | Katalog Higgsfield berisi 48 model; sebagian besar baru diuji lewat body permintaan, belum lewat generate sungguhan. Penyedia LLM selain Gemini juga belum semuanya diuji. | Uji model yang sering dipakai, lalu catat model yang bermasalah. |
+| Tidak semua model sudah diuji langsung | Katalog Higgsfield berisi 48 model, fal.ai 25 model, dan Gemini 4 model; sebagian besar baru diuji lewat body permintaan, belum lewat generate sungguhan. Penyedia LLM selain Gemini juga belum semuanya diuji. | Uji model yang sering dipakai, lalu catat model yang bermasalah. |
 
 ## Ide pengembangan
 

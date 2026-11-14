@@ -17,9 +17,11 @@ import type {
   ProjectSnapshot,
   ProjectSummary
 } from '@shared/types'
+import { newProjectModels } from '@shared/media'
 import { visualSourceOf } from '@shared/script'
 import { getDb } from './db'
 import { assetUrl, projectDir, projectsRoot } from './paths'
+import { getSecret } from './secrets'
 import { getSettings } from './settings'
 
 export const DEFAULT_EDITOR: EditorSettings = {
@@ -156,6 +158,7 @@ export function listProjects(): ProjectSummary[] {
 
 export function createProject(input: NewProjectInput): Project {
   const s = getSettings()
+  const models = newProjectModels(s, (p) => !!getSecret(p))
   const now = Date.now()
   const id = randomUUID()
   const tts = input.ttsProvider ?? s.defaultTtsProvider
@@ -175,8 +178,8 @@ export function createProject(input: NewProjectInput): Project {
       input.styleId ?? 'stickman',
       tts,
       tts === 'gemini' ? 'Charon' : '',
-      s.imageModel,
-      s.videoModel,
+      models.imageModel,
+      models.videoModel,
       JSON.stringify(DEFAULT_EDITOR),
       now,
       now

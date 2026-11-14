@@ -1,48 +1,74 @@
 import { useEffect, useMemo, useState, type ReactNode } from 'react'
 import { Film, Image as ImageIcon, Move, Users } from 'lucide-react'
-import { effectiveResolution, fitDuration, getImageModel, getVideoModel, hfModelOptions, maxRefs, resolutionOptions } from '@shared/higgsfield'
+import {
+  effectiveResolution,
+  fitDuration,
+  getImageModel,
+  getVideoModel,
+  IMAGE_MODELS,
+  MEDIA_PROVIDERS,
+  maxRefs,
+  mediaModelOptions,
+  PROVIDER_LABEL,
+  resolutionOptions,
+  VIDEO_MODELS,
+  type MediaModel,
+  type MediaProvider
+} from '@shared/media'
 import type { CreditEstimate, ModelOption, Project } from '@shared/types'
 import { ModelLogo } from '../../components/ModelLogo'
 import { ModelPicker } from '../../components/ModelPicker'
+import { ProviderLogo } from '../../components/ProviderLogo'
 import { Segmented, Spinner } from '../../components/ui'
-import { creditLabel } from '../../lib/format'
+import { costLabel } from '../../lib/format'
 import { useEstimate, useEstimates } from '../../lib/useEstimate'
 
-const IMAGE_OPTIONS = hfModelOptions('image')
-const VIDEO_OPTIONS = hfModelOptions('video')
-const IMAGE_IDS = IMAGE_OPTIONS.map((o) => o.id)
-const VIDEO_IDS = VIDEO_OPTIONS.map((o) => o.id)
+const IMAGE_OPTIONS = mediaModelOptions('image')
+const VIDEO_OPTIONS = mediaModelOptions('video')
+const PROVIDER_OF = new Map([...IMAGE_MODELS, ...VIDEO_MODELS].map((m) => [m.id, m.provider]))
+const LOGO_OF = Object.fromEntries(MEDIA_PROVIDERS.map((p) => [PROVIDER_LABEL[p], p])) as Record<string, MediaProvider>
 
-/** Adds each model's estimated credits to its picker row once a Higgsfield key is known to exist. */
-function withCosts(options: ModelOption[], costs: Record<string, CreditEstimate | null>, unit: (id: string) => string, on: boolean): ModelOption[] {
-  if (!on) return options
-  return options.map((o) => ({
-    ...o,
-    credits: o.id in costs ? (costs[o.id]?.credits ?? null) : undefined,
-    usd: costs[o.id]?.usd ?? null,
-    creditUnit: unit(o.id)
-  }))
+/** Locks rows of providers without a key, and adds each unlocked model's estimated price once it arrives. */
+function decorate(options: ModelOption[], costs: Record<string, CreditEstimate | null>, unit: (id: string) => string, hasKey: (p: MediaProvider) => boolean): ModelOption[] {
+  return options.map((o) => {
+    const p = PROVIDER_OF.get(o.id)!
+    if (!hasKey(p)) return { ...o, locked: `Isi kunci ${PROVIDER_LABEL[p]} di Pengaturan untuk memakai model ini` }
+    return {
+      ...o,
+      credits: o.id in costs ? (costs[o.id]?.credits ?? null) : undefined,
+      usd: costs[o.id]?.usd ?? null,
+      creditUnit: unit(o.id)
+    }
+  })
 }
 
 function Cost({
   value,
+  model,
   hasKey,
   children
 }: {
   value: CreditEstimate | null | undefined
+  model: MediaModel
   hasKey: boolean | null
-  children: (credits: number) => ReactNode
+  children: (label: string, each: CreditEstimate) => ReactNode
 }) {
-  if (hasKey === false) return <span className="text-muted">Perkiraan kredit muncul setelah kunci Higgsfield diisi di Pengaturan.</span>
+  if (hasKey === false) return <span className="text-muted">Perkiraan harga muncul setelah kunci {PROVIDER_LABEL[model.provider]} diisi di Pengaturan.</span>
   if (value === undefined)
     return (
       <span className="flex items-center gap-1.5 text-muted">
         <Spinner className="size-3" />
-        Menghitung kredit…
+        Menghitung harga…
       </span>
     )
-  if (value === null) return <span className="text-muted">Perkiraan kredit belum tersedia.</span>
-  return <span>{children(value.credits)}</span>
+  const label = costLabel(value)
+  if (!value || !label) return <span className="text-muted">Perkiraan harga belum tersedia.</span>
+  return (
+    <span>
+      {children(label, value)}
+      {model.provider === 'gemini' && <span className="text-muted"> (perkiraan dari tarif Google)</span>}
+    </span>
+  )
 }
 
 function Card({ icon, title, children }: { icon: ReactNode; title: string; children: ReactNode }) {
@@ -57,7 +83,7 @@ function Card({ icon, title, children }: { icon: ReactNode; title: string; child
   )
 }
 
-/** Which Higgsfield models draw and animate this project's clips. */
+/** Which provider and model draw and animate this project's clips. */
 export function ModelSection({
   project,
   clipCount,
@@ -72,30 +98,38 @@ export function ModelSection({
   const image = getImageModel(project.imageModel)
   const video = getVideoModel(project.videoModel)
   const seconds = fitDuration(video, perClip) ?? perClip
-  const imageCost = useEstimate('image', image.id, project.aspectRatio)
   const resolutions = resolutionOptions(video)
   const resolution = effectiveResolution(video, project.videoResolution)
-  const videoCost = useEstimate('video', video.id, project.aspectRatio, perClip, resolution)
-  const [hasKey, setHasKey] = useState<boolean | null>(null)
+  const [keys, setKeys] = useState<Set<MediaProvider> | null>(null)
 
   useEffect(() => {
-    void window.api.settings.keys().then((keys) => setHasKey(!!keys.find((k) => k.provider === 'higgsfield')?.configured))
+    void window.api.settings.keys().then((list) =>
+      setKeys(new Set(MEDIA_PROVIDERS.filter((p) => list.find((k) => k.provider === p)?.configured)))
+    )
   }, [])
 
-  const imageCosts = useEstimates('image', IMAGE_IDS, project.aspectRatio, undefined, hasKey === true)
-  const videoCosts = useEstimates('video', VIDEO_IDS, project.aspectRatio, perClip, hasKey === true)
-  const imageModels = useMemo(() => withCosts(IMAGE_OPTIONS, imageCosts, () => '', hasKey === true), [imageCosts, hasKey])
+  const hasKey = (p: MediaProvider): boolean => !!keys?.has(p)
+  const imageKey = keys ? hasKey(image.provider) : null
+  const videoKey = keys ? hasKey(video.provider) : null
+  const imageCost = useEstimate('image', image.id, project.aspectRatio, undefined, undefined, imageKey === true)
+  const videoCost = useEstimate('video', video.id, project.aspectRatio, perClip, resolution, videoKey === true)
+  const imageIds = useMemo(() => IMAGE_OPTIONS.filter((o) => keys?.has(PROVIDER_OF.get(o.id)!)).map((o) => o.id), [keys])
+  const videoIds = useMemo(() => VIDEO_OPTIONS.filter((o) => keys?.has(PROVIDER_OF.get(o.id)!)).map((o) => o.id), [keys])
+  const imageCosts = useEstimates('image', imageIds, project.aspectRatio, undefined, imageIds.length > 0)
+  const videoCosts = useEstimates('video', videoIds, project.aspectRatio, perClip, videoIds.length > 0)
+  const imageModels = useMemo(() => decorate(IMAGE_OPTIONS, imageCosts, () => '', hasKey), [imageCosts, keys])
   const videoModels = useMemo(
-    () => withCosts(VIDEO_OPTIONS, videoCosts, (id) => `${fitDuration(getVideoModel(id), perClip)} dtk`, hasKey === true),
-    [videoCosts, perClip, hasKey]
+    () => decorate(VIDEO_OPTIONS, videoCosts, (id) => `${fitDuration(getVideoModel(id), perClip)} dtk`, hasKey),
+    [videoCosts, perClip, keys]
   )
+  const anyKey = !!keys?.size
 
   return (
     <div className="flex flex-col gap-2">
       <div className="flex items-baseline gap-2">
         <span className="text-sm font-semibold">Model AI</span>
         <span className="text-[13px] text-muted">
-          {IMAGE_OPTIONS.length} model gambar dan {VIDEO_OPTIONS.length} model video dari Higgsfield
+          {IMAGE_OPTIONS.length} model gambar dan {VIDEO_OPTIONS.length} model video dari {MEDIA_PROVIDERS.length} penyedia
         </span>
       </div>
       <div className="grid grid-cols-2 gap-3">
@@ -103,18 +137,19 @@ export function ModelSection({
           <ModelPicker
             value={image.id}
             models={imageModels}
-            footerNote={hasKey ? 'kredit per gambar, perkiraan Higgsfield untuk akunmu' : undefined}
+            footerNote={anyKey ? 'harga per gambar: kredit Higgsfield, dolar untuk fal.ai dan Gemini' : undefined}
             renderIcon={(m) => <ModelLogo family={m.family} />}
+            renderGroup={(g) => LOGO_OF[g] && <ProviderLogo id={LOGO_OF[g]} size={18} />}
             detail="description"
-            tagFilters={['Rekomendasi', 'Referensi', 'GPT Image', 'Soul', 'Recraft', '4K']}
+            tagFilters={['Rekomendasi', 'Referensi', 'Murah', 'GPT Image', 'Soul', '4K']}
             menuClassName="w-[430px]"
             onChange={(id) => onChange({ imageModel: id })}
           />
           <p className="text-[12.5px] leading-snug text-ink-2">
-            <Cost value={imageCost} hasKey={hasKey}>
-              {(c) => (
+            <Cost value={imageCost} model={image} hasKey={imageKey}>
+              {(label, each) => (
                 <>
-                  ≈ {creditLabel(c)} kredit per gambar · {clipCount} gambar ≈ <b className="font-semibold text-ink">{creditLabel(c * clipCount)} kredit</b>
+                  ≈ {label} per gambar · {clipCount} gambar ≈ <b className="font-semibold text-ink">{costLabel(each, clipCount)}</b>
                 </>
               )}
             </Cost>
@@ -130,10 +165,11 @@ export function ModelSection({
           <ModelPicker
             value={video.id}
             models={videoModels}
-            footerNote={hasKey ? `kredit per video untuk klip ±${perClip} detik` : undefined}
+            footerNote={anyKey ? `harga per video untuk klip ±${perClip} detik` : undefined}
             renderIcon={(m) => <ModelLogo family={m.family} />}
+            renderGroup={(g) => LOGO_OF[g] && <ProviderLogo id={LOGO_OF[g]} size={18} />}
             detail="description"
-            tagFilters={['Rekomendasi', 'Kling', 'Seedance', 'Wan', 'Referensi', '4K']}
+            tagFilters={['Rekomendasi', 'Kling', 'Seedance', 'Wan', 'Murah', '4K']}
             align="right"
             menuClassName="w-[430px]"
             onChange={(id) => onChange({ videoModel: id })}
@@ -145,7 +181,7 @@ export function ModelSection({
                 size="sm"
                 value={resolution ?? resolutions[0]}
                 onChange={(v) => onChange({ videoResolution: v })}
-                options={resolutions.map((r) => ({ id: r, label: r.toUpperCase() === '4K' || r.toUpperCase() === '2K' ? r.toUpperCase() : r }))}
+                options={resolutions.map((r) => ({ id: r, label: /^\d+k$/i.test(r) ? r.toUpperCase() : r }))}
                 className="min-w-0 flex-1"
               />
             </div>
@@ -153,10 +189,10 @@ export function ModelSection({
             resolution && <p className="text-[12.5px] text-ink-2">Resolusi {resolution} (satu-satunya pilihan model ini)</p>
           )}
           <p className="text-[12.5px] leading-snug text-ink-2">
-            <Cost value={videoCost} hasKey={hasKey}>
-              {(c) => (
+            <Cost value={videoCost} model={video} hasKey={videoKey}>
+              {(label) => (
                 <>
-                  ≈ {creditLabel(c)} kredit per video {seconds} detik{resolution ? `, ${resolution}` : ''}
+                  ≈ {label} per video {seconds} detik{resolution ? `, ${resolution}` : ''}
                 </>
               )}
             </Cost>

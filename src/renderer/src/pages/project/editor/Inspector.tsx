@@ -10,6 +10,7 @@ import {
   replaceCaptionWords,
   resolveCaption
 } from '@shared/captions'
+import { PROVIDER_LABEL, type MediaProvider } from '@shared/media'
 import { CAMERA_PRESETS, MOTION_STRENGTHS } from '@shared/motion'
 import { geminiVoiceName } from '@shared/models'
 import { voiceSpan } from '@shared/timeline'
@@ -24,6 +25,11 @@ import { isRunning, jobFor, useProject } from '../../../store/project'
 import { UNKNOWN_AUDIO_MS, useAudition, useCaptionUi, useTimeline } from './engine'
 import { OverlayPanel } from './OverlayPanel'
 import { TransitionPanel } from './TransitionPanel'
+
+/** The provider that made an asset, by name; assets from before providers existed came from Higgsfield. */
+function providerLabel(provider: string | null): string {
+  return PROVIDER_LABEL[(provider ?? 'higgsfield') as MediaProvider] ?? 'AI'
+}
 
 /** 'transisi' has no button on the rail; it opens from the round buttons between clips on the timeline. */
 export type InspectorTab = 'klip' | 'suara' | 'caption' | 'overlay' | 'musik' | 'transisi'
@@ -89,7 +95,7 @@ function ClipTab({ clip, index }: { clip: Clip; index: number }) {
       {clip.motionType === 'video' ? (
         <Section title="Video AI">
           {video ? (
-            <p className="text-[13px] text-ink-2">Klip ini memakai video dari Higgsfield.</p>
+            <p className="text-[13px] text-ink-2">Klip ini memakai video dari {providerLabel(video.provider)}.</p>
           ) : (
             <p className="text-[13px] text-ink-2">Video belum dibuat. Sampai video siap, pratinjau memakai gambar diam.</p>
           )}

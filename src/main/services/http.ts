@@ -1,6 +1,10 @@
 /** Reads a FastAPI-style `{ detail }` error body (string, object or list) into one readable line. */
 export async function readError(res: Response): Promise<string> {
-  const text = await res.text().catch(() => '')
+  return errorDetail(await res.text().catch(() => ''), res.status)
+}
+
+/** The readable line of an error body, for callers that already read the text. */
+export function errorDetail(text: string, status: number): string {
   try {
     const body = JSON.parse(text)
     const d = body?.detail ?? body?.error ?? body
@@ -10,7 +14,7 @@ export async function readError(res: Response): Promise<string> {
   } catch {
     // not JSON
   }
-  return text.slice(0, 300) || `HTTP ${res.status}`
+  return text.slice(0, 300) || `HTTP ${status}`
 }
 
 export class ApiError extends Error {

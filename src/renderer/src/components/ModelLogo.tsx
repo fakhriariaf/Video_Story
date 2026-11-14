@@ -1,11 +1,14 @@
 import { cx } from './cx'
 
 /**
- * Brand marks for Higgsfield's model families (from LobeHub Icons, MIT; the marks belong to their owners).
+ * Brand marks for the image and video model families (from LobeHub Icons, MIT; the marks belong to their owners).
  * Families without their own mark use their maker's: Alibaba for Wan, HappyHorse and Z-Image, and
  * Higgsfield for its in-house Soul and Cinema Studio.
  */
-const FILES = import.meta.glob(['../assets/models/*.svg', '../assets/providers/higgsfield.png'], { eager: true, import: 'default' }) as Record<string, string>
+const FILES = import.meta.glob(['../assets/models/*.svg', '../assets/providers/higgsfield.png', '../assets/providers/gemini.svg'], {
+  eager: true,
+  import: 'default'
+}) as Record<string, string>
 const file = (path: string): string | undefined => FILES[`../assets/${path}`]
 
 const FAMILY_LOGO: Record<string, { src: string; bg: string; inset: number }> = {
@@ -19,6 +22,8 @@ const FAMILY_LOGO: Record<string, { src: string; bg: string; inset: number }> = 
   'Z-Image': { src: 'models/alibaba-color.svg', bg: '#FFFFFF', inset: 0.16 },
   Kling: { src: 'models/kling-color.svg', bg: '#FFFFFF', inset: 0.18 },
   Seedance: { src: 'models/bytedance-color.svg', bg: '#FFFFFF', inset: 0.18 },
+  Seedream: { src: 'models/bytedance-color.svg', bg: '#FFFFFF', inset: 0.18 },
+  Gemini: { src: 'providers/gemini.svg', bg: '#FFFFFF', inset: 0.2 },
   Wan: { src: 'models/alibaba-color.svg', bg: '#FFFFFF', inset: 0.16 },
   HappyHorse: { src: 'models/alibaba-color.svg', bg: '#FFFFFF', inset: 0.16 },
   Hailuo: { src: 'models/hailuo-color.svg', bg: '#FFFFFF', inset: 0.18 },

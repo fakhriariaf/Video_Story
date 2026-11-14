@@ -1,16 +1,21 @@
 import { useEffect, useState } from 'react'
 import type { AspectRatio, CreditEstimate } from '@shared/types'
 
-/** Higgsfield's price for one request. undefined while loading, null when it cannot be estimated (no key, offline). */
+/**
+ * The provider's price for one request. undefined while loading, null when it cannot be estimated (no key,
+ * offline). Pass enabled=false to skip asking, e.g. while the provider has no key.
+ */
 export function useEstimate(
   kind: 'image' | 'video',
   modelId: string,
   aspect: AspectRatio,
   seconds?: number,
-  resolution?: string | null
+  resolution?: string | null,
+  enabled = true
 ): CreditEstimate | null | undefined {
   const [value, setValue] = useState<CreditEstimate | null | undefined>(undefined)
   useEffect(() => {
+    if (!enabled) return setValue(null)
     let alive = true
     setValue(undefined)
     window.api.generate
@@ -20,7 +25,7 @@ export function useEstimate(
     return () => {
       alive = false
     }
-  }, [kind, modelId, aspect, seconds, resolution])
+  }, [kind, modelId, aspect, seconds, resolution, enabled])
   return value
 }
 
