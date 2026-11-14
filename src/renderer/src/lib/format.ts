@@ -38,18 +38,5 @@ export function errorText(e: unknown): string {
   return msg.replace(/^Error invoking remote method '[^']+': (Error: )?/, '')
 }
 
-/** Higgsfield credits: whole numbers from 10 up, one decimal below. */
-export function creditLabel(n: number): string {
-  return (n >= 10 ? Math.round(n) : Math.round(n * 10) / 10).toLocaleString('id-ID')
-}
-
-/** "12 kr" for Higgsfield credits, "US$0,40" for dollar-priced providers, null when unknown. */
-export function costLabel(e: { credits: number | null; usd: number | null } | null | undefined, times = 1): string | null {
-  if (e?.credits != null) return `${creditLabel(e.credits * times)} kr`
-  if (e?.usd != null) return usdLabel(e.usd * times)
-  return null
-}
-
-export function usdLabel(n: number): string {
-  return `US$${n.toLocaleString('id-ID', { minimumFractionDigits: 2, maximumFractionDigits: n < 1 ? 3 : 2 })}`
-}
+// Price labels live in shared code so the main-process-free helpers (the Idea step's slate) use the same ones.
+export { costLabel, creditLabel, usdLabel } from '@shared/price'

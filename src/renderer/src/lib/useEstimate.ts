@@ -13,20 +13,21 @@ export function useEstimate(
   resolution?: string | null,
   enabled = true
 ): CreditEstimate | null | undefined {
-  const [value, setValue] = useState<CreditEstimate | null | undefined>(undefined)
+  // The answer is kept with the inputs it belongs to, so a price for the previous model is never shown.
+  const key = `${kind}|${modelId}|${aspect}|${seconds ?? ''}|${resolution ?? ''}|${enabled}`
+  const [state, setState] = useState<{ key: string; value: CreditEstimate | null }>({ key: '', value: null })
   useEffect(() => {
-    if (!enabled) return setValue(null)
+    if (!enabled) return setState({ key, value: null })
     let alive = true
-    setValue(undefined)
     window.api.generate
       .estimate(kind, modelId, aspect, seconds, resolution)
-      .then((v) => alive && setValue(v))
-      .catch(() => alive && setValue(null))
+      .then((v) => alive && setState({ key, value: v }))
+      .catch(() => alive && setState({ key, value: null }))
     return () => {
       alive = false
     }
-  }, [kind, modelId, aspect, seconds, resolution, enabled])
-  return value
+  }, [key])
+  return state.key === key ? state.value : undefined
 }
 
 /**
