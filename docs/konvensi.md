@@ -64,6 +64,17 @@ model). Font caption ada terpisah di `captions.ts`.
 | `ModelPicker`, `ModelLogo`, `ProviderLogo` | `components/` | pemilih model AI dengan ikon dan biaya |
 | `AutoTextarea` | `components/AutoTextarea.tsx` | textarea yang tumbuh mengikuti isi dan tetap bisa diubah ukurannya |
 | `StyleMenu`, `StylePicker` | `components/` | pemilih gaya visual berupa grid thumbnail 1:1 |
+| `AppRail` | `components/AppRail.tsx` | menu sisi kiri Beranda dan Pengaturan: logo, menu, sub-menu tab Pengaturan, ringkasan Layanan AI |
+| `FilmStrip` | `components/FilmStrip.tsx` | daftar proyek sebagai pita film; 3 kolom, 4 kolom kalau pitanya cukup lebar |
+
+### Kerangka halaman
+
+- **Beranda dan Pengaturan** memakai `AppRail` (228 px) di kiri dan isi di kanan. Tab Pengaturan tampil sebagai
+  sub-menu di rail; kalau Pengaturan dibuka dari dalam proyek, baris pertama rail adalah "Kembali ke proyek".
+- **Halaman proyek** (Ide, Naskah, Storyboard, Editor) memakai bilah atas `ProjectHeader` dengan empat langkah,
+  supaya Editor mendapat lebar penuh.
+- Ringkasan Layanan AI di rail dihitung `serviceSummary` (`src/shared/services.ts`) dari setelan, status kunci,
+  akun, dan status model Whisper.
 
 ### Aturan UI (hasil masukan pemilik aplikasi)
 
