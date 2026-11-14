@@ -481,7 +481,7 @@ export function Timeline({
                   {held > 0 && (
                     <span
                       title="Videonya sudah habis di sini; frame terakhirnya ditahan"
-                      className="pointer-events-none absolute inset-y-0 right-0 bg-[repeating-linear-gradient(135deg,rgba(31,29,26,0.35)_0_4px,transparent_4px_8px)]"
+                      className="pointer-events-none absolute inset-y-0 right-0 bg-[repeating-linear-gradient(135deg,rgba(11,10,26,0.5)_0_4px,transparent_4px_8px)]"
                       style={{ width: held * pps }}
                     />
                   )}
